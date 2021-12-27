@@ -7,7 +7,9 @@ launch.json
 /server-dist
 /storage/*.key
 /storage/document
-storage/tmp/
+/storage/tmp/
+/storage/logs/backups
+/backups
 
 /vendor
 .env
@@ -23,6 +25,7 @@ storage/installed
 s.sql
 modules_statuses.json
 .babelrc
+.DS_Store
 
 # IDE helpers
 /config/ide-helper.php

@@ -1,0 +1,45 @@
+version: "3.9"
+services:
+    postgre:
+        image: postgres
+        restart: always
+        volumes:
+            - ./data/pgdb:/var/lib/postgresql/data
+        environment:
+            POSTGRES_PASSWORD: Wox9Paebei1T
+        ports:
+            - 5432:5432
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8080:8080
+    web:
+        container_name: webserver
+        image: gtfb/host
+        ports:
+            - "80:80"
+            - "443:443"
+            - "9110:9110"
+        volumes:
+            - './sites:/var/www:delegated'
+            - './config/nginx:/usr/local/openresty/nginx/sites:delegated'
+            - './certbot-etc:/etc/letsencrypt:delegated'
+            - './certbot-var:/var/lib/letsencrypt:delegated'
+            - '.env:/usr/local/env/.env'
+        tty: true
+        restart: always
+    db:
+        container_name: database
+        image: mariadb:10.5.9
+        command: --max_allowed_packet=256M
+        volumes:
+          - "./databases:/var/lib/mysql:delegated"
+        ports:
+           - "3306:3306"
+        environment:
+          MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+          MYSQL_DATABASE: ${MYSQL_DATABASE}
+          MYSQL_USER: ${MYSQL_USER}
+          MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        restart: always

@@ -191,6 +191,7 @@ return [
         NotificationChannels\Telegram\TelegramServiceProvider::class,
 
         App\Providers\RepositoryServiceProvider::class,
+        App\Providers\PluginServiceProvider::class,
         // App\Providers\AltrpProviders\AppServiceProvider::class,
         // App\Providers\AltrpRepositoryServiceProvider::class,
         // App\Providers\AltrpProviders\AppServiceProvider::class,
