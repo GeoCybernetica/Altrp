@@ -51,7 +51,7 @@ _ide_helper.php
 /out
 /app/Plugins/*/
 /app/AltrpPlugins/*/
-/Modules/*/
+/Modules
 /app/Plugins/plugins.json
 public/modules/
 /config/telebot.php

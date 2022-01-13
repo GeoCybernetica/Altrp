@@ -3,13 +3,24 @@
 
 ## Changelog
 
+### 0.20.22
+* Bug fixed for Crop Widget, Dropbar Widget, Select Input Widget & Select Tree Input Widget
+* Some Customizer Fixes
+* Some Admin Fixes
+
+### 0.20.21
+* Bug fixed
++ Add Changelog for Updates Page
+
+### 0.20.0
++ Add Categories
 
 ### 0.19.10
 + Add Menu Widget Server Side Rendering
 
 ### 0.19.9
 * Fix Carousel Widgets Synchronize
-+ Add `Single Click for Lightbox` and `<img/> Tag` Settings for Carousel Widget
++ Add `Single Click for Lightbox` and `<img/>` Tag Settings for Carousel Widget
 
 ### 0.19.8
 * Fix Dropbar with Template Issue

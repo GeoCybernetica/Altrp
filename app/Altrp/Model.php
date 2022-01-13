@@ -5,6 +5,7 @@ namespace App\Altrp;
 
 use App\Http\Requests\ApiRequest;
 use App\SQLEditor;
+use App\CategoryObject;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Support\Arr;
@@ -37,6 +38,7 @@ class Model extends EloquentModel
         'pk',
         'last_upgrade',
         'preset',
+        'guid',
     ];
 
     protected $hidden = [
@@ -51,6 +53,17 @@ class Model extends EloquentModel
     public function altrp_robots()
     {
         return $this->hasMany(Robot::class);
+    }
+
+    public function categories()
+    {
+        return $this->hasMany(CategoryObject::class, 'object_guid', 'guid');
+    }
+
+    public function categoryOptions()
+    {
+        return CategoryObject::select('altrp_categories.guid as value', 'altrp_categories.title as label')->leftJoin('altrp_categories', 'altrp_categories.guid', '=', 'altrp_category_objects.category_guid')
+            ->where('altrp_category_objects.object_guid', $this->guid)->get();
     }
 
   /**
@@ -328,15 +341,23 @@ class Model extends EloquentModel
         return $relations;
     }
 
-    public static function getBySearch($search, $orderColumn = 'title', $orderType = 'Desc')
+    public static function getBySearch($search, $orderColumn = 'title', $orderType = 'Desc', $categories=null)
     {
         $sortType = 'orderBy' . ($orderType == 'Asc' ? '' : $orderType);
-         return self::where('title','like', "%{$search}%")
-             ->orWhere('id', 'like', "%{$search}%")
-           ->$sortType($orderColumn)
-           ->get();
-
-
+         return self::select('altrp_models.*')->with('categories.category')
+            ->when($categories, function ($query, $categories) {
+                if (is_string($categories)) {
+                    $categories = explode(",", $categories);
+                    $query->leftJoin('altrp_category_objects', 'altrp_category_objects.object_guid', '=', 'altrp_models.guid')
+                          ->whereIn('altrp_category_objects.category_guid', $categories);
+                }
+            })
+            ->where(function ($query) use ($search) {
+                $query->where('altrp_models.title','like', "%{$search}%")
+                      ->orWhere('altrp_models.id', 'like', "%{$search}%");
+            })
+            ->$sortType($orderColumn)
+            ->get();
     }
 
   /**
@@ -346,20 +367,44 @@ class Model extends EloquentModel
    * @param ApiRequest $request
    * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
    */
-  public static function getBySearchWithPaginate( $search, $offset, $limit, ApiRequest $request, $orderColumn = 'id', $orderType = 'Desc')
+  public static function getBySearchWithPaginate( $search, $offset, $limit, ApiRequest $request, $orderColumn = 'altrp_models.id', $orderType = 'Desc', $categories=null)
     {
       $sortType = 'orderBy' . ($orderType == 'Asc' ? '' : $orderType);
       if( $request->has( 'preset' ) ) {
-        return self::where('title','like', "%{$search}%")
+        return self::select('altrp_models.*')->with('categories.category')
+          ->where('title','like', "%{$search}%")
           ->where( 'preset', $request->get( 'preset' ) )
-          ->orWhere('id', "%$search%")
+          // ->orWhere('id', "%$search%")
+          // ->orWhere('id', "%$category%")
+          ->where(function ($query) use ($search, $category) {
+              $query->where('id', "%$search%")
+                    ->orWhere('id', "%$category%");
+          })
+          ->when($categories, function ($query, $categories) {
+              if (is_string($categories)) {
+                  $categories = explode(",", $categories);
+                  $query->leftJoin('altrp_category_objects', 'altrp_category_objects.object_guid', '=', 'altrp_models.guid')
+                        ->whereIn('altrp_category_objects.category_guid', $categories);
+              }
+          })
           ->skip($offset)
           ->$sortType($orderColumn)
           ->take($limit);
       } else {
-        return self::where('title','like', "%{$search}%")
-          ->orWhere('id', "%$search%")
-
+        return self::select('altrp_models.*')->with('categories.category')
+          // ->where('title','like', "%{$search}%")
+          // ->orWhere('id', "%$search%")
+          ->where(function ($query) use ($search) {
+              $query->where('altrp_models.title','like', "%{$search}%")
+                    ->orWhere('altrp_models.id', "%$search%");
+          })
+          ->when($categories, function ($query, $categories) {
+              if (is_string($categories)) {
+                  $categories = explode(",", $categories);
+                  $query->leftJoin('altrp_category_objects', 'altrp_category_objects.object_guid', '=', 'altrp_models.guid')
+                        ->whereIn('altrp_category_objects.category_guid', $categories);
+              }
+          })
           ->skip($offset)
           ->$sortType($orderColumn)
           ->take($limit);
@@ -374,18 +419,32 @@ class Model extends EloquentModel
      * @param string $orderType
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-  public static function getWithPaginate( $offset, $limit , ApiRequest $request, $orderColumn = 'id', $orderType = 'Desc')
+  public static function getWithPaginate( $offset, $limit , ApiRequest $request, $orderColumn = 'id', $orderType = 'Desc', $categories=null)
     {
         $sortType = 'orderBy' . ($orderType == 'Asc' ? '' : $orderType);
       if( $request->has( 'preset' ) ) {
-        return self::where('preset', $request->get( 'preset' ) )
-
+        return self::select('altrp_models.*')->with('categories.category')
+          ->where('preset', $request->get( 'preset' ) )
+          ->when($categories, function ($query, $categories) {
+              if (is_string($categories)) {
+                  $categories = explode(",", $categories);
+                  $query->leftJoin('altrp_category_objects', 'altrp_category_objects.object_guid', '=', 'altrp_models.guid')
+                        ->whereIn('altrp_category_objects.category_guid', $categories);
+              }
+          })
           ->skip($offset)
           ->take($limit)
           ->$sortType($orderColumn);
       } else {
-
-        return self::skip($offset)
+        return self::select('altrp_models.*')->with('categories.category')
+          ->when($categories, function ($query, $categories) {
+              if (is_string($categories)) {
+                  $categories = explode(",", $categories);
+                  $query->leftJoin('altrp_category_objects', 'altrp_category_objects.object_guid', '=', 'altrp_models.guid')
+                        ->whereIn('altrp_category_objects.category_guid', $categories);
+              }
+          })
+          ->skip($offset)
           ->take($limit)
           ->$sortType($orderColumn);
       }
@@ -396,10 +455,19 @@ class Model extends EloquentModel
         return self::toBase()->count();
     }
 
-    public static function getCountWithSearch($search)
+    public static function getCountWithSearch($search, $categories=null)
     {
-      return self::where('title','like', "%{$search}%")
-        ->orWhere('id', $search)
+      return self::where(function ($query) use ($search) {
+            $query->where('altrp_models.title','like', "%{$search}%")
+            ->orWhere('altrp_models.id', $search);
+        })
+        ->when($categories, function ($query, $categories) {
+            if (is_string($categories)) {
+                $categories = explode(",", $categories);
+                $query->leftJoin('altrp_category_objects', 'altrp_category_objects.object_guid', '=', 'altrp_models.guid')
+                      ->whereIn('altrp_category_objects.category_guid', $categories);
+            }
+        })
         ->toBase()
         ->count();
     }

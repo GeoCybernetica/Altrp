@@ -75,11 +75,11 @@ class PluginController extends Controller
       } else {
         $plugin->clearMetadata();
         if( $plugin->enabled ){
-          $plugin->updatePluginStaticFiles();
+          $plugin->updatePluginSettings();
         }
       }
     }
-
+    Plugin::updateAltrpPluginLists();
     return response()->json( $res, $status, [], JSON_UNESCAPED_UNICODE );
   }
 
@@ -117,7 +117,7 @@ class PluginController extends Controller
 
       $response = $client->get( $request->get('update_url'), [
         'headers' => [
-          'altrp-domain-resource' => str_replace(['https://', 'http://'], '', Request::root()),
+          'altrp-domain-resource' => str_replace(['https://', 'http://'], '', $request->root()),
           'authorization' => request()->cookie('altrpMarketApiToken'),
         ]
       ])->getBody()->getContents();
@@ -128,7 +128,7 @@ class PluginController extends Controller
         'line' => $e->getLine(),
         'trace' => $e->getTrace(),
         ];
-      $status = $e->getCode();
+      $status = 500;
       return response()->json( $res, $status, [], JSON_UNESCAPED_UNICODE );
     }
 
@@ -154,7 +154,7 @@ class PluginController extends Controller
     }
     $archive->close();
     File::deleteDirectory( $temp_path );
-    $plugin->updatePluginStaticFiles();
+    $plugin->updatePluginSettings();
     return response()->json( $res, $status, [], JSON_UNESCAPED_UNICODE );
   }
 }

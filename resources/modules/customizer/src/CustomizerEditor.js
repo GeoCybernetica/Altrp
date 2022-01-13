@@ -25,14 +25,13 @@ import Sidebar from "./js/components/sidebar/Sidebar";
 import Switch from "./js/components/sidebar/modules/widgets/Switch";
 import Change from "./js/components/sidebar/modules/widgets/Change";
 import Start from "./js/components/sidebar/modules/widgets/Start";
-import DocumentAction from "./js/components/sidebar/modules/widgets/DocumentAction";
-import CrudAction from "./js/components/sidebar/modules/widgets/CrudAction";
-import ApiAction from "./js/components/sidebar/modules/widgets/ApiAction";
-import MessageAction from "./js/components/sidebar/modules/widgets/MessageAction";
-import Customizer from "./js/components/sidebar/modules/widgets/Customizer";
 import Return from "./js/components/sidebar/modules/widgets/Return";
 import CustomEdge from "./js/components/sidebar/modules/widgets/CustomEdge";
 import ConnectionLine from './js/components/sidebar/modules/widgets/ConnectionLine';
+import ContextMenuCustomizer from "./js/components/sidebar/modules/data/ContextMenuCustomizer";
+import {contextMenu} from "react-contexify";
+import {setCopyNode, setSelectNode} from "./js/store/copy-node/action";
+import {storage} from "./js/storage";
 
 const mapStateToProps = state => {
   return {
@@ -73,7 +72,28 @@ class CustomizerEditor extends Component {
     this.setState(s => ({ ...s, elements, customizer, btnActive: "btn_active" }));
   }
 
+  updateCustomizer = async () => {
+    const customizerId = new URL(window.location).searchParams.get("customizer_id");
+    const customizer = (await this.resource.get(customizerId)).data
+    store.dispatch(setCurrentCustomizer(customizer));
+  }
+
+  checkingLocalStorageRelevance = () => {
+    let localObj = storage.getItem('node')
+    if (localObj) {
+      let date = new Date().getTime();
+      if (date - localObj.startTime > localObj.expires) {
+        storage.deleteItem('node')
+        store.dispatch(setCopyNode(false))
+      } else {
+        store.dispatch(setCopyNode(true))
+      }
+    }
+  }
+
+
   async componentDidMount() {
+    this.checkingLocalStorageRelevance()
     store.subscribe(this.updateCustomizerState.bind(this));
 
     const customizerId = new URL(window.location).searchParams.get("customizer_id");
@@ -121,6 +141,7 @@ class CustomizerEditor extends Component {
         if(item.id == selectEdge?.id) this.setState(s => ({ ...s, selectEdge: {} }));
       })
     }
+    this.PaneClick();
     store.dispatch(setCustomizerSettingsData(newStore));
   }
 
@@ -249,7 +270,10 @@ class CustomizerEditor extends Component {
     this.setState(s => ({ ...s, reactFlowInstance }));
   }
 
-  onNodeDragStop(event, node) {
+  onNodeDragStop = (event, node) => {
+    if (node.id !== this.state.selectNode?.id) {
+      this.PaneClick();
+    }
     store.dispatch(setUpdatedNode(node));
   }
 
@@ -271,6 +295,7 @@ class CustomizerEditor extends Component {
 
     if(isNode(elementStore)) this.setState(s => ({ ...s, selectNode: elementStore, selectEdge: false }));
     if(isEdge(elementStore)) this.setState(s => ({ ...s, selectEdge: elementStore, selectNode: false }));
+    store.dispatch(setSelectNode(element.type, element.id))
     this.setState(s => ({ ...s, activePanel: "selected" }));
   }
 
@@ -326,6 +351,25 @@ class CustomizerEditor extends Component {
     });
   }
 
+  PaneClick = () => {
+    if (this.state.activePanel !== 'widgets') {
+      this.setState(state => ({ ...state, activePanel: "widgets" }));
+    }
+    store.dispatch(setSelectNode(false, false))
+  }
+
+  showMenu(e){
+    contextMenu.show({
+      event: e,
+      id: "context"
+    });
+  }
+
+  rightClick = (e, node) => {
+    this.onElementClick(e, node)
+    this.showMenu(e)
+  }
+
 
   render() {
     return (
@@ -343,13 +387,18 @@ class CustomizerEditor extends Component {
                   btnChange={ this.btnChange }
                   setSources={ this.setSources }
                    onLayout={ this.onLayout }
+                   updateCustomizer={ this.updateCustomizer }
           />
           <div className="content" ref={this.reactFlowRef }>
             <ReactFlow
               elements={ this.props.elements }
               onConnect={ this.onConnect }
               onElementsRemove={ this.onElementsRemove }
+              deleteKeyCode={'Delete'}
               onElementClick={ this.onElementClick }
+              onNodeContextMenu={this.rightClick}
+              onPaneContextMenu={(e) => this.showMenu(e)}
+              onPaneClick={(e) => this.PaneClick(e)}
               onLoad={ this.onLoad }
               onDrop={ this.onDrop }
               onNodeDragStart={ this.onNodeDragStart }
@@ -387,6 +436,13 @@ class CustomizerEditor extends Component {
                 }}
               />
             </ReactFlow>
+            <ContextMenuCustomizer
+              node={this.state.selectNode}
+              disabled={this.state.activePanel}
+              deleteNode={this.onElementsRemove}
+              reactFlowRef={this.reactFlowRef.current}
+              reactFlowInstance={this.state.reactFlowInstance}
+            />
           </div>
         </ReactFlowProvider>
       </div>

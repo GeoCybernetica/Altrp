@@ -12,6 +12,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Support\Str;
+use App\CategoryObject;
 
 
 class RobotController extends Controller
@@ -38,9 +40,39 @@ class RobotController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $robots = Robot::with('user')->get()->each(function (Robot $robot) {
-            $robot->setAttribute('author',data_get( $robot, 'user.name', ''));
-        });
+        
+        $search = $request->get('s');
+        $categories = $request->get('categories');
+        $page = $request->get('page', 1);
+        $orderColumn = $request->get('order_by') ?? 'name';
+        $orderColumn = 'altrp_robots.' . $orderColumn;
+        $limit = $request->get('pageSize', 10);
+        $offset = $limit * ($page - 1);
+        $orderType = $request->get('order') ? ucfirst(strtolower($request->get('order'))) : 'Desc';
+        $sortType = 'orderBy' . ($orderType == 'Asc' ? '' : $orderType);
+
+        $robots = Robot::select('altrp_robots.*')->with(['user', 'categories.category'])
+            ->when($categories, function ($query, $categories) {
+                if (is_string($categories)) {
+                    $categories = explode(",", $categories);
+                    $query->leftJoin('altrp_category_objects', 'altrp_category_objects.object_guid', '=', 'altrp_robots.guid')
+                          ->whereIn('altrp_category_objects.category_guid', $categories);
+                }
+            })
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('altrp_robots.name','like', '%'.$search.'%')
+                          ->orWhere('altrp_robots.id','like', '%'.$search.'%');
+                });
+            })
+            ->when(($offset == 0 || $offset > 0) && $limit, function ($query) use ($offset, $limit) {
+                $query->skip($offset)->take($limit);
+            })
+            ->$sortType($orderColumn)
+            ->get()->each(function (Robot $robot) {
+                $robot->setAttribute('author',data_get( $robot, 'user.name', ''));
+            });
+
         return \response()->json($robots);
     }
 
@@ -54,7 +86,23 @@ class RobotController extends Controller
 
         $data['user_id'] = auth()->id();
         $robot = new Robot($data);
+        $robot->guid = (string)Str::uuid();
         $result = $robot->save();
+
+        $categories = $request->get( '_categories' );
+        if( is_array($categories) && count($categories) > 0 && $robot->guid){
+          $insert = [];
+          foreach($categories as $key => $category){
+            $insert[$key] = [
+              "category_guid" => $category['value'],
+              "object_guid" => $robot->guid,
+              "object_type" => "Robot"
+            ];
+          }
+          CategoryObject::insert($insert);
+        }
+
+        //dd($insert);
 
         return \response()->json([
             'success' => $result,
@@ -68,6 +116,7 @@ class RobotController extends Controller
      */
     public function show(Robot $robot)
     {
+        $robot->categories = $robot->categoryOptions();
         return \response()->json($robot);
     }
 
@@ -107,13 +156,27 @@ class RobotController extends Controller
 
         $result = $robot->update($data);
 
+        // CategoryObject::where("object_guid", $robot->guid)->delete();
+        // $categories = $request->get( '_categories' );
+        // if( is_array($categories) && count($categories) > 0 && $robot->guid){
+        //   $insert = [];
+        //   foreach($categories as $key => $category){
+        //     $insert[$key] = [
+        //       "category_guid" => $category['value'],
+        //       "object_guid" => $robot->guid,
+        //       "object_type" => "Robot"
+        //     ];
+        //   }
+        //   CategoryObject::insert($insert);
+        // }
+
         $writer = new ScheduleFileWriter(app_path('Console/Kernel.php'));
         $command = 'robot:run ' . $robot->id;
         if ($writer->scheduleExists($command)) {
             $writer->removeSchedule($command);
         }
 
-        if ($data['start_condition'] == 'cron') {
+        if (isset($data['start_condition']) && $data['start_condition'] == 'cron') {
             $config = is_string($data['start_config'])
                 ? json_decode($data['start_config'])
                 : json_decode(json_encode($data['start_config']));
@@ -124,7 +187,7 @@ class RobotController extends Controller
             );
         }
 
-        if ($data['start_condition'] == 'telegram_bot' && $data['start_config']['bot_token'] && $data['enabled']) {
+        if (isset($data['start_condition']) && $data['start_condition'] == 'telegram_bot' && $data['start_config']['bot_token'] && $data['enabled']) {
                 $result = $this->dispatch(new RunRobotsJob(
                     [$robot],
                     $this->robotsService,
@@ -145,6 +208,7 @@ class RobotController extends Controller
     public function destroy(Robot $robot): JsonResponse
     {
         $result = $robot->delete();
+        CategoryObject::where("object_guid", $robot->guid)->delete();
 
         return \response()->json(['success' => $result], $result ? 200 : 500);
     }

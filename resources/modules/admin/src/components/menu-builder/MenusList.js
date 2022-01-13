@@ -10,18 +10,24 @@ class MenusList extends Component {
     super(props);
     this.state = {
       menus: [],
+      menusDidMount: [],
+      categoryOptions: [],
+      activeCategory: 'All',
       activeHeader: 0,
       currentPage: 1,
       menusSearch: ""
     }
     this.resource = new Resource({route: '/admin/ajax/menus'})
+    this.categoryOptions = new Resource({route: "/admin/ajax/category/options"})
     this.itemsPerPage = 3;
   }
 
   async componentDidMount() {
     try {
+      this.updateMenus()
+      let {data} = await this.categoryOptions.getAll();
       let menus = await this.resource.getAll();
-      this.setState(state => ({...state, menus}));
+      this.setState(state => ({...state, menusDidMount: menus, categoryOptions: data }));
     } catch (e) {
       console.error(e);
     }
@@ -47,6 +53,15 @@ class MenusList extends Component {
 
   searchMenus = (e) => {
     e.preventDefault();
+
+    let url = new URL(location.href);
+    if (this.state.menusSearch) {
+      url.searchParams.set('s', this.state.menusSearch);
+      this.props.history.push(`${url.pathname + url.search}`)
+    } else {
+      url.searchParams.delete('s');
+      this.props.history.push(`${url.pathname + url.search}`)
+    }
     this.updateMenus();
   }
 
@@ -72,14 +87,78 @@ class MenusList extends Component {
     }
   }
 
+  deleteMenus = async () => {
+    let menus = await this.resource.getAll();
+    this.setState(state => ({...state, menusDidMount: menus }));
+    await this.updateMenus();
+  }
+
   updateMenus = async () => {
-    let menus = await  this.resource.getQueried({ s: this.state.menusSearch });
-    this.setState(state => ({...state, menus}))
+    let url = new URL(location.href);
+    let urlCategories = url.searchParams.get('categories')
+    let urlS = url.searchParams.get('s')
+    let menus = []
+    if (urlCategories) {
+      menus = await this.resource.getQueried({
+        categories: urlCategories,
+        s: urlS === null ? this.state.menusSearch : urlS
+      });
+    } else {
+      menus = await this.resource.getQueried({
+        s: urlS === null ? this.state.menusSearch : urlS
+      });
+    }
+
+    this.setState(state => ({
+      ...state,
+      menus,
+      menusSearch: urlS === null ? this.state.menusSearch : urlS,
+      activeCategory: urlCategories === null ? 'All' : urlCategories
+    }))
+  }
+
+  getCategory = async (guid, all) => {
+    let url = new URL(location.href);
+    let urlS = url.searchParams.get('s')
+    if (guid) {
+      url.searchParams.set('categories', guid);
+      this.props.history.push(`${url.pathname + url.search}`)
+      let menus = await this.resource.getQueried({
+        categories: guid,
+        s: urlS === null ? this.state.menusSearch : urlS
+      });
+      this.setState(state => ({
+        ...state,
+        menus,
+        activeCategory: guid
+      }))
+    } else {
+      url.searchParams.delete('categories');
+      this.props.history.push(`${url.pathname + url.search}`)
+      let menus = await this.resource.getQueried({
+        s: urlS === null ? this.state.menusSearch : urlS
+      });
+      this.setState(state => ({
+        ...state,
+        menus,
+        activeCategory: all
+      }))
+    }
   }
 
   render() {
 
-    const { menus, currentPage, menusSearch } = this.state;
+    const { menus, currentPage, menusSearch, categoryOptions, menusDidMount } = this.state;
+    let menusMap = menus.map(menu => {
+      let categories = menu.categories.map(item => {
+        return item.category.title
+      })
+      categories = categories.join(', ')
+      return {
+        ...menu,
+        categories
+      }
+    })
 
     return <div className="admin-pages admin-page">
       <div className={this.state.activeHeader ? "admin-heading admin-heading-shadow" : "admin-heading"}>
@@ -88,6 +167,11 @@ class MenusList extends Component {
             <div className="admin-breadcrumbs__current">Menus</div>
           </div>
           <button className="btn" onClick={this.addNew} >Add New</button>
+          <div className="admin-filters">
+            <span className="admin-filters__current">
+              All ({ menusDidMount.length || "0" })
+            </span>
+          </div>
         </div>
         <UserTopPanel />
       </div>
@@ -97,9 +181,9 @@ class MenusList extends Component {
             {
               name: 'name',
               title: 'Name',
-              default: '(no Name)',
               url: true,
               editUrl: true,
+              default: '(no Name)',
               tag: 'Link'
             },
             {
@@ -107,21 +191,31 @@ class MenusList extends Component {
               title: 'Categories'
             }
           ]}
-
           quickActions={[
+            {
+              tag: 'Link',
+              props: { href: '/admin/menus/:id' },
+              title: 'Edit'
+            },
             {
               tag: "button",
               route: `/admin/ajax/menus/:id`,
               method: "delete",
               confirm: "Are You Sure?",
               after: () => {
-                this.updateMenus()
+                this.deleteMenus()
               },
               className: "quick-action-menu__item_danger",
               title: "Delete"
             }
           ]}
-          rows={menus.slice(
+          filterPropsCategories={{
+            DidMountArray: menusDidMount,
+            categoryOptions: categoryOptions,
+            getCategories: this.getCategory,
+            activeCategory: this.state.activeCategory
+          }}
+          rows={menusMap.slice(
             currentPage * this.itemsPerPage - this.itemsPerPage,
             currentPage * this.itemsPerPage
           )}

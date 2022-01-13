@@ -1058,9 +1058,10 @@ class AltrpAction extends AltrpModel {
    * действие - выполнение пользовательского кода
    * @return {Promise<{}>}
    */
-  doActionCustomCode() {
+  async doActionCustomCode() {
     let code = this.getProperty('code');
     try {
+      code = replaceContentWithData(code, this.getCurrentModel().getData())
       eval(code);
       return {success: true};
     } catch (error) {
@@ -1143,6 +1144,13 @@ class AltrpAction extends AltrpModel {
       };
     }
     try {
+      if(_.isFunction(element.elementRef.current[action])){
+        let result = await element.elementRef.current[action]();
+        if(_.isObject(result)){
+          return result
+        }
+        return {success:true}
+      }
       element.elementRef.current.fireAction(action);
       return {
         success: true
@@ -1213,7 +1221,7 @@ class AltrpAction extends AltrpModel {
     const compare = this.getProperty('compare');
     let conditionLeft = this.getProperty('condition_left');
     let conditionRight = this.getProperty('condition_right');
-    conditionLeft = getDataByPath(conditionLeft);
+    conditionLeft = getDataByPath(conditionLeft, null , this.getCurrentModel().getData());
     conditionRight = replaceContentWithData(conditionRight, this.getCurrentModel().getData());
     const res = altrpCompare(conditionLeft, conditionRight, compare);
     return {success: res};

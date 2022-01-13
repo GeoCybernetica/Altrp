@@ -46,6 +46,7 @@ import {
   setGlobalFonts
 } from "./js/store/altrp-global-colors/actions";
 import {setGlobalStylesPresets} from "./js/store/altrp-global-styles/actions";
+import { addWidget, filterWidgets } from "./js/store/widgets/actions";
 
 /**
  * Главный класс редактора.<br/>
@@ -267,6 +268,17 @@ class Editor extends Component {
   openNavigratonPanel() {
     this.modules.templateDataStorage.setCurrentRootElement();
     this.showNavigationPanel();
+  }
+
+  addWidget(element, component) {
+    window.appStore.dispatch(addWidget({element, component}))
+  }
+
+  /**
+   * Method accepts a function that changes the list of widgets
+   */
+  filterWidgets(fn) {
+    window.appStore.dispatch(filterWidgets(fn))
   }
 
   /**

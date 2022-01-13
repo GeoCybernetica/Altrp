@@ -1,7 +1,9 @@
 let gulp = require('gulp');
 let zip = require('gulp-zip');
 let notify = require("gulp-notify");
+let gulpCopy = require("gulp-copy");
 let path = require('path');
+let fs = require('fs');
 
 const excludes = [
   './**/*',
@@ -19,6 +21,7 @@ const excludes = [
   '!./public/favicon.ico',
   '!./out/**',
   '!./app/AltrpModels/**',
+  '!./altrpnjs/**',
   '!./public/storage/**',
   '!./database/altrp_migrations/**',
   '!./resources/modules/**',
@@ -69,6 +72,11 @@ const excludes = [
   '!./WriteChunksToFrontBlade.js',
 ];
 
+/**
+ *
+ * @param filename
+ * @returns {*}
+ */
 function altrpZip(filename = 'altrp.zip') {
   return gulp.src(excludes).pipe(zip(filename))
       .pipe(gulp.dest('../'))
@@ -79,6 +87,36 @@ function altrpZip(filename = 'altrp.zip') {
       }));
 }
 
+async  function altrpJSZip(){
+  let filename = 'altrp-js.zip'
+  await gulp.src([
+    './public/**/*',
+    '!./public/storage/**',
+    '!./public/altrp-plugins/**',
+    '!./public/.htaccess',
+    '!./public/*.php',
+    '!./public/web.config',
+    '!./public/mix-manifest.json',
+  ]).pipe(gulpCopy('./altrpnjs/build/', {}))
+    .pipe(gulp.dest('./'))
+  return gulp.src([
+    './altrpnjs/build/**/*'
+  ]).pipe(zip(filename))
+    .pipe(gulp.dest('../'))
+    .pipe(notify({
+      message:'Архив готов',
+      sound: true,
+      title: 'Altrp JS'
+    }))
+}
+async function  clearJSBuild(){
+  const _p = __dirname + `${path.sep}altrpnjs${path.sep}build`
+  if(fs.existsSync(_p)){
+    return fs.unlinkSync(_p)
+  }
+  return 0
+}
 exports.pack = ()=>{return altrpZip()};
+exports.packJS = ()=>{return altrpJSZip()};
 exports.packTest = ()=>{return altrpZip('altrp-test.zip')};
-
+// exports.clearJSBuild = clearJSBuild
