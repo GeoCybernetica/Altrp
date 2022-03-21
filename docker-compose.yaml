@@ -33,7 +33,7 @@ services:
             - 9110:9110
         volumes:
             - './:/var/www/zayavka.geobuilder.ru'
-            - './config/nginx:/usr/local/openresty/nginx/sites'
+            - './config/nginx/zayavka.geobuilder.local:/usr/local/openresty/nginx/sites/zayavka.geobuilder.local'
             - './certbot-etc:/etc/letsencrypt'
             - './certbot-var:/var/lib/letsencrypt'
         tty: true
