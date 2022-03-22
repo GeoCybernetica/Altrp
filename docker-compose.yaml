@@ -1,6 +1,6 @@
 version: "3.0"
 services:
-    postgre:
+    gtfb_postgres:
         # ### TODO: make an image
         # cd ~
         # apt-get update
@@ -9,7 +9,7 @@ services:
         # cd tds_fdw
         # make USE_PGXS=1 install
         container_name: gtfb_postgres
-        image: postgres:13.4-buster
+        image: postgres
         restart: always
         volumes:
             - ./data/pgdb:/var/lib/postgresql/data
@@ -19,13 +19,14 @@ services:
             POSTGRES_DB: zayavka
         ports:
             - 5432:5432
-    adminer:
+    gtfb_adminer:
+        container_name: gtfb_adminer
         image: adminer
         restart: always
         ports:
-            - 8088:8080
-    web:
-        container_name: gtfb_webserver
+            - 8080:8080
+    gtfb_web:
+        container_name: gtfb_web
         image: gtfb/host
         ports:
             - 8888:80
@@ -34,7 +35,6 @@ services:
         volumes:
             - './:/var/www/zayavka.geobuilder.ru'
             - './config/nginx:/usr/local/openresty/nginx/sites'
-            - './certbot-etc:/etc/letsencrypt'
-            - './certbot-var:/var/lib/letsencrypt'
+            - '.env:/usr/local/env/.env'
         tty: true
         restart: always
