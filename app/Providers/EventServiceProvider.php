@@ -22,7 +22,7 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Users\UpdateLastLoggedInAt',
         ],
         \SocialiteProviders\Manager\SocialiteWasCalled::class => [
-            'App\Providers\SocialiteGeobuilder\GeobuilderExtendSocialite@handle'
+            'App\Providers\SocialiteProviders\Geobuilder\GeobuilderExtendSocialite@handle'
         ],
     ];
 
