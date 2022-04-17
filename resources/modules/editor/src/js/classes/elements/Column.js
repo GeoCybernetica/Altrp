@@ -10,7 +10,7 @@ import {
   TAB_STYLE,
   TAB_CONTENT,
   CONTROLLER_GRADIENT,
-  CONTROLLER_MEDIA
+  CONTROLLER_MEDIA, CONTROLLER_TEXT
 } from "../modules/ControllersManager";
 import { advancedTabControllers } from "../../decorators/register-controllers";
 
@@ -282,6 +282,7 @@ class Column extends BaseElement {
 
     this.addControl('background_image', {
       type: CONTROLLER_MEDIA,
+      locked: true,
       label: 'Background Image',
       default: { url: "" },
     });
@@ -454,6 +455,16 @@ class Column extends BaseElement {
       label: "Z-index",
     });
 
+    this.addControl("position_style_css_id_column", {
+      type: CONTROLLER_TEXT,
+      label: "CSS ID"
+    });
+
+    this.addControl("position_style_css_classes_column", {
+      type: CONTROLLER_TEXT,
+      label: "CSS Classes"
+    });
+
     this.endControlSection();
 
     this.startControlSection("column_style_border", {
@@ -512,18 +523,13 @@ class Column extends BaseElement {
     });
 
     this.addControl("column_style_border_radius", {
-      type: CONTROLLER_SLIDER,
+      type: CONTROLLER_DIMENSIONS,
       label: 'Border radius',
-      default: {
-        unit: 'px',
-      },
-      units: [
+      units:[
         'px',
         '%',
         'vh',
       ],
-      max: 100,
-      min: 0,
     });
 
     this.addControl('column_style_box_shadow', {

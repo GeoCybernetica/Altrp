@@ -36,6 +36,9 @@ class Table extends BaseElement {
   static getType() {
     return "widget";
   }
+  static getGroup() {
+    return "Advanced";
+  }
   _registerControls() {
     if (this.controllersRegistered) {
       return;
@@ -60,6 +63,7 @@ class Table extends BaseElement {
         },
       ],
       default: 'datasource',
+      locked: true,
     });
 
     this.addControl("posts_datasource", {
@@ -68,6 +72,7 @@ class Table extends BaseElement {
       conditions: {
         'choose_datasource': 'datasource',
       },
+      locked: true,
     });
 
     this.addControl("posts_query_heading", {
@@ -122,7 +127,7 @@ class Table extends BaseElement {
         },
       ],
       default: 3,
-
+      locked: true,
     });
 
     this.addControl("posts_card_template", {
@@ -136,6 +141,7 @@ class Table extends BaseElement {
         textTemplate: 'Go to Template',
       },
       nullable: true,
+      locked: true,
     });
 
     this.addControl("posts_card_hover_template", {
@@ -149,6 +155,7 @@ class Table extends BaseElement {
         textTemplate: 'Go to Template',
       },
       nullable: true,
+      locked: true,
     });
 
     this.addControl("posts_transition_type", {
@@ -181,6 +188,7 @@ class Table extends BaseElement {
         }
       ],
       default: 'left',
+      locked: true,
     });
 
 
@@ -198,7 +206,8 @@ class Table extends BaseElement {
         unit: 'px',
       },
       max: 120,
-      min: 0
+      min: 0,
+      locked: true,
     });
 
 
@@ -220,6 +229,7 @@ class Table extends BaseElement {
         }
       ],
       default: 'prev_next',
+      locked: true,
     });
 
     this.endControlSection();
@@ -271,6 +281,7 @@ class Table extends BaseElement {
     this.addControl('prev_text', {
       label: 'Prev Text',
       default: 'Prev Page',
+      locked: true,
     });
 
     this.addControl('prev_icon', {
@@ -305,6 +316,7 @@ class Table extends BaseElement {
     this.addControl('next_text', {
       label: 'Next Text',
       default: 'Next Page',
+      locked: true,
     });
 
     this.addControl('next_icon', {
@@ -390,11 +402,13 @@ class Table extends BaseElement {
 
     this.addControl("posts_columns_gap", {
       label: 'Columns Gap',
+      locked: true,
     });
 
     this.addControl("posts_rows_gap", {
       label: 'Rows Gap',
       max: 100,
+      locked: true,
     });
 
     this.endControlSection();

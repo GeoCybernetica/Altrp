@@ -11,6 +11,7 @@ const CLICK_EXCLUDE_TAG_NAMES = [
 ];
 
 const ACTIONS_CACHE = (window.altrp.ACTIONS_CACHE = window.altrp.ACTIONS_CACHE || {})
+
 /**
  *
  * @param {PointerEvent} e
@@ -20,6 +21,7 @@ export default function clickActions(e){
   if(CLICK_EXCLUDE_TAG_NAMES.indexOf(e.target.tagName.toLowerCase()) >=0){
     return
   }
+
   let {actions, element} =
     getActionsElement(e.target,
       'data-altrp-wrapper-click-actions',

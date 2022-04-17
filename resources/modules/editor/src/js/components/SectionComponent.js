@@ -25,10 +25,31 @@ const { isEditor, redirect } = window.altrpHelpers;
 
   .altrp-section {
     position: relative;
+    overflow: hidden;
     top: auto;
     right: auto;
     left: auto;
     bottom: auto;
+  }
+
+  .background_section {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .section-video {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
   }
 
   .altrp-section_section-boxed.altrp-section_section-boxed {
@@ -65,7 +86,7 @@ class SectionComponent extends Component {
     if (isEditor()) {
       return;
     }
-    const sectionLink = this.props.element.getSettings("link_link");
+    const sectionLink = this.props.element.getLockedSettings("link_link");
     redirect(sectionLink, e, this.props.element.getCurrentModel().getData());
   };
 
@@ -84,17 +105,17 @@ class SectionComponent extends Component {
     let styles = {
       maxWidth: "100%"
     };
-    const background_image = this.props.element.getSettings(
+    const background_image = this.props.element.getLockedSettings(
       "background_image",
       {}
     );
-    const background_image_hover = this.props.element.getResponsiveSetting(
+    const background_image_hover = this.props.element.getResponsiveLockedSetting(
       "background_image",
       ":hover",
       {},
     );
-    const {  isFixed } = this.props.element.getSettings();
-    const widthType = this.props.element.getSettings()
+    const {  isFixed } = this.props.element.getLockedSettings();
+    const widthType = this.props.element.getLockedSettings()
       .layout_content_width_type;
 
 
@@ -102,11 +123,14 @@ class SectionComponent extends Component {
       "altrp-section",
       `altrp-section_columns-${this.props.element.getColumnsCount()}`
     ];
+    let sectionBackground = [
+      'background_section',
+    ]
     if (this.sectionIsLink()) {
       sectionClasses.push("altrp-pointer");
     }
     if (background_image.url || background_image_hover /*  && !isScrollEffect */) {
-      sectionClasses.push("altrp-background-image");
+      sectionBackground.push("altrp-background-image" + this.props.element.getId());
     }
 
     if (widthType === "boxed" && !isFixed) {
@@ -134,12 +158,26 @@ class SectionComponent extends Component {
       />
     ));
 
-    const fitToContent = this.props.element.getResponsiveSetting("layout_height", "", "default")
+    const fitToContent = this.props.element.getResponsiveLockedSetting("layout_height", "", "default")
     if (fitToContent === "fit") {
       sectionClasses.push("section-fit-to-content");
     }
     const layout_html_tag =
-      this.props.element.getSettings("layout_html_tag") || "div";
+      this.props.element.getLockedSettings("layout_html_tag") || "div";
+
+    const position_style_css_classes = this.props.element.getLockedSettings("position_style_css_classes") || "";
+    const position_style_css_id = this.props.element.getLockedSettings("position_style_css_id") || "";
+    const background_video_poster = this.props.element.getResponsiveLockedSetting("url_video-poster") || "";
+    const background_video_url = this.props.element.getResponsiveLockedSetting("url_video") || "";
+    const background_video_url_webm = this.props.element.getResponsiveLockedSetting("url_video-webm") || "";
+    const background__section = background_video_url || background_video_url_webm ? (
+      <video preload='metadata' poster={background_video_poster} muted loop autoPlay playsInline className="section-video section-video-controllers">
+        <source src={background_video_url_webm || 'none'} type="video/webm" className="section-video-source" />
+        <source src={background_video_url || 'none'} type="video/mp4" className="section-video-source" />
+      </video>
+    ) : (
+      <span className={sectionBackground.join(" ")} />
+    )
 
 
     return React.createElement(
@@ -150,12 +188,13 @@ class SectionComponent extends Component {
           sectionClasses.join(" ") +
           " " +
           (this.isActive() ? 'active ' : '') +
-          this.state.settings.position_style_css_classes,
-        id: "",
+          position_style_css_classes,
+        id: position_style_css_id,
         onClick: this.onClick,
         columns: this.props.element.children || [],
         settings: this.props.element.getSettings()
       },
+      background__section,
      sectionWrapper
     );
 

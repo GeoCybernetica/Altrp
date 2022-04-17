@@ -16,13 +16,14 @@ class Templates extends Component {
     super(props);
     this.state = {
       templates: [],
-      templatesDidMount: [],
       activeHeader: 0,
       allTemplates: [],
       templateAreas: [],
+      templateAreasModal: [],
       activeTemplateArea: {},
       pageCount: 1,
       currentPage: 1,
+      count: 1,
       templateSearch: '',
       sorting: {},
       categoryOptions: [],
@@ -77,7 +78,6 @@ class Templates extends Component {
    */
   setActiveArea(activeTemplateArea) {
     this.updateTemplates(1, activeTemplateArea);
-    this.DidMountTemplates(activeTemplateArea)
     this.setState(state => {
       return {...state, activeTemplateArea};
     })
@@ -97,11 +97,14 @@ class Templates extends Component {
         this.resource.getQueried({
           categories: urlCategories,
           s: urlS === null ? this.state.templateSearch : urlS,
-          ...this.state.sorting
+          ...this.state.sorting,
+          page: this.state.currentPage,
+          pageSize: this.itemsPerPage,
         }).then(res => {
           this.setState(state => {
             return {
               ...state,
+              count: res.count,
               pageCount: res.pageCount,
               templates: res.templates,
               activeCategory: urlCategories,
@@ -114,15 +117,18 @@ class Templates extends Component {
           area: activeTemplateArea.name,
           categories: urlCategories,
           s: urlS === null ? this.state.templateSearch : urlS,
-          ...this.state.sorting
+          ...this.state.sorting,
+          page: this.state.currentPage,
+          pageSize: this.itemsPerPage,
         }).then(res => {
           this.setState(state => {
             return {
               ...state,
+              count: res.count,
               pageCount: res.pageCount,
               templates: res.templates,
               activeCategory: urlCategories,
-              templateSearch: urlS === null ? this.state.templateSearch : urlS
+              templateSearch: urlS === null ? this.state.templateSearch : urlS,
             }
           });
         });
@@ -131,11 +137,14 @@ class Templates extends Component {
       if (activeTemplateArea.name === "all") {
         this.resource.getQueried({
           s: urlS === null ? this.state.templateSearch : urlS,
-          ...this.state.sorting
+          ...this.state.sorting,
+          page: this.state.currentPage,
+          pageSize: this.itemsPerPage,
         }).then(res => {
           this.setState(state => {
             return {
               ...state,
+              count: res.count,
               pageCount: res.pageCount,
               templates: res.templates,
               templateSearch: urlS === null ? this.state.templateSearch : urlS
@@ -146,11 +155,14 @@ class Templates extends Component {
         this.resource.getQueried({
           area: activeTemplateArea.name,
           s: urlS === null ? this.state.templateSearch : urlS,
-          ...this.state.sorting
+          ...this.state.sorting,
+          page: this.state.currentPage,
+          pageSize: this.itemsPerPage,
         }).then(res => {
           this.setState(state => {
             return {
               ...state,
+              count: res.count,
               pageCount: res.pageCount,
               templates: res.templates,
               templateSearch: urlS === null ? this.state.templateSearch : urlS
@@ -161,29 +173,6 @@ class Templates extends Component {
     }
   }
 
-  DidMountTemplates = async (activeTemplateArea = this.state.activeTemplateArea) => {
-    if (activeTemplateArea.name === 'all') {
-      let { templates } = await this.resource.getQueried({
-        s: this.state.templateSearch,
-        ...this.state.sorting
-      })
-      this.setState(state => ({
-        ...state,
-        templatesDidMount: templates
-      }))
-    } else {
-      let { templates } = await this.resource.getQueried({
-        area: activeTemplateArea.name,
-
-        s: this.state.templateSearch,
-        ...this.state.sorting
-      })
-      this.setState(state => ({
-        ...state,
-        templatesDidMount: templates
-      }))
-    }
-  }
 
   /** @function generateTemplateJSON
    * Генерируем контент файла template в формате JSON
@@ -246,10 +235,8 @@ class Templates extends Component {
     }
 
     this.setState(state => {
-      return {...state, templateAreas: templateAreasNew}
+      return {...state, templateAreas: templateAreasNew, templateAreasModal: templateAreas}
     });
-    this.updateTemplates(this.state.currentPage, this.state.activeTemplateArea)
-    await this.DidMountTemplates(this.state.activeTemplateArea)
     const { data } = await this.categoryOptions.getAll();
     this.setState(state => ({
       ...state,
@@ -257,10 +244,10 @@ class Templates extends Component {
     }))
 
     window.addEventListener("scroll", this.listenScrollHeader)
+  }
 
-    return () => {
-      window.removeEventListener("scroll", this.listenScrollHeader)
-    }
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.listenScrollHeader)
   }
 
   listenScrollHeader = () => {
@@ -470,7 +457,7 @@ class Templates extends Component {
   }
 
   render() {
-    const {templateSearch, categoryOptions, templatesDidMount, sorting, templates} = this.state
+    const {templateSearch, categoryOptions, sorting, templates, count, pageCount, currentPage} = this.state
 
     let templatesMap = templates.map(template => {
       let categories = template.categories.map(item => {
@@ -543,15 +530,12 @@ class Templates extends Component {
             }
           ]}
           filterPropsCategories={{
-            DidMountArray: templatesDidMount,
+            DidMountArray: templates,
             categoryOptions: categoryOptions,
             getCategories: this.getCategory,
             activeCategory: this.state.activeCategory
           }}
-          rows={templatesMap.slice(
-            this.state.currentPage * this.itemsPerPage - this.itemsPerPage,
-            this.state.currentPage * this.itemsPerPage
-          )}
+          rows={templatesMap}
           quickActions={[{
             tag: 'a', props: {
               href: '/admin/editor?template_id=:id',
@@ -576,7 +560,9 @@ class Templates extends Component {
             route: '/admin/ajax/templates/:id',
             method: 'delete',
             confirm: 'Are You Sure?',
-            after: () => this.updateTemplates(this.state.currentPage, this.state.activeTemplateArea),
+            after: () => {
+              this.updateTemplates(this.state.currentPage, this.state.activeTemplateArea)
+            },
             className: 'quick-action-menu__item_danger',
             title: 'Delete'
           }]}
@@ -589,21 +575,21 @@ class Templates extends Component {
             change: (e) => this.changeTemplates(e)
           }}
 
-          pageCount={Math.ceil(templates.length / this.itemsPerPage) || 1}
-          currentPage={this.state.currentPage}
-          changePage={page => {
+          pageCount={pageCount || 1}
+          currentPage={currentPage}
+          changePage={async (page) => {
             if (this.state.currentPage !== page) {
-              this.setState({currentPage: page});
+              await this.setState({currentPage: page})
+              await this.updateTemplates(page, this.state.activeTemplateArea)
             }
           }}
-          itemsCount={templates.length}
-
+          itemsCount={count || 1}
           openPagination={true}
         />
       </div>
       {this.state.modal && (
         <SmallModal toggleModal={this.toggleModal} activeMode={this.state.modal}>
-          <TemplateChildrenModal toggleModal={this.toggleModal} categoryOptions={this.state.categoryOptions} templateAreas={this.state.templateAreas} />
+          <TemplateChildrenModal toggleModal={this.toggleModal} categoryOptions={this.state.categoryOptions} templateAreas={this.state.templateAreasModal} />
         </SmallModal>
       )}
     </div>;

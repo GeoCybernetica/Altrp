@@ -42,6 +42,9 @@ class Button extends BaseElement {
   static getType() {
     return 'widget';
   }
+  static getGroup() {
+    return "Basic";
+  }
   _registerControls() {
     if (this.controllersRegistered) {
       return
@@ -55,7 +58,8 @@ class Button extends BaseElement {
     this.addControl('button_text', {
       type: CONTROLLER_TEXTAREA,
       label: 'Button Text',
-      default: 'Click Me'
+      default: 'Click Me',
+      locked: true,
     });
 
     this.addControl('button_alignment', {
@@ -103,21 +107,25 @@ class Button extends BaseElement {
     this.addControl('button_icon_right', {
       type: CONTROLLER_MEDIA,
       label: 'Right Icon',
+      locked: true,
     });
 
     this.addControl('button_icon_left', {
       type: CONTROLLER_MEDIA,
       label: 'Left Icon',
+      locked: true,
     });
 
     this.addControl('button_icon_top', {
       type: CONTROLLER_MEDIA,
       label: 'Top Icon',
+      locked: true,
     });
 
     this.addControl('button_icon_bottom', {
       type: CONTROLLER_MEDIA,
       label: 'Bottom Icon',
+      locked: true,
     });
 
     // this.addControl('button_icon_position', {
@@ -159,6 +167,7 @@ class Button extends BaseElement {
         tag: 'Link'
       },
       label: 'Link',
+      locked: true,
     });
 
     this.endControlSection();
@@ -169,7 +178,7 @@ class Button extends BaseElement {
 
     this.startControlSection('position_section', {
       tab: TAB_STYLE,
-      label: 'Position',
+      label: 'Position (content)',
     });
 
     this.addControl('position_padding', {
@@ -186,11 +195,38 @@ class Button extends BaseElement {
       ],
     });
 
+    this.addControl('position_margin', {
+      type: CONTROLLER_DIMENSIONS,
+      label: 'Margin',
+      default: {
+        unit: 'px',
+        bind: true
+      },
+      units: [
+        'px',
+        '%',
+        'vh',
+      ],
+    });
+
     this.addControl('position_z_index', {
       hideOnEmail: true,
       type: CONTROLLER_NUMBER,
       label: 'Z-index',
     });
+
+    this.addControl("position_css_id", {
+      type: CONTROLLER_TEXT,
+      label: "CSS ID",
+      locked: true,
+    });
+
+    this.addControl("position_css_classes", {
+      type: CONTROLLER_TEXT,
+      label: "CSS Classes",
+      locked: true,
+    });
+
 
     this.addControl('position_opacity', {
       type: CONTROLLER_SLIDER,
@@ -225,8 +261,8 @@ class Button extends BaseElement {
         firstColor: "rgba(97,206,112,1)",
         firstPoint: '0',
         secondColor: "rgba(242,41,91,1)",
-        secondPoint: "100",
-        angle: "0",
+        secondPoint: "90",
+        angle: "260",
         value: ""
       },
     });
@@ -235,6 +271,7 @@ class Button extends BaseElement {
       type: CONTROLLER_MEDIA,
       label: 'Background Image',
       default: { url: "" },
+      locked: true,
     });
 
     this.addControl('background_position', {
@@ -330,21 +367,6 @@ class Button extends BaseElement {
       label: 'Background Repeat',
     });
 
-    this.addControl("background_image_width", {
-      type: CONTROLLER_SLIDER,
-      label: 'Width',
-      conditions: {
-        'background_size': [''],
-      },
-      units: [
-        'px',
-        '%',
-        'vw',
-      ],
-      max: 1000,
-      min: 0,
-    });
-
     this.addControl('background_size', {
       type: CONTROLLER_SELECT,
       options: [
@@ -366,6 +388,22 @@ class Button extends BaseElement {
         },
       ],
       label: 'Background Size',
+      default: 'unset',
+    });
+
+    this.addControl("background_image_width", {
+      type: CONTROLLER_SLIDER,
+      label: 'Width',
+      conditions: {
+        'background_size': [''],
+      },
+      units: [
+        'px',
+        '%',
+        'vw',
+      ],
+      max: 1000,
+      min: 0,
     });
 
     this.endControlSection();
@@ -443,7 +481,7 @@ class Button extends BaseElement {
 
     this.addControl('style_background_shadow', {
       type: CONTROLLER_SHADOW,
-      label: 'Shadow',
+      label: 'Box Shadow',
     });
 
 
@@ -498,7 +536,6 @@ class Button extends BaseElement {
         '%',
         'vh',
       ],
-      stateless: true,
     });
 
     this.addControl('icon_padding_left', {
@@ -513,7 +550,6 @@ class Button extends BaseElement {
         '%',
         'vh',
       ],
-      stateless: true,
     });
 
     this.addControl('icon_padding_top', {
@@ -528,7 +564,6 @@ class Button extends BaseElement {
         '%',
         'vh',
       ],
-      stateless: true,
     });
 
     this.addControl('icon_padding_bottom', {
@@ -543,7 +578,62 @@ class Button extends BaseElement {
         '%',
         'vh',
       ],
-      stateless: true,
+    });
+
+    this.addControl('icon_margin_right', {
+      type: CONTROLLER_DIMENSIONS,
+      label: 'Margin for icon right',
+      default: {
+        unit: 'px',
+        bind: true
+      },
+      units: [
+        'px',
+        '%',
+        'vh',
+      ],
+    });
+
+    this.addControl('icon_margin_left', {
+      type: CONTROLLER_DIMENSIONS,
+      label: 'Margin for icon left',
+      default: {
+        unit: 'px',
+        bind: true
+      },
+      units: [
+        'px',
+        '%',
+        'vh',
+      ],
+    });
+
+    this.addControl('icon_margin_top', {
+      type: CONTROLLER_DIMENSIONS,
+      label: 'Margin for icon top',
+      default: {
+        unit: 'px',
+        bind: true
+      },
+      units: [
+        'px',
+        '%',
+        'vh',
+      ],
+    });
+
+    this.addControl('icon_margin_bottom', {
+      type: CONTROLLER_DIMENSIONS,
+      label: 'Margin for icon bottom',
+      default: {
+        unit: 'px',
+        bind: true
+      },
+      units: [
+        'px',
+        '%',
+        'vh',
+      ],
     });
 
     this.addControl('icon_color', {
@@ -572,7 +662,6 @@ class Button extends BaseElement {
       ],
       max: 100,
       min: 0,
-      stateless: true,
     });
 
     this.addControl('icon_size_left', {
@@ -585,7 +674,6 @@ class Button extends BaseElement {
       ],
       max: 100,
       min: 0,
-      stateless: true,
     });
 
     this.addControl('icon_size_top', {
@@ -598,7 +686,6 @@ class Button extends BaseElement {
       ],
       max: 100,
       min: 0,
-      stateless: true,
     });
 
     this.addControl('icon_size_bottom', {
@@ -611,7 +698,6 @@ class Button extends BaseElement {
       ],
       max: 100,
       min: 0,
-      stateless: true,
     });
 
     this.endControlSection();
@@ -686,29 +772,29 @@ class Button extends BaseElement {
 
     this.endControlSection();
 
-    this.startControlSection('button_advanced_tooltip', {
-      tab: TAB_ADVANCED,
-      label: 'Tooltip'
-    });
-
-    this.addControl('button_advanced_tooltip_font', {
-      type: CONTROLLER_SELECT2,
-      label: 'Font',
-      placeholder: 'Lato',
-      default: '"Lato"',
-      options: [
-        {
-          value: '"Roboto"',
-          label: 'Roboto'
-        },
-        {
-          value: '"Lato"',
-          label: 'Lato'
-        },
-      ],
-    });
-
-    this.endControlSection();
+    // this.startControlSection('button_advanced_tooltip', {
+    //   tab: TAB_ADVANCED,
+    //   label: 'Tooltip'
+    // });
+    //
+    // this.addControl('button_advanced_tooltip_font', {
+    //   type: CONTROLLER_SELECT2,
+    //   label: 'Font',
+    //   placeholder: 'Lato',
+    //   default: '"Lato"',
+    //   options: [
+    //     {
+    //       value: '"Roboto"',
+    //       label: 'Roboto'
+    //     },
+    //     {
+    //       value: '"Lato"',
+    //       label: 'Lato'
+    //     },
+    //   ],
+    // });
+    //
+    // this.endControlSection();
 
     advancedTabControllers(this);
   }

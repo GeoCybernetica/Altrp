@@ -3,6 +3,56 @@
 
 ## Changelog
 
+### 1.0.5
+* Fix Sidebars Actions
+* Fix Users Update
+* Fix Encrypted Settings Issue
+
+### 1.0.4
+* Add Nodes to Visual Codes:
+  - Document
+  - CRUD
+  - API
+  - Message
+  - Customizer
+* Fix Bulk
+* Fix Some Widgets Render
+
+### 1.0.3
+* Fix Page Roles
+* Fix Dynamic Variables in SQL-Editor
+* Fix Controller Generate Issues
+
+### 1.0.2
+* Fix Section Width
+* Add Import/Export Visual Codes
+* Delete `altrp_ajax` from Request Body
+* Add Function to Send Emails
+
+### 1.0.1
+* Fix Elements Conditions Display
+* Fix HTML in JSON-data for Templates
+* Add Styles for Custom Areas
+* Show Section Background on Front-end
+* Fix Login Action for Elements
+
+### 1.0.0
+* Release version
+
+### 0.20.25
+* Some Fixes for Section 
++ Add Video Background for Sections
+* Add Elements Navigator in Editor
+* Fix widgets Tabs Switcher, Divider, Content, Heading
+
+### 0.20.24
++ Add Widget Groups
+* Fix Visual Codes Pagination Issue
+* Restyle Template Condition Popup 
+
+### 0.20.23
++ Add Tournament Widget
+
 ### 0.20.22
 * Bug fixed for Crop Widget, Dropbar Widget, Select Input Widget & Select Tree Input Widget
 * Some Customizer Fixes

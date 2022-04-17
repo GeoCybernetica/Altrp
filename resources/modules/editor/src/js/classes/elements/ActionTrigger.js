@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import WidgetIcon from "../../../svgs/accordion.svg";
+import WidgetIcon from "../../../svgs/trigger.svg";
 import {
   CONTROLLER_TEXTAREA,
   CONTROLLER_COLOR,
@@ -33,6 +33,10 @@ class Accordion extends BaseElement {
     return "widget";
   }
 
+  static getGroup() {
+    return "Advanced";
+  }
+
   _registerControls() {
     if (this.controllersRegistered) {
       return;
@@ -55,6 +59,7 @@ class Accordion extends BaseElement {
           value: 'timeout'
         },
       ],
+      locked: true,
     })
 
     this.addControl('timeout', {
@@ -62,8 +67,8 @@ class Accordion extends BaseElement {
       label: 'Timeout (ms)',
       conditions: {
         type: ['interval', 'timeout']
-      }
-      ,
+      },
+      locked: true,
     })
     this.addControl('interval', {
       type: CONTROLLER_NUMBER,
@@ -71,6 +76,7 @@ class Accordion extends BaseElement {
       conditions: {
         type: 'interval'
       },
+      locked: true,
     })
 
     actionsControllers(this, 'Actions', 'trigger_',);

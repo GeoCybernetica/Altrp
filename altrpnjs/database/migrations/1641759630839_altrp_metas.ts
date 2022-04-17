@@ -9,16 +9,14 @@ export default class AltrpMetas extends BaseSchema {
       return
     }
     this.schema.createTable(this.tableName, (table) => {
-      table.bigIncrements('id')
       table.string('meta_name').unique()
       table.text('meta_value', 'longtext')
-
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
-      table.timestamp('deleted_at', { useTz: true })
+      table.timestamp('deleted_at', { useTz: true }).nullable()
     })
   }
 

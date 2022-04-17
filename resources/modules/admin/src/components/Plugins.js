@@ -15,20 +15,27 @@ export default class Plugins extends Component {
     };
   }
 
-  async componentWillMount() {
+  async componentDidMount() {
     const req = await axios.get("/admin/ajax/plugins");
-    this.setState({
-      plugins: req.data
-    });
-
-    window.addEventListener("scroll", this.listenScrollHeader)
-    return () => {
-      window.removeEventListener("scroll", this.listenScrollHeader)
+    let plugins = req.data
+    if(! _.isArray(plugins)){
+      plugins = []
     }
+    this.setState({
+      plugins
+    });
+    window.addEventListener("scroll", this.listenScrollHeader)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.listenScrollHeader)
   }
 
   updatePlugins = async ()=>{
-    const plugins = await ( new Resource({route:'/admin/ajax/plugins'})).getAll()
+    let plugins = await ( new Resource({route:'/admin/ajax/plugins'})).getAll()
+    if(! _.isArray(plugins)){
+      plugins = []
+    }
     this.setState({
       plugins
     });
@@ -82,7 +89,7 @@ export default class Plugins extends Component {
         </div>
         <div className="admin-content">
           <div className="row">
-            {this.state.plugins.map((item, key) => {
+            {this.state?.plugins?.map((item, key) => {
               return (
                 <PluginItem _key={key}
                             updatePlugins={this.updatePlugins}

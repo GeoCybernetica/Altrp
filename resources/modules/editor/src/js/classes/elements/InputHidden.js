@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import FromIcon from "../../../svgs/form-horizontal.svg";
+import FromIcon from "../../../svgs/hidden.svg";
 import { advancedTabControllers } from "../../decorators/register-controllers";
 import {
   CONTROLLER_TEXTAREA,
@@ -25,13 +25,16 @@ class InputHidden extends BaseElement {
     return "input-hidden";
   }
   static getTitle() {
-    return "Input Hidden";
+    return "Hidden";
   }
   static getIconComponent() {
     return FromIcon;
   }
   static getType() {
     return "widget";
+  }
+  static getGroup() {
+    return "Form";
   }
   _registerControls() {
     if (this.controllersRegistered) {
@@ -139,14 +142,15 @@ class InputHidden extends BaseElement {
 
     this.addControl("content_default_value", {
       type: CONTROLLER_TEXTAREA,
-      label: "Default Value"
+      label: "Default Value",
+      locked: true,
     });
 
     this.addControl("content_calculation", {
       type: CONTROLLER_TEXTAREA,
       label: "Calculation",
-      description:
-        "E.g {{altrpforms.form_id.field_id}}*{{altrpforms.form_id.field_id_2}}+10"
+      description: "E.g {{altrpforms.form_id.field_id}}*{{altrpforms.form_id.field_id_2}}+10",
+      locked: true,
     });
 
     this.endControlSection();
@@ -161,7 +165,8 @@ class InputHidden extends BaseElement {
 
     this.addControl("create_allowed", {
       type: CONTROLLER_SWITCHER,
-      label: "Allowed"
+      label: "Allowed",
+      locked: true,
     });
 
     this.addControl("create_url", {
@@ -171,7 +176,8 @@ class InputHidden extends BaseElement {
       description: "/ajax/models/tests",
       conditions: {
         create_allowed: true
-      }
+      },
+      locked: true,
     });
 
     this.addControl("create_label", {
@@ -180,7 +186,8 @@ class InputHidden extends BaseElement {
       responsive: false,
       conditions: {
         create_allowed: true
-      }
+      },
+      locked: true,
     });
 
     this.addControl("create_data", {

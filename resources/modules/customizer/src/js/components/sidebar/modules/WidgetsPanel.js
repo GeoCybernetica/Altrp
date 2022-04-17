@@ -35,6 +35,7 @@ class WidgetsPanel extends React.Component {
     return node;
   }
 
+
   render() {
     let start = this.issetNode('start');
     let finish = this.issetNode('return');
@@ -43,14 +44,14 @@ class WidgetsPanel extends React.Component {
       <Scrollbars autoHide autoHideTimeout={500} autoHideDuration={200}>
         {this.props.customizer.type ? (
           <div className="widget-panel">
-            {start && <div className="customizer-widget" onDragStart={(event) => this.onDragStart( event, 'start' )} draggable>
-              <StartIcon/>
-              <p>Start</p>
-            </div>}
-            <div className="customizer-widget" onDragStart={(event) => this.onDragStart( event, 'switch' )} draggable>
-              <SwitchIcon/>
-              <p>Switch</p>
-            </div>
+            {/*{start && <div className="customizer-widget" onDragStart={(event) => this.onDragStart( event, 'start' )} draggable>*/}
+            {/*  <StartIcon/>*/}
+            {/*  <p>Start</p>*/}
+            {/*</div>}*/}
+            {/*<div className="customizer-widget" onDragStart={(event) => this.onDragStart( event, 'switch' )} draggable>*/}
+            {/*  <SwitchIcon/>*/}
+            {/*  <p>Switch</p>*/}
+            {/*</div>*/}
             {/*<div className="customizer-widget" onDragStart={(event) => this.onDragStart( event, 'documentAction' )} draggable>*/}
             {/*  <DocumentIcon/>*/}
             {/*  <p>Document</p>*/}
@@ -67,14 +68,32 @@ class WidgetsPanel extends React.Component {
             {/*  <MessageIcon/>*/}
             {/*  <p>Message</p>*/}
             {/*</div>*/}
-            <div className="customizer-widget" onDragStart={(event) => this.onDragStart( event, 'change' )} draggable>
-              <CustomizerIcon/>
-              <p>Change</p>
-            </div>
-            {<div className="customizer-widget" onDragStart={(event) => this.onDragStart( event, 'return' )} draggable>
-              <FinishIcon/>
-              <p>Return</p>
-            </div>}
+            {/*<div className="customizer-widget" onDragStart={(event) => this.onDragStart( event, 'change' )} draggable>*/}
+            {/*  <CustomizerIcon/>*/}
+            {/*  <p>Change</p>*/}
+            {/*</div>*/}
+            {/*{<div className="customizer-widget" onDragStart={(event) => this.onDragStart( event, 'return' )} draggable>*/}
+            {/*  <FinishIcon/>*/}
+            {/*  <p>Return</p>*/}
+            {/*</div>}*/}
+            {this.props.nodeState.map(item => {
+              if (item.name === "start" && start) {
+                return (
+                  <div className="customizer-widget" key={item.name}
+                       onDragStart={(event) => this.onDragStart(event, item.name)} draggable>
+                    <item.icon/>
+                    <p>{item.title}</p>
+                  </div>
+                )
+              } else if (item.name !== "start") {
+                return (
+                  <div className="customizer-widget" key={item.name} onDragStart={(event) => this.onDragStart( event, item.name )} draggable>
+                    <item.icon/>
+                    <p>{item.title}</p>
+                  </div>
+                )
+              }
+            })}
           </div>
         ) : (
           <h2 className="widget-panel__text">Choose Type in settings</h2>
@@ -86,7 +105,8 @@ class WidgetsPanel extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    customizer: state.currentCustomizer
+    customizer: state.currentCustomizer,
+    nodeState: state.nodeStoreData.nodes
   }
 }
 

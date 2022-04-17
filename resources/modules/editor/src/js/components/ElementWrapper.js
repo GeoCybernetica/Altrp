@@ -65,6 +65,7 @@ import TooltipComponent from "./widgets/styled-components/TooltipComponent";
 import AltrpTooltip2 from "./altrp-tooltip/AltrpTooltip2";
 import React from "react";
 import getSchedulerStyles from "../../../../front-app/src/js/components/helpers/getSchedulerStyles";
+import getTournamentStyles from "../../../../front-app/src/js/components/helpers/getTournamentStyles";
 import getIconStyles from "../../../../front-app/src/js/components/helpers/getIconStyles";
 import getInputTextAutocompleteStyles
   from "../../../../front-app/src/js/components/helpers/getInputTextAutocompleteStyles";
@@ -75,6 +76,7 @@ import InputDateRangeComponent from "./widgets/styled-components/InputDateRangeC
 import StarsComponent from "./widgets/styled-components/StarsComponent";
 import ProgressBarComponent from "./widgets/styled-components/ProgressBarComponent";
 import InputCropImageComponent from "./widgets/styled-components/InputCropImageComponent";
+import getFeedbackStyles from "../../../../front-app/src/js/components/helpers/getFeedbackStyles";
 
 const { connect } = window.reactRedux;
 const { replaceContentWithData } = window.altrpHelpers;
@@ -121,7 +123,8 @@ const ElementWrapperGlobalStyles = window.createGlobalStyle`${({
     case "section":
       styles += `.${prefix}${elementId} {${SectionWidgetComponent(
         settings,
-        element.children.length
+        element.children.length,
+        elementId
       )}}`;
       break;
     case "column":
@@ -334,6 +337,12 @@ const ElementWrapperGlobalStyles = window.createGlobalStyle`${({
     case "funnel-diagram":
     case "radar-diagram":
       styles += `.${prefix}${elementId} {${DiagramComponent(settings)}}`
+      break;
+    case 'tournament':
+      styles += `.${prefix}${elementId} {${getTournamentStyles(settings, elementId)}}`
+      break;
+    case 'feedback':
+      styles += `.${prefix}${elementId} {${getFeedbackStyles(settings, elementId)}}`
       break;
   }
 
@@ -758,7 +767,7 @@ class ElementWrapper extends Component {
     let emptyColumn = "";
     if (
       this.props.element.getType() === "column" &&
-      !this.state.children.length
+      !this.props.element.getChildren().length
     ) {
       emptyColumn = (
         <div className="column-empty-plus" onClick={this.showWidgetsPanel}>

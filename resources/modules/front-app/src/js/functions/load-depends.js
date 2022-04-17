@@ -72,11 +72,18 @@ window.LIBS = {
       console.log('LOAD "image-crop": ', performance.now());
       return Promise.resolve(res)
     });
-  }
+  },
+  'reacket': () => {
+    return import(/* webpackChunkName: 'reacket' */'../libs/reacket').then(res => {
+      window.libsLoaded.push('reacket')
+      console.log('LOAD "reacket": ', performance.now());
+      return Promise.resolve(res)
+    });
+  },
 };
 
 window.libsToLoad = window.libsToLoad || [];
-__altrp_settings__.libsToLoad?.forEach(lib=>{
+window.__altrp_settings__?.libsToLoad?.forEach(lib=>{
   libsToLoad.push(LIBS[lib]())
 })
 export default function loadDepends(){

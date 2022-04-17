@@ -58,6 +58,7 @@ const fieldStyle = settings => {
     borderWidth,
     borderColor,
     borderRadius,
+    widthTextArea,
     boxShadow;
 
   const {
@@ -72,6 +73,9 @@ const fieldStyle = settings => {
     image_select_image_position,
     cross_size
   } = settings;
+
+  settings && (widthTextArea = getResponsiveSetting(settings, "field_width_textarea"));
+  widthTextArea && (styles += sizeStyled(widthTextArea, "width"));
 
   settings && (boxShadow = getResponsiveSetting(settings, "box_shadow"));
   boxShadow && (styles += shadowControllerToStyles(boxShadow));
@@ -97,10 +101,8 @@ const fieldStyle = settings => {
   borderWidth && (styles += borderWidthStyled(borderWidth));
 
   settings &&
-    (borderRadius = getResponsiveSetting(
-      settings,
-      "global_filter_input_border_radius"
-    ));
+    (borderRadius = getResponsiveSetting(settings, 'border_radius') ||  getResponsiveSetting(settings, "global_filter_input_border_radius" ));
+
   borderRadius &&
     (styles += dimensionsControllerToStyles(borderRadius, "border-radius"));
 
@@ -155,6 +157,75 @@ const fieldStyle = settings => {
 
   //TODO не нашел как активировать эту штуку
   //cross_size && (styles += `font-size:${cross_size.size}${cross_size.unit};`);
+
+  styles += "}";
+
+  styles += `&& .altrp-field:hover {`;
+
+  settings && (boxShadow = getResponsiveSetting(settings, "box_shadow", ':hover'));
+  boxShadow && (styles += shadowControllerToStyles(boxShadow));
+
+  settings &&
+    (typographic = getResponsiveSetting(settings, "field_font_typographic", ':hover'));
+  typographic && (styles += typographicControllerToStyles(typographic));
+
+  settings && (color = getResponsiveSetting(settings, "field_font_color"));
+  color && (styles += colorPropertyStyled(color, "color"));
+
+  settings && (borderColor = getResponsiveSetting(settings, "border_color", ':hover'));
+  borderColor && (styles += colorPropertyStyled(borderColor, "border-color"));
+
+  settings && (borderWidth = getResponsiveSetting(settings, "border_width", ':hover'));
+  borderWidth && (styles += borderWidthStyled(borderWidth));
+
+  settings &&
+    (borderRadius = getResponsiveSetting(settings, 'border_radius', ':hover') ||  getResponsiveSetting(settings, "global_filter_input_border_radius", ':hover'));
+  borderRadius &&
+    (styles += dimensionsControllerToStyles(borderRadius, "border-radius"));
+
+  settings &&
+    (backgroundColor = getResponsiveSetting(
+      settings,
+      "background_style_background_color",
+      ':hover'
+    ));
+  backgroundColor &&
+    (styles += colorPropertyStyled(backgroundColor, "background-color"));
+
+  styles += "}";
+
+
+  styles += `&& .altrp-field:focus {`;
+
+  settings && (boxShadow = getResponsiveSetting(settings, "box_shadow", ':focus'));
+  boxShadow && (styles += shadowControllerToStyles(boxShadow));
+
+  settings &&
+    (typographic = getResponsiveSetting(settings, "field_font_typographic", ':focus'));
+  typographic && (styles += typographicControllerToStyles(typographic));
+
+  settings && (color = getResponsiveSetting(settings, "field_font_color"));
+  color && (styles += colorPropertyStyled(color, "color"));
+
+  settings && (borderColor = getResponsiveSetting(settings, "border_color", ':focus'));
+  borderColor && (styles += colorPropertyStyled(borderColor, "border-color", '!important'));
+
+  settings && (borderWidth = getResponsiveSetting(settings, "border_width", ':focus'));
+  borderWidth && (styles += borderWidthStyled(borderWidth));
+
+  settings &&
+    (borderRadius = getResponsiveSetting(settings, 'border_radius', ':focus') ||  getResponsiveSetting(settings, "global_filter_input_border_radius", ':focus'));
+  borderRadius &&
+    (styles += dimensionsControllerToStyles(borderRadius, "border-radius"));
+
+  settings &&
+    (backgroundColor = getResponsiveSetting(
+      settings,
+      "background_style_background_color",
+      ':focus'
+    ));
+  backgroundColor &&
+    (styles += colorPropertyStyled(backgroundColor, "background-color"));
 
   styles += "}";
 
@@ -301,8 +372,24 @@ const fieldLabelContainerStyle = settings => {
   label_icon_position && (styles += `flex-direction:${label_icon_position};`);
 
   styles += "}";
+
+  styles += `&& .altrp-field-container:hover .altrp-field-label-container {`
+
+  settings &&
+    (backgroundColor = getResponsiveSetting(
+      settings,
+      "label_background_color",
+      ':hover'
+    ));
+  backgroundColor &&
+    (styles += colorPropertyStyled(backgroundColor, "background-color"));
+  styles += '}'
+
   return styles;
 };
+
+
+let styles = `&& .altrp-field-label-container {`;
 /**
  * Стили для класса altrp-field-label
  * @param {Object} settings style settings of element
@@ -312,18 +399,30 @@ const fieldLabel = settings => {
   let styles = `&& .altrp-field-label {`;
   let color, typographic;
 
+  settings && (color = getResponsiveSetting(settings, "label_style_font_color"));
+  color && (styles += colorPropertyStyled(color, "color"));
+
+  settings && (typographic = getResponsiveSetting(settings, "label_style_font_typographic"));
+  typographic && (styles += typographicControllerToStyles(typographic));
+
+  styles += "}";
+
+  styles += `&& .altrp-field-container:hover .altrp-field-label {`;
+
   settings &&
-    (color = getResponsiveSetting(settings, "label_style_font_color"));
+    (color = getResponsiveSetting(settings, "label_style_font_color", ':hover'));
   color && (styles += colorPropertyStyled(color, "color"));
 
   settings &&
     (typographic = getResponsiveSetting(
       settings,
-      "label_style_font_typographic"
+      "label_style_font_typographic",
+      ':hover'
     ));
   typographic && (styles += typographicControllerToStyles(typographic));
 
   styles += "}";
+
   return styles;
 };
 /**
@@ -492,6 +591,23 @@ const fieldLabelRequired = settings => {
   typographic && (styles += typographicControllerToStyles(typographic));
 
   styles += "}";
+
+  styles += `&& .altrp-field-container:hover .altrp-field-label--required::after {`;
+
+  settings &&
+    (color = getResponsiveSetting(settings, "required_style_font_color", ':hover'));
+  color && (styles += colorPropertyStyled(color, "color"));
+
+  settings &&
+    (typographic = getResponsiveSetting(
+      settings,
+      "required_style_font_typographic",
+      ':hover'
+    ));
+  typographic && (styles += typographicControllerToStyles(typographic));
+
+  styles += "}";
+
   return styles;
 };
 /**
@@ -584,10 +700,13 @@ const maskMismatchMessage = (settings, id) => {
 //Точка входа
 function FormComponent(settings) {
   let styles = "";
-  const { background_section_opacity } = settings;
+  const background_section_opacity = getResponsiveSetting(settings, 'background_section_opacity');
   //for all element
-  background_section_opacity &&
-    (styles += `opacity:${background_section_opacity.size};`);
+  if (background_section_opacity && background_section_opacity?.size) {
+    styles += `opacity:${background_section_opacity.size};`
+  } else {
+    styles += "";
+  }
   //altrp-input-wrapper
   const inputWrapperStyles = inputWrapperStyle(settings);
   inputWrapperStyles && (styles += inputWrapperStyles);

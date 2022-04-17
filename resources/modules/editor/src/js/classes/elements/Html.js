@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import CodeIcon from "../../../svgs/code.svg";
+import CodeIcon from "../../../svgs/html.svg";
 
 import {
   TAB_CONTENT,
@@ -20,6 +20,9 @@ class Html extends BaseElement {
   static getType() {
     return "widget";
   }
+  static getGroup() {
+    return "Advanced";
+  }
   _registerControls() {
     if (this.controllersRegistered) {
       return;
@@ -27,11 +30,12 @@ class Html extends BaseElement {
 
     this.startControlSection("Data", {
       tab: TAB_CONTENT,
-      label: "Data"
+      label: "Data",
     });
     this.addControl("data", {
       type: CONTROLLER_TEXTAREA,
-      label: "Inner HTML"
+      label: "Inner HTML",
+      locked: true,
     });
     this.endControlSection();
 

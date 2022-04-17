@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Tree, Icon } from "@blueprintjs/core";
 import { connect } from "react-redux";
 import NavigationItem from "./NavigationItem";
+import Scrollbars from "react-custom-scrollbars";
 import {
   editorSetCurrentElementByID,
   deleteCurrentElementByID,
@@ -125,29 +126,32 @@ class NavigationPanel extends Component {
       id: template.id,
       onClick: (node, e) => this.showItem(e, node.id),
       [parent != null && "parent"]: parent,
-      secondaryLabel: template.name !== "root-element" && (
-        <div>
-          <Icon
-            icon="trash"
-            style={{ cursor: "pointer" }}
-            onClick={e => this.deleteItem(e, template.id)}
-          />
-        </div>
+      secondaryLabel: (
+        template.getName() !== "root-element" && (
+          <div>
+            <Icon
+              icon="trash"
+              style={{ cursor: "pointer" }}
+              onClick={e => this.deleteItem(e, template.id)}
+            />
+          </div>
+        )
       )
     };
   }
 
   render() {
-    console.log(this.state.template)
     return (
-      <div style={{ overflow: "auto" }}>
-        <Tree
-          contents={this.state.template}
-          onNodeExpand={this.handleExpand}
-          onNodeCollapse={this.handleCollapse}
-          onNodeDoubleClick={this.showItem}
-        />
-      </div>
+      <Scrollbars  autoHide autoHideTimeout={500} autoHideDuration={200}>
+        <div style={{ width: '100%', padding: '10px'}}>
+          <Tree
+            contents={this.state.template}
+            onNodeExpand={this.handleExpand}
+            onNodeCollapse={this.handleCollapse}
+            onNodeDoubleClick={this.showItem}
+          />
+        </div>
+      </Scrollbars>
     );
   }
 }

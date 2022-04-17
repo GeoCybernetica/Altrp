@@ -38,7 +38,6 @@ class SqlEditor extends Component {
       modelTitle: 'Model Title',
       activeHeader: 0,
       value: {
-        paged: false,
         is_object: false,
         auth: false,
         model_id: null,
@@ -110,10 +109,10 @@ class SqlEditor extends Component {
     this.setState({ modelsOptions: options });
 
     window.addEventListener("scroll", this.listenScrollHeader)
+  }
 
-    return () => {
-      window.removeEventListener("scroll", this.listenScrollHeader)
-    }
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.listenScrollHeader)
   }
 
   listenScrollHeader = () => {

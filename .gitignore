@@ -69,7 +69,6 @@ public/modules/editor
 public/modules/reports
 public/modules/reports-new
 
-package-lock.json
 yarn.lock
 *.conf
 rootCA.crt
@@ -79,3 +78,11 @@ server.crt
 server.csr
 server.key
 dhparam.pem
+
+#files
+/public/sitemap.xml
+/public/robots.txt
+/AltrpObservers/
+/Controllers/
+/Entities/
+/test.js

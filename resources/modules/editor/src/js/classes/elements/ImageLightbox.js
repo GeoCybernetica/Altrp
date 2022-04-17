@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import ImageIcon from '../../../svgs/image.svg';
+import ImageIcon from '../../../svgs/lightbox.svg';
 import { advancedTabControllers } from "../../decorators/register-controllers";
 import {
   CONTROLLER_MEDIA,
@@ -24,7 +24,7 @@ class ImageLightbox extends BaseElement {
     return 'image-lightbox';
   }
   static getTitle() {
-    return 'Image lightbox';
+    return 'Image Lightbox';
   }
 
   static getIconComponent() {
@@ -32,6 +32,9 @@ class ImageLightbox extends BaseElement {
   }
   static getType() {
     return 'widget';
+  }
+  static getGroup() {
+    return "Advanced";
   }
   _registerControls() {
     if (this.controllersRegistered) {
@@ -46,11 +49,13 @@ class ImageLightbox extends BaseElement {
     this.addControl('l_id', {
       label: 'Lightbox ID',
       responsive: false,
+      locked: true,
     });
 
     this.addControl('content_media', {
       type: CONTROLLER_MEDIA,
       label: 'Image',
+      locked: true,
     });
 
     this.addControl('content_path', {
@@ -58,6 +63,7 @@ class ImageLightbox extends BaseElement {
       dynamic: false,
       responsive: false,
       label: 'Path',
+      locked: true,
     });
 
 
@@ -66,6 +72,7 @@ class ImageLightbox extends BaseElement {
       dynamic: false,
       responsive: false,
       label: 'Default Image URL',
+      locked: true,
     });
 
     this.addControl('lightbox_switch', {
@@ -78,6 +85,7 @@ class ImageLightbox extends BaseElement {
       hideOnEmail: true,
       type: CONTROLLER_SWITCHER,
       label: 'Cursor pointer',
+      locked: true,
     });
 
 
@@ -184,6 +192,7 @@ class ImageLightbox extends BaseElement {
       ],
       max: 1000,
       min: 0,
+      locked: true,
     });
 
     this.addControl('width_size', {
@@ -197,6 +206,7 @@ class ImageLightbox extends BaseElement {
       ],
       max: 1000,
       min: 0,
+      locked: true,
     });
 
     this.endControlSection();
@@ -288,7 +298,7 @@ class ImageLightbox extends BaseElement {
     this.startControlSection('background_section', {
       hideOnEmail: true,
       tab: TAB_STYLE,
-      label: 'Background'
+      label: 'Background',
     });
 
     this.addControl("background_color", {
@@ -306,6 +316,7 @@ class ImageLightbox extends BaseElement {
     this.addControl('background_image', {
       type: CONTROLLER_MEDIA,
       label: 'Background Image',
+      locked: true,
     });
 
     this.addControl('background_position', {

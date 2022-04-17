@@ -2,7 +2,8 @@
 
 
 @section('head')
-    <script src="{{ url }}"></script>
+
+    <script src="{{ url }}" defer></script>
 
     @if(css)
         <link href="{{css}}" rel="stylesheet"/>
@@ -12,7 +13,7 @@
         let _altrpVersion = "{{ version }}";
 
         window.altrpMenus = [];
-        const _token = "{{ token }}";
+        window.container_width = {{{ get_altrp_setting( 'container_width', '1440' ) }}};
     </script>
 @end
 

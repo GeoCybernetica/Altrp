@@ -32,6 +32,15 @@ module.exports = {
         ]
       },
       {
+        test: /\.css$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          "style-loader",
+          // Translates CSS into CommonJS
+          "css-loader",
+        ]
+      },
+      {
         test: /\.svg$/,
         exclude: /slick.svg$|spritesheet.svg$/,
         use: [
@@ -45,6 +54,10 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /(\.(woff|woff2|eot|ttf|otf)|slick.svg)$/,
+        use: ["file-loader"]
       },
       {
         test: /\.(png|jpg|gif)$/,
@@ -67,7 +80,7 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, "public/"),
     port: 3000,
-    publicPath: "http://localhost:3000/admin/",
+    publicPath: "http://localhost:3002/admin/",
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",

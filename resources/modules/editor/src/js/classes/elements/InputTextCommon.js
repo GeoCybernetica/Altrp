@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import FromIcon from "../../../svgs/form-horizontal.svg";
+import FromIcon from "../../../svgs/input.svg";
 import { advancedTabControllers } from "../../decorators/register-controllers";
 import {
   CONTROLLER_TEXTAREA,
@@ -35,6 +35,9 @@ class InputTextCommon extends BaseElement {
   }
   static getType() {
     return "widget";
+  }
+  static getGroup() {
+    return "Form";
   }
   _registerControls() {
     if (this.controllersRegistered) {
@@ -72,7 +75,8 @@ class InputTextCommon extends BaseElement {
           value: "tel",
           label: "Tel"
         },
-      ]
+      ],
+      locked: true,
     });
 
     this.addControl("form_id", {
@@ -94,72 +98,6 @@ class InputTextCommon extends BaseElement {
       conditions: { content_type: ["email"] }
     });
 
-    this.addControl("sort_default", {
-      type: CONTROLLER_SWITCHER,
-      label: "Sort Default",
-      conditions: {
-        content_type: ["select", "select2"]
-      }
-    });
-
-    this.addControl("textarea_resize", {
-      type: CONTROLLER_SELECT,
-      label: "Resize",
-      options: [
-        {
-          label: "Both",
-          value: "both"
-        },
-        {
-          label: "None",
-          value: "none"
-        },
-        {
-          label: "Horizontal",
-          value: "horizontal"
-        },
-        {
-          label: "Vertical",
-          value: "vertical"
-        }
-      ],
-      conditions: { content_type: ["textarea"] }
-    });
-
-    this.addControl("justify_options", {
-      type: CONTROLLER_SELECT,
-      label: "Options Alignment",
-      options: [
-        {
-          label: "left",
-          value: "flex-start"
-        },
-        {
-          label: "center",
-          value: "center"
-        },
-        {
-          label: "right",
-          value: "flex-end"
-        },
-        {
-          label: "space-between",
-          value: "space-between"
-        },
-        {
-          label: "space-around",
-          value: "space-around"
-        },
-        {
-          label: "space-evenly",
-          value: "space-evenly"
-        }
-      ],
-      conditions: {
-        content_type: ["image_select"]
-      }
-    });
-
     const optionsRepeater = new Repeater();
 
     optionsRepeater.addControl("label", {
@@ -177,131 +115,10 @@ class InputTextCommon extends BaseElement {
       label: "Image"
     });
 
-    this.addControl("image_select_options", {
-      label: "Options",
-      type: CONTROLLER_REPEATER,
-      fields: optionsRepeater.getControls(),
-      conditions: {
-        content_type: ["image_select"]
-      },
-      default: []
-    });
-
-    this.addControl("image_select_item_width", {
-      type: CONTROLLER_SLIDER,
-      label: "Item Width",
-      max: 500,
-      min: 0,
-      units: ["px", "%", "vw"],
-      default: { unit: "px" },
-      conditions: {
-        content_type: ["image_select"]
-      }
-    });
-
-    this.addControl("image_select_item_height", {
-      type: CONTROLLER_SLIDER,
-      label: "Item Height",
-      max: 500,
-      min: 0,
-      units: ["px", "%", "vh"],
-      default: { unit: "px" },
-      conditions: {
-        content_type: ["image_select"]
-      }
-    });
-
-    this.addControl("image_select_image_fit", {
-      type: CONTROLLER_SELECT,
-      options: [
-        {
-          value: "unset",
-          label: "unset"
-        },
-        {
-          value: "fill",
-          label: "fill"
-        },
-        {
-          value: "cover",
-          label: "cover"
-        },
-        {
-          value: "contain",
-          label: "contain"
-        },
-        {
-          value: "scale-down",
-          label: "scale-down"
-        },
-        {
-          value: "none",
-          label: "none"
-        }
-      ],
-      label: "Background Size",
-      conditions: {
-        content_type: ["image_select"]
-      }
-    });
-
-    this.addControl("image_select_image_position", {
-      type: CONTROLLER_SELECT,
-      options: [
-        {
-          value: "top left",
-          label: "top left"
-        },
-        {
-          value: "top",
-          label: "top"
-        },
-        {
-          value: "top right",
-          label: "top right"
-        },
-        {
-          value: "right",
-          label: "right"
-        },
-        {
-          value: "bottom right",
-          label: "bottom right"
-        },
-        {
-          value: "bottom",
-          label: "bottom"
-        },
-        {
-          value: "bottom left",
-          label: "bottom left"
-        },
-        {
-          value: "left",
-          label: "left"
-        },
-        {
-          value: "center",
-          label: "center"
-        }
-      ],
-      label: "Background Position",
-      conditions: {
-        content_type: ["image_select"]
-      }
-    });
-
-    this.addControl("content_accept", {
-      type: CONTROLLER_TEXT,
-      label: "Accept",
-      conditions: {
-        content_type: ["file"]
-      }
-    });
-
     this.addControl("content_label", {
       type: CONTROLLER_TEXT,
-      label: "Label"
+      label: "Label",
+      locked: true,
     });
 
     this.addControl("content_label_position_type", {
@@ -329,12 +146,14 @@ class InputTextCommon extends BaseElement {
           value: "absolute",
           label: "Absolute"
         }
-      ]
+      ],
+      locked: true,
     });
 
     this.addControl("label_icon", {
       type: CONTROLLER_MEDIA,
-      label: "Label Icon"
+      label: "Label Icon",
+      locked: true,
     });
 
     this.addControl("label_icon_position", {
@@ -358,13 +177,14 @@ class InputTextCommon extends BaseElement {
           value: "column-reverse",
           label: "Top"
         }
-      ]
+      ],
+      locked: true,
     });
 
     this.addControl("content_placeholder", {
       type: CONTROLLER_TEXT,
       label: "Placeholder",
-      default: "Placeholder"
+      locked: true,
     });
 
     this.addControl("content_mask", {
@@ -372,7 +192,8 @@ class InputTextCommon extends BaseElement {
       label: "Mask",
       conditions: {
         content_type: ["text", "tel"]
-      }
+      },
+      locked: true,
     });
 
     this.addControl("mask_mismatch_message", {
@@ -380,7 +201,8 @@ class InputTextCommon extends BaseElement {
       label: "Validation Error Message",
       conditions: {
         content_type: ["text", "tel", "email"]
-      }
+      },
+      locked: true,
     });
 
     this.addControl("read_only", {
@@ -388,17 +210,20 @@ class InputTextCommon extends BaseElement {
       label: "Read only",
       conditions: {
         content_type: "wysiwyg"
-      }
+      },
+      locked: true,
     });
 
     this.addControl("content_required", {
       type: CONTROLLER_SWITCHER,
-      label: "Required"
+      label: "Required",
+      locked: true,
     });
 
     this.addControl("content_readonly", {
       type: CONTROLLER_SWITCHER,
-      label: "Readonly"
+      label: "Readonly",
+      locked: true,
     });
 
     this.addControl("content_autocomplete", {
@@ -406,65 +231,14 @@ class InputTextCommon extends BaseElement {
       label: "Autocomplete",
       conditions: {
         content_type: ["text", "password", "email"]
-      }
+      },
+      locked: true,
     });
 
     this.addControl("content_timestamp", {
       type: CONTROLLER_SWITCHER,
       label: "Timestamp",
       default: false
-    });
-
-
-    this.addControl("content_options_nullable", {
-      type: CONTROLLER_SWITCHER,
-      label: "Select Nullable",
-      default: false,
-      conditions: {
-        content_type: ["select", "select2"]
-      }
-    });
-    this.addControl("nulled_option_title", {
-      type: CONTROLLER_TEXT,
-      label: "Nulled Option Label",
-      conditions: {
-        content_type: ["select", "select2", "radio", "checkbox"]
-      }
-    });
-
-    this.addControl("options_sorting", {
-      type: CONTROLLER_SELECT,
-      label: "Options Sorting",
-      default: "",
-      conditions: {
-        content_type: ["select", "select2", "radio", "checkbox"]
-      },
-      options: [
-        {
-          value: "",
-          label: "None"
-        },
-        {
-          value: "asc",
-          label: "ASC"
-        },
-        {
-          value: "desc",
-          label: "DESC"
-        }
-      ]
-    });
-
-    this.addControl("model_for_options", {
-      type: CONTROLLER_SELECT2,
-      label: "Choose Datasource for Select Options",
-      default: "",
-      conditions: {
-        content_type: ["select", "select2", "radio", "checkbox"]
-      },
-      nullable: true,
-      options_resource:
-        "/admin/ajax/models_options?with_names=1&not_plural=1&with_sql_queries=1"
     });
 
     this.addControl("params_for_update", {
@@ -486,15 +260,6 @@ class InputTextCommon extends BaseElement {
       }
     });
 
-    this.addControl("select2_multiple", {
-      type: CONTROLLER_SWITCHER,
-      label: "Multiple",
-      default: false,
-      conditions: {
-        content_type: ["select2", "file", "image_select"]
-      }
-    });
-
     // this.addControl('is_select_all_allowed', {
     //   type: CONTROLLER_SWITCHER,
     //   label: 'Allow Select All',
@@ -508,73 +273,17 @@ class InputTextCommon extends BaseElement {
     //   },
     // });
 
-    this.addControl("content_options", {
-      type: CONTROLLER_TEXTAREA,
-      label: "Or Type Select Options",
-      conditions: {
-        content_type: ["select", "select2", "radio", "checkbox"]
-      },
-      description:
-        'Enter each option in a separate line. To differentiate between label and value, separate them with a pipe char ("|"). For example: f_name | First Name'
-    });
-
     this.addControl("content_default_value", {
       type: CONTROLLER_TEXTAREA,
-      label: "Default Value"
+      label: "Default Value",
+      locked: true,
     });
 
     this.addControl("content_calculation", {
       type: CONTROLLER_TEXTAREA,
       label: "Calculation",
-      conditions: {
-        "content_type!": ["file"]
-      },
       description:
         "E.g {{altrpforms.form_id.field_id}}*{{altrpforms.form_id.field_id_2}}+10"
-    });
-
-    this.endControlSection();
-
-    this.startControlSection("create_options", {
-      tab: TAB_CONTENT,
-      label: "Create Options Settings",
-      conditions: {
-        content_type: ["select2"]
-      }
-    });
-
-    this.addControl("create_allowed", {
-      type: CONTROLLER_SWITCHER,
-      label: "Allowed"
-    });
-
-    this.addControl("create_url", {
-      label: "URL",
-      dynamic: false,
-      responsive: false,
-      description: "/ajax/models/tests",
-      conditions: {
-        create_allowed: true
-      }
-    });
-
-    this.addControl("create_label", {
-      label: "Label Field",
-      dynamic: false,
-      responsive: false,
-      conditions: {
-        create_allowed: true
-      }
-    });
-
-    this.addControl("create_data", {
-      type: CONTROLLER_TEXTAREA,
-      label: "Data",
-      conditions: {
-        create_allowed: true
-      },
-      description:
-        'Enter additional data for new item in a separate line.<br/>To differentiate between label and value, separate them with a pipe char ("|").<br/>For example: title | Post.<br/>Or<br/>title | {\'{{title}}\'} for Take Value from This Form Field with Name "title" \n'
     });
 
     this.endControlSection();
@@ -585,7 +294,8 @@ class InputTextCommon extends BaseElement {
 
     this.addControl('left_icon', {
       type: CONTROLLER_MEDIA,
-      label: 'Left Icon'
+      label: 'Left Icon',
+      locked: true,
     })
 
     this.addControl('password_show_left_icon', {
@@ -593,12 +303,14 @@ class InputTextCommon extends BaseElement {
       conditions:{
         content_type: 'password'
       },
-      label: 'Password Show Left Icon'
+      label: 'Password Show Left Icon',
+      locked: true,
     })
 
     this.addControl('right_icon', {
       type: CONTROLLER_MEDIA,
-      label: 'Right Icon'
+      label: 'Right Icon',
+      locked: true,
     })
 
     this.addControl('password_show_right_icon', {
@@ -606,12 +318,8 @@ class InputTextCommon extends BaseElement {
       conditions:{
         content_type: 'password'
       },
-      label: 'Password Show Right Icon'
-    })
-
-    this.addControl('icons_size', {
-      label: 'Icons Size',
-      placeholder: '20px'
+      label: 'Password Show Right Icon',
+      locked: true,
     })
 
     this.endControlSection();
@@ -698,6 +406,182 @@ class InputTextCommon extends BaseElement {
     //
     // this.endControlSection();
 
+    this.startControlSection("position_section", {
+      tab: TAB_STYLE,
+      label: "Input Position"
+    });
+
+    this.addControl("field_width", {
+      type: CONTROLLER_SLIDER,
+      stateless:true,
+      label: "Width",
+      max: 500,
+      min: 0,
+      units: ["px", "%", "vw"]
+    });
+
+    this.addControl("field_height", {
+      type: CONTROLLER_SLIDER,
+      stateless:true,
+      label: "Height",
+      max: 100,
+      min: 0,
+      units: ["px", "%", "vw"]
+    });
+
+    this.addControl("placeholder_and_value_alignment_position_section", {
+      type: CONTROLLER_CHOOSE,
+      label: "Alignment",
+      stateless:true,
+      options: [
+        {
+          icon: "left",
+          value: "left"
+        },
+        {
+          icon: "center",
+          value: "center"
+        },
+        {
+          icon: "right",
+          value: "right"
+        }
+      ]
+    });
+
+    this.addControl("position_margin", {
+      type: CONTROLLER_DIMENSIONS,
+      label: "Margin",
+      default: {
+        unit: "px"
+      },
+      stateless:true,
+      units: ["px", "%", "vh"]
+    });
+
+    this.addControl("position_padding", {
+      type: CONTROLLER_DIMENSIONS,
+      label: "Padding",
+      stateless:true,
+      units: ["px", "%", "vh"]
+    });
+
+    this.addControl("position_z_index-wrapper", {
+      type: CONTROLLER_NUMBER,
+      label: "Z-index",
+      default: 0
+    });
+
+    this.addControl("position_css_id", {
+      type: CONTROLLER_TEXT,
+      label: "CSS ID",
+      locked: true,
+    });
+
+    this.addControl("position_css_classes", {
+      type: CONTROLLER_TEXT,
+      label: "CSS Classes",
+      locked: true,
+    });
+
+    this.addControl("background_section_opacity", {
+      type: CONTROLLER_SLIDER,
+      label: "Opacity",
+      max: 1,
+      min: 0,
+      step: 0.01
+    });
+
+    this.endControlSection();
+
+    this.startControlSection("background_section", {
+      tab: TAB_STYLE,
+      label: "Background"
+    });
+
+    this.addControl("background_style_background_color", {
+      type: CONTROLLER_COLOR,
+      label: "Background Color"
+    });
+
+    this.endControlSection();
+
+    this.startControlSection("border_section", {
+      tab: TAB_STYLE,
+      label: "Border"
+    });
+
+    this.addControl("border_type", {
+      type: CONTROLLER_SELECT,
+      label: "Border Type",
+      options: [
+        {
+          value: "none",
+          label: "None"
+        },
+        {
+          value: "solid",
+          label: "Solid"
+        },
+        {
+          value: "double",
+          label: "Double"
+        },
+        {
+          value: "dotted",
+          label: "Dotted"
+        },
+        {
+          value: "dashed",
+          label: "Dashed"
+        },
+        {
+          value: "groove",
+          label: "Groove"
+        }
+      ],
+      // stateless: true,
+    });
+
+    this.addControl("border_width", {
+      type: CONTROLLER_DIMENSIONS,
+      label: "Border Width",
+      // stateless:true,
+      units: ["px", "%", "vh"]
+    });
+
+    this.addControl("border_color", {
+      type: CONTROLLER_COLOR,
+      label: "Border Color"
+    });
+
+    this.addControl("border_radius", {
+      type: CONTROLLER_DIMENSIONS,
+      label: "Border Radius",
+      default: {
+        unit: "px"
+      },
+      units: ["px", "%", "vh"]
+    });
+
+    this.addControl("box_shadow", {
+      type: CONTROLLER_SHADOW,
+      label: "Box Shadow",
+      default: {
+        blur: 0,
+        horizontal: 0,
+        vertical: 0,
+        opacity: 1,
+        spread: 0,
+        colorRGB: "rgb(0, 0, 0)",
+        color: "rgb(0, 0, 0)",
+        colorPickedHex: "#000000",
+        type: " "
+      }
+    });
+
+    this.endControlSection();
+
     this.startControlSection("label_style_section", {
       tab: TAB_STYLE,
       label: "Label"
@@ -725,6 +609,7 @@ class InputTextCommon extends BaseElement {
       units: ["px", "%", "vh"],
       max: 60,
       min: 0,
+      locked: true,
     });
 
     this.addControl("label_padding", {
@@ -825,68 +710,6 @@ class InputTextCommon extends BaseElement {
 
     this.endControlSection();
 
-    this.startControlSection("position_section", {
-      tab: TAB_STYLE,
-      label: "Position"
-    });
-
-    this.addControl("field_width", {
-      type: CONTROLLER_SLIDER,
-      stateless:true,
-      label: "Width",
-      max: 500,
-      min: 0,
-      units: ["px", "%", "vw"]
-    });
-
-    this.addControl("field_height", {
-      type: CONTROLLER_SLIDER,
-      stateless:true,
-      label: "Height",
-      max: 100,
-      min: 0,
-      units: ["px", "%", "vw"]
-    });
-
-    this.addControl("placeholder_and_value_alignment_position_section", {
-      type: CONTROLLER_CHOOSE,
-      label: "Alignment",
-      stateless:true,
-      options: [
-        {
-          icon: "left",
-          value: "left"
-        },
-        {
-          icon: "center",
-          value: "center"
-        },
-        {
-          icon: "right",
-          value: "right"
-        }
-      ]
-    });
-
-    this.addControl("position_margin", {
-      type: CONTROLLER_DIMENSIONS,
-      label: "Margin",
-      default: {
-        unit: "px"
-      },
-      stateless:true,
-      units: ["px", "%", "vh"]
-    });
-
-    this.addControl("position_padding", {
-      type: CONTROLLER_DIMENSIONS,
-      label: "Padding",
-      stateless:true,
-      units: ["px", "%", "vh"]
-    });
-
-    this.endControlSection();
-
     this.startControlSection("font_style_section", {
       tab: TAB_STYLE,
       label: "Font"
@@ -916,7 +739,7 @@ class InputTextCommon extends BaseElement {
 
     this.addControl("placeholder_style_font_color", {
       type: CONTROLLER_COLOR,
-      label: "font color"
+      label: "Font Color"
     });
 
     this.endControlSection();
@@ -947,104 +770,6 @@ class InputTextCommon extends BaseElement {
 
     this.endControlSection();
 
-    this.startControlSection("background_section", {
-      tab: TAB_STYLE,
-      label: "Background"
-    });
-
-    this.addControl("background_style_background_color", {
-      type: CONTROLLER_COLOR,
-      label: "Background Color"
-    });
-
-    this.addControl("background_section_opacity", {
-      type: CONTROLLER_SLIDER,
-      label: "Opacity",
-      default: {
-        size: 1
-      },
-      max: 1,
-      min: 0,
-      step: 0.01
-    });
-
-    this.endControlSection();
-
-    this.startControlSection("border_section", {
-      tab: TAB_STYLE,
-      label: "Border"
-    });
-
-    this.addControl("border_type", {
-      type: CONTROLLER_SELECT,
-      label: "Border Type",
-      options: [
-        {
-          value: "none",
-          label: "None"
-        },
-        {
-          value: "solid",
-          label: "Solid"
-        },
-        {
-          value: "double",
-          label: "Double"
-        },
-        {
-          value: "dotted",
-          label: "Dotted"
-        },
-        {
-          value: "dashed",
-          label: "Dashed"
-        },
-        {
-          value: "groove",
-          label: "Groove"
-        }
-      ],
-      // stateless: true,
-    });
-
-    this.addControl("border_width", {
-      type: CONTROLLER_DIMENSIONS,
-      label: "Border Width",
-      // stateless:true,
-      units: ["px", "%", "vh"]
-    });
-
-    this.addControl("border_color", {
-      type: CONTROLLER_COLOR,
-      label: "Border Color"
-    });
-
-    this.addControl("box_shadow", {
-      type: CONTROLLER_SHADOW,
-      label: "Box shadow",
-      default: {
-        blur: 0,
-        horizontal: 0,
-        vertical: 0,
-        opacity: 1,
-        spread: 0,
-        colorRGB: "rgb(0, 0, 0)",
-        color: "rgb(0, 0, 0)",
-        colorPickedHex: "#000000",
-        type: " "
-      }
-    });
-
-    this.addControl("border_radius", {
-      type: CONTROLLER_DIMENSIONS,
-      label: "Radius",
-      default: {
-        unit: "px"
-      },
-      units: ["px", "%", "vh"]
-    });
-
-    this.endControlSection();
 
     this.startControlSection("transform_section", {
       tab: TAB_STYLE,
@@ -1109,7 +834,7 @@ class InputTextCommon extends BaseElement {
     })
     this.addControl('input_icons_radius', {
       type: CONTROLLER_DIMENSIONS,
-      label: 'Radius',
+      label: 'Border Radius',
       units: ["px", "%", "vw"],
       stateless: true,
     })
@@ -1126,7 +851,7 @@ class InputTextCommon extends BaseElement {
 
     this.addControl('input_icons_background', {
       type: CONTROLLER_COLOR,
-      label: 'Background',
+      label: 'Background Color',
     })
 
     this.endControlSection();

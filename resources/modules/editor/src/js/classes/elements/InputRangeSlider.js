@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import widgetIcon from '../../../svgs/bullet-list.svg';
+import widgetIcon from '../../../svgs/slider_range.svg';
 import {advancedTabControllers} from "../../decorators/register-controllers";
 import {
   CONTROLLER_TEXTAREA,
@@ -28,7 +28,7 @@ class InputRangeSlider extends BaseElement{
     return'input-range-slider';
   }
   static getTitle(){
-    return'Input Range Slider';
+    return'Range Slider';
   }
 
   static getIconComponent(){
@@ -36,6 +36,9 @@ class InputRangeSlider extends BaseElement{
   }
   static getType(){
     return 'widget';
+  }
+  static getGroup() {
+    return "Form";
   }
   _registerControls() {
     if (this.controllersRegistered) {
@@ -50,55 +53,65 @@ class InputRangeSlider extends BaseElement{
     this.addControl('vertical', {
       type: CONTROLLER_SWITCHER,
       label: 'Vertical',
+      locked: true,
     });
 
     this.addControl('min', {
       type: CONTROLLER_NUMBER,
       label: 'Min',
       default: 0,
+      locked: true,
     });
 
     this.addControl('max', {
       type: CONTROLLER_NUMBER,
       label: 'Max',
       default: 100,
+      locked: true,
     });
 
     this.addControl('step', {
       type: CONTROLLER_NUMBER,
       label: 'Step Size',
+      locked: true,
     });
 
     this.addControl('label_step', {
       type: CONTROLLER_NUMBER,
       label: 'Label Step Size',
       default: 25,
+      locked: true,
     });
 
     this.addControl('thousands_separator', {
       type: CONTROLLER_SWITCHER,
       label: 'Thousands separator',
+      locked: true,
     });
 
     this.addControl('thousands_separator_value', {
       type: CONTROLLER_TEXT,
       label: 'Separator',
+      locked: true,
     });
 
     this.addControl('decimal_place', {
       type: CONTROLLER_NUMBER,
       label: 'Rounding Degree',
+      locked: true,
     });
 
     this.addControl('decimal_separator', {
       type: CONTROLLER_TEXT,
       label: 'Separator',
+      locked: true,
     });
 
     this.addControl('custom_label', {
       type: CONTROLLER_TEXT,
       label: '',
-      default: "value: {n}"
+      default: "value: {n}",
+      locked: true,
     });
 
     this.endControlSection();
@@ -106,12 +119,12 @@ class InputRangeSlider extends BaseElement{
 
     this.startControlSection('form_start', {
       tab: TAB_CONTENT,
-      label: 'Start form',
+      label: 'Start Form',
     });
 
     this.addControl("form_id_start", {
       type: CONTROLLER_TEXT,
-      label: "Start form ID",
+      label: "Start Form ID",
       responsive: false
     });
 
@@ -122,9 +135,9 @@ class InputRangeSlider extends BaseElement{
     });
 
     this.addControl("content_default_value_start", {
-      type: CONTROLLER_TEXTAREA,
+      type: CONTROLLER_NUMBER,
       responsive: false,
-      label: "Start default Value"
+      label: "Start Default Value"
     });
 
     this.addControl("content_calculation_start", {
@@ -155,7 +168,7 @@ class InputRangeSlider extends BaseElement{
     });
 
     this.addControl("content_default_value_end", {
-      type: CONTROLLER_TEXTAREA,
+      type: CONTROLLER_NUMBER,
       responsive: false,
       label: "End default Value"
     });
@@ -282,7 +295,7 @@ class InputRangeSlider extends BaseElement{
 
     this.addControl("handle_size", {
       type: CONTROLLER_SLIDER,
-      label: 'Size',
+      label: 'Height',
       units: [
         'px',
       ],
@@ -290,12 +303,25 @@ class InputRangeSlider extends BaseElement{
       min: 0,
     });
 
+    this.addControl("handle_width", {
+      type: CONTROLLER_SLIDER,
+      label: 'Width',
+      units: [
+        'px',
+      ],
+      max: 50,
+      min: 0,
+      locked: true,
+    });
+
     this.addControl("tr_x", {
       label: 'Translate X',
+      type: CONTROLLER_NUMBER,
     });
 
     this.addControl("tr_y", {
       label: 'Translate Y',
+      type: CONTROLLER_NUMBER,
     });
 
     this.addControl('handle_radius', {

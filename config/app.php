@@ -33,7 +33,7 @@ return [
     |
     */
 
-    'altrp_version' => '0.20.22',
+    'altrp_version' => '1.0.5',
 
     /*
     |--------------------------------------------------------------------------
@@ -173,7 +173,6 @@ return [
          * Package Service Providers...
          */
         Ixudra\Curl\CurlServiceProvider::class,
-        WeStacks\TeleBot\Laravel\TeleBotServiceProvider::class,
 
         /*
          * Application Service Providers...

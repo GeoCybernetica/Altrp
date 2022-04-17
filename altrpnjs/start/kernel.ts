@@ -10,7 +10,24 @@
 */
 
 import Server from '@ioc:Adonis/Core/Server'
-import Route from "@ioc:Adonis/Core/Route";
+import Route from "@ioc:Adonis/Core/Route"
+import './view'
+import './events'
+import "../app/Services/TelegramBot"
+import {other} from "App/Services/Other";
+import _ from "lodash";
+import Customizer from "App/Models/Customizer";
+import Timer from "App/Services/Timer";
+
+const timers = other.get("timers", {});
+
+for (const key of _.keys(timers)) {
+  Customizer.query().where("name", key).preload("altrp_model").first().then((customizer) => {
+    if(customizer) {
+      new Timer(key, timers[key], customizer)
+    }
+  });
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -22,9 +39,10 @@ import Route from "@ioc:Adonis/Core/Route";
 |
 */
 Server.middleware.register([
-  () => import('App/Middleware/AltrpRouting'),
   () => import('@ioc:Adonis/Core/BodyParser'),
+  () => import('App/Middleware/SilentAuth'),
   () => import('@ioc:Adonis/Addons/Shield'),
+  () => import('App/Middleware/AltrpRouting'),
 ])
 
 Route.get('*', async () => {
@@ -50,6 +68,7 @@ Server.middleware.registerNamed({
   auth: () => import("App/Middleware/Auth"),
   admin: () => import("App/Middleware/IsAdmin"),
   cors: () => import("App/Middleware/Cors"),
-  installChecker:   () => import('App/Middleware/InstallChecker'),
 })
+
+
 

@@ -16,8 +16,6 @@ import AltrpImage from "../altrp-image/AltrpImage";
     padding-left: 0;
     opacity: 1;
     object-fit: cover;
-    border-color: rgb(50,168,82);
-    border-radius: 0;
   }
 
   .altrp-image-container {
@@ -45,11 +43,11 @@ class ImageWidget extends Component {
   render() {
     const { element } = this.props;
     const link = this.state.settings.image_link || {};
-    const cursorPointer = this.props.element.getSettings("cursor_pointer", false);
-    const background_image = this.props.element.getSettings(
-      "background_image",
-      {}
-    );
+    const cursorPointer = this.props.element.getLockedSettings("cursor_pointer", false);
+    // const background_image = this.props.element.getSettings(
+    //   "background_image",
+    //   {}
+    // );
     let classNames = "altrp-image-container";
     let media = this.state.settings.content_media;
 
@@ -67,16 +65,16 @@ class ImageWidget extends Component {
     /**
      * Возьмем данные из окружения
      */
-    if(this.getContent('raw_url')){
+    if(this.getLockedContent('raw_url')){
       media = {
-        url: this.getContent('raw_url'),
+        url: this.getLockedContent('raw_url'),
         assetType: "media",
       }
     } else if (
-      this.getContent("content_path") &&
-      _.isObject(getDataByPath(this.getContent("content_path"), null, model))
+      this.getLockedContent("content_path") &&
+      _.isObject(getDataByPath(this.getLockedContent("content_path"), null, model))
     ) {
-      media = getDataByPath(this.getContent("content_path"), null, model);
+      media = getDataByPath(this.getLockedContent("content_path"), null, model);
       /**
        * Проверим массив ли с файлами content_path
        */
@@ -86,24 +84,24 @@ class ImageWidget extends Component {
         media.assetType = "media";
       }
     } else if (
-      this.getContent("content_path") &&
-      _.isString(getDataByPath(this.getContent("content_path"), null, model))
+      this.getLockedContent("content_path") &&
+      _.isString(getDataByPath(this.getLockedContent("content_path"), null, model))
     ) {
-      media = getDataByPath(this.getContent("content_path"), null, model);
+      media = getDataByPath(this.getLockedContent("content_path"), null, model);
       media = {
         assetType: "media",
         url: media,
         name: "null"
       };
-    } else if (this.getContent('default_url') && _.isString(getDataByPath(this.getContent("default_url"), null, model))){
+    } else if (this.getLockedContent('default_url') && _.isString(getDataByPath(this.getLockedContent("default_url"), null, model))){
       media = {
         assetType: "media",
-        url: getDataByPath(this.getContent("default_url"), null, model),
+        url: getDataByPath(this.getLockedContent("default_url"), null, model),
         name: "default"
       };
     }
-    let width = this.props.element.getResponsiveSetting('width_size');
-    let height = this.props.element.getResponsiveSetting('height_size');
+    let width = this.props.element.getResponsiveLockedSetting('width_size');
+    let height = this.props.element.getResponsiveLockedSetting('height_size');
     width = _.get(width, 'size', '100') + _.get(width, 'unit', '%');
     if(_.get(height, 'size')){
       height = _.get(height, 'size') + _.get(height, 'unit', '%');
@@ -111,7 +109,7 @@ class ImageWidget extends Component {
       height = '';
     }
 
-    if(_.get(this.props.element.getResponsiveSetting('height_size'), 'size', '100') === "0") {
+    if(_.get(this.props.element.getResponsiveLockedSetting('height_size'), 'size', '100') === "0") {
       height = ""
     }
 
@@ -121,17 +119,19 @@ class ImageWidget extends Component {
         width={width}
         element={this.props.element}
         height={height}
-        className={
-          "altrp-image" +
-          (background_image ? " altrp-background-image" : "")
-        }
+        // className={
+        //   "altrp-image" +
+        //   (background_image ? " altrp-background-image-widget" : "")
+        // }
+        className="altrp-image"
       />
     );
 
     if (link.toPrevPage && !isEditor()) {
       return (
         <div
-          className={classNames}
+          className={classNames + ` ${this.state.settings.position_css_classes || ""}`}
+          id={this.state.settings.position_css_id}
           onClick={() => {
             history.back();//todo: реализовать для h-altrp
           }}
@@ -151,7 +151,8 @@ class ImageWidget extends Component {
 
       return (
         <div
-          className={classNames}
+          className={classNames + ` ${this.state.settings.position_css_classes || ""}`}
+          id={this.state.settings.position_css_id}
         >
           {(linkUrl && ! isEditor()) ? (
             link.tag === "a" || window['h-altrp'] ? (

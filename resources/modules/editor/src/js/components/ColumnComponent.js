@@ -34,7 +34,7 @@ class ColumnComponent extends Component {
     if (isEditor()) {
       return;
     }
-    const columnLink = this.props.element.getSettings('link_link');
+    const columnLink = this.props.element.getLockedSettings('link_link');
     redirect(columnLink, e, this.props.element.getCurrentModel().getData());
   };
 
@@ -47,14 +47,14 @@ class ColumnComponent extends Component {
   }
 
   render() {
-    const background_image = this.props.element.getSettings('background_image', {});
-    const background_image_hover = this.props.element.getResponsiveSetting(
+    const background_image = this.props.element.getLockedSettings('background_image', {});
+    const background_image_hover = this.props.element.getResponsiveLockedSetting(
       "background_image",
       ":hover",
       {},
     );
     let ElementWrapper = window.SectionElementWrapper || this.props.ElementWrapper || window.ElementWrapper;
-    let className = "altrp-column altrp-column-priority " + (this.state.settings.position_style_css_classes || "") + (background_image?.url || background_image_hover?.url ? ' altrp-background-image' : '');
+    let className = "altrp-column altrp-column-priority " + (this.state.settings.position_style_css_classes_column || "") + (background_image?.url || background_image_hover?.url ? ' altrp-background-image-columns' : '');
     if(this.isActive()){
       className += ' active';
     }
@@ -62,13 +62,13 @@ class ColumnComponent extends Component {
       className += ' altrp-pointer';
     }
 
-    const layout_html_tag = this.props.element.getSettings('layout_html_tag') || 'div';
+    const layout_html_tag = this.props.element.getLockedSettings('layout_html_tag') || 'div';
 
 
     return React.createElement(layout_html_tag,
       {
         className,
-        id: this.state.settings.position_style_css_id || "",
+        id: this.state.settings.position_style_css_id_column || "",
         onClick: this.onClick,
         settings: this.props.element.getSettings()
       },

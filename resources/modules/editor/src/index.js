@@ -9,6 +9,7 @@ import '../../front-app/src/js/libs/moment'
 import '../../front-app/src/js/libs/template-loader'
 import '../../front-app/src/js/libs/fullcalendar'
 import '../../front-app/src/js/libs/image-crop'
+import '../../front-app/src/js/libs/reacket'
 import { Provider } from "react-redux";
 import "./installing";
 import ElementsManager from "./js/classes/modules/ElementsManager";
@@ -77,8 +78,8 @@ function loadEditorContent(EditorContent){
       "head"
     )[0];
     let script = iframe.contentWindow.document.createElement("script");
-    script.src = "http://localhost:3000/src/bundle.js";
-    script.defer = "http://localhost:3000/src/bundle.js";
+    script.src = "http://127.0.0.1:3000/src/bundle.js";
+    script.defer = "http://127.0.0.1:3000/src/bundle.js";
     head.appendChild(script);
   }
 
@@ -107,6 +108,7 @@ import(/* webpackChunkName: 'Editor' */"./Editor.js")
     Editor = Editor.default;
 
     let editorTarget = document.getElementById("editor");
+
     if (editorTarget) {
       window.ReactDOM.render(
         <Provider store={store}>

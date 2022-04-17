@@ -17,10 +17,6 @@ import { TextArea } from "@blueprintjs/core";
 
 const { moment } = window.altrpHelpers;
 (window.globalDefaults = window.globalDefaults || []).push(`
-.altrp-field {
-  border-style: solid;
-  width: 100%;
-}
 .altrp-field-file{
   display: flex;
   justify-content: center;
@@ -269,13 +265,6 @@ const { moment } = window.altrpHelpers;
   display: flex;
   flex-wrap: wrap;
 }
-.altrp-field-option {
-  display: flex;
-  padding: 10px;
-}
-.altrp-field-option__label {
-  cursor: pointer;
-}
 textarea.altrp-field {
   display: block;
 }
@@ -373,32 +362,25 @@ class InputTextareaWidget extends Component {
     this.debounceDispatch = this.debounceDispatch.bind(this);
 
     this.defaultValue =
-      this.getContent("content_default_value") ||
-      (this.valueMustArray() ? [] : "");
-    if (this.valueMustArray() && !_.isArray(this.defaultValue)) {
-      this.defaultValue = [];
-    }
+      this.getLockedContent("content_default_value")  || "";
+    // console.log(this.getLockedContent("content_default_value"));
+    // if(! this.getLockedContent("content_default_value")){
+    //   console.log(props.element.settings.content_default_value);
+    // }
     this.state = {
       settings: { ...props.element.getSettings() },
       value: this.defaultValue,
       options: parseOptionsFromSettings(
-        props.element.getSettings("content_options")
+        props.element.getLockedSettings("content_options")
       ),
       paramsForUpdate: null
     };
     this.altrpSelectRef = React.createRef();
-    if (this.getContent("content_default_value")) {
-      this.dispatchFieldValueToStore(this.getContent("content_default_value"));
+    if (this.getLockedContent("content_default_value")) {
+      this.dispatchFieldValueToStore(this.getLockedContent("content_default_value"));
     }
   }
 
-  /**
-   * В некоторых случаях значение поля должно быть массивом
-   * @return {boolean}
-   */
-  valueMustArray() {
-    return false;
-  }
   /**
    * Чистит значение
    */
@@ -423,7 +405,7 @@ class InputTextareaWidget extends Component {
         create_allowed,
         create_label,
         create_url
-      } = this.props.element.getSettings();
+      } = this.props.element.getLockedSettings();
       if (create_allowed && create_label && create_url) {
         this.createItem(e);
       }
@@ -436,9 +418,9 @@ class InputTextareaWidget extends Component {
    * @param {{}} prevState
    */
   async _componentDidMount(prevProps, prevState) {
-    if (this.props.element.getSettings("content_options")) {
+    if (this.props.element.getLockedSettings("content_options")) {
       let options = parseOptionsFromSettings(
-        this.props.element.getSettings("content_options")
+        this.props.element.getLockedSettings("content_options")
       );
 
       this.setState(state => ({ ...state, options }));
@@ -454,7 +436,7 @@ class InputTextareaWidget extends Component {
       !prevProps.currentModel.getProperty("altrpModelUpdated") &&
       this.props.currentModel.getProperty("altrpModelUpdated")
     ) {
-      value = this.getContent("content_default_value");
+      value = this.getLockedContent("content_default_value");
       this.setState(
         state => ({ ...state, value, contentLoaded: true }),
         () => {
@@ -468,7 +450,7 @@ class InputTextareaWidget extends Component {
       this.props.currentDataStorage.getProperty("currentDataStorageLoaded") &&
       !this.state.contentLoaded
     ) {
-      value = this.getContent("content_default_value");
+      value = this.getLockedContent("content_default_value");
       this.setState(
         state => ({ ...state, value, contentLoaded: true }),
         () => {
@@ -491,7 +473,7 @@ class InputTextareaWidget extends Component {
    * Получить url для запросов
    */
   getRoute() {
-    let url = this.props.element.getSettings("model_for_options");
+    let url = this.props.element.getLockedSettings("model_for_options");
 
     if (url.indexOf("/") === -1) {
       return `/ajax/models/${url}_options`;
@@ -511,7 +493,7 @@ class InputTextareaWidget extends Component {
       !prevProps.currentDataStorage.getProperty("currentDataStorageLoaded") &&
       this.props.currentDataStorage.getProperty("currentDataStorageLoaded")
     ) {
-      let value = this.getContent(
+      let value = this.getLockedContent(
         "content_default_value"
       );
       this.setState(
@@ -549,7 +531,7 @@ class InputTextareaWidget extends Component {
     if (isEditor()) {
       return;
     }
-    let content_calculation = this.props.element.getSettings(
+    let content_calculation = this.props.element.getLockedSettings(
       "content_calculation"
     );
     const altrpforms = this.props.formsStore;
@@ -675,7 +657,7 @@ class InputTextareaWidget extends Component {
   async updateOptions() {
     {
       let formId = this.props.element.getFormId();
-      let paramsForUpdate = this.props.element.getSettings("params_for_update");
+      let paramsForUpdate = this.props.element.getLockedSettings("params_for_update");
       let formData = _.get(this.props.formsStore, [formId], {});
       paramsForUpdate = parseParamsFromString(
         paramsForUpdate,
@@ -687,7 +669,7 @@ class InputTextareaWidget extends Component {
       let options = [...this.state.options];
       if (!_.isEqual(paramsForUpdate, this.state.paramsForUpdate)) {
         if (!_.isEmpty(paramsForUpdate)) {
-          if (this.props.element.getSettings("params_as_filters", false)) {
+          if (this.props.element.getLockedSettings("params_as_filters", false)) {
             paramsForUpdate = JSON.stringify(paramsForUpdate);
             options = await new Resource({
               route: this.getRoute()
@@ -738,7 +720,7 @@ class InputTextareaWidget extends Component {
     }
 
     if (
-      this.props.element.getSettings("content_options_nullable") &&
+      this.props.element.getLockedSettings("content_options_nullable") &&
       e &&
       e.value === "<null>"
     ) {
@@ -755,11 +737,11 @@ class InputTextareaWidget extends Component {
          * Обновляем хранилище только если не текстовое поле
          */
 
-        const change_actions = this.props.element.getSettings("change_actions");
-        const change_change_end = this.props.element.getSettings(
+        const change_actions = this.props.element.getLockedSettings("change_actions");
+        const change_change_end = this.props.element.getLockedSettings(
           "change_change_end"
         );
-        const change_change_end_delay = this.props.element.getSettings(
+        const change_change_end_delay = this.props.element.getLockedSettings(
           "change_change_end_delay"
         );
 
@@ -801,7 +783,7 @@ class InputTextareaWidget extends Component {
     if (optionsDynamicSetting) {
       options = convertData(optionsDynamicSetting, options);
     }
-    if (!this.props.element.getSettings("sort_default")) {
+    if (!this.props.element.getLockedSettings("sort_default")) {
       options = _.sortBy(options, o => o && (o.label ? o.label.toString() : o));
     }
     return options;
@@ -814,7 +796,7 @@ class InputTextareaWidget extends Component {
    */
 
   onFocus = async e => {
-    const focus_actions = this.props.element.getSettings("focus_actions");
+    const focus_actions = this.props.element.getLockedSettings("focus_actions");
 
     if (focus_actions && !isEditor()) {
       const actionsManager = (
@@ -840,7 +822,7 @@ class InputTextareaWidget extends Component {
     if (_.get(editor, "getData")) {
       this.dispatchFieldValueToStore(editor.getData(), true);
     }
-    if (this.props.element.getSettings("actions", []) && !isEditor()) {
+    if (this.props.element.getLockedSettings("actions", []) && !isEditor()) {
       const actionsManager = (
         await import(
           /* webpackChunkName: 'ActionsManager' */
@@ -850,7 +832,7 @@ class InputTextareaWidget extends Component {
       await actionsManager.callAllWidgetActions(
         this.props.element.getIdForAction(),
         "blur",
-        this.props.element.getSettings("actions", []),
+        this.props.element.getLockedSettings("actions", []),
         this.props.element
       );
     }
@@ -871,7 +853,7 @@ class InputTextareaWidget extends Component {
         changeFormFieldValue(fieldName, value, formId, userInput)
       );
       if (userInput) {
-        const change_actions = this.props.element.getSettings("change_actions");
+        const change_actions = this.props.element.getLockedSettings("change_actions");
 
         if (change_actions && !isEditor()) {
           const actionsManager = (
@@ -906,7 +888,7 @@ class InputTextareaWidget extends Component {
       create_label,
       create_data,
       select2_multiple
-    } = this.props.element.getSettings();
+    } = this.props.element.getLockedSettings();
     if (!create_label && !create_url) {
       return;
     }
@@ -992,11 +974,11 @@ class InputTextareaWidget extends Component {
   render() {
     let label = null;
 
-    const settings = this.props.element.getSettings();
+    const settings = this.props.element.getLockedSettings();
     const {
       content_readonly,
       select2_multiple: isMultiple,
-      label_icon
+      label_icon,
     } = settings;
 
     let value = this.getValue();
@@ -1004,7 +986,7 @@ class InputTextareaWidget extends Component {
 
     let classLabel = "";
     let styleLabel = {};
-    const content_label_position_type = this.props.element.getResponsiveSetting(
+    const content_label_position_type = this.props.element.getResponsiveLockedSetting(
       "content_label_position_type"
     );
     switch (content_label_position_type) {
@@ -1085,7 +1067,7 @@ class InputTextareaWidget extends Component {
         autoComplete={autocomplete}
         placeholder={this.state.settings.content_placeholder}
         className={
-          "altrp-field " + this.state.settings.position_css_classes
+          "altrp-field " + (this.state.settings.position_css_classes || "")
         }
         onChange={this.onChange}
         onBlur={this.onBlur}

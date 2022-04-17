@@ -868,6 +868,7 @@ class InputSelect2Widget extends Component {
    */
   getOptions() {
     let options = [...this.state.options];
+    const {element} = this.props
     const optionsDynamicSetting = this.props.element.getDynamicSetting(
       "content_options"
     );
@@ -876,7 +877,7 @@ class InputSelect2Widget extends Component {
     if(_.isString(content_options)
       && content_options.indexOf('{{') === 0
       && ! model_for_options){
-      options = getDataByPath(content_options.replace('{{', '').replace('}}', ''))
+      options = getDataByPath(content_options.replace('{{', '').replace('}}', ''), [], element.getCurrentModel())
       if( ! _.isArray(options)){
         options = [];
       }

@@ -5,13 +5,22 @@
   ],
   "exclude": [
     "node_modules",
-    "resources/modules",
+    "app/AltrpModels",
+    "app/AltrpControllers",
+    "app/AltrpListeners",
+    "app/altrp-listeners",
+    ".env",
+    "resources/views/altrp",
     "build"
   ],
+
   "compilerOptions": {
+    "allowJs": true,
     "outDir": "build",
+    "module": "commonjs",
     "rootDir": "./",
     "sourceMap": true,
+    "esModuleInterop": true,
     "paths": {
       "App/*": [
         "./app/*"
@@ -33,7 +42,12 @@
       "@adonisjs/lucid",
       "@adonisjs/auth",
       "@adonisjs/session",
+      "@adonisjs/mail",
       "@adonisjs/shield"
+    ],
+    "jsx": "react",
+    "lib": [
+      "dom"
     ]
   }
 }

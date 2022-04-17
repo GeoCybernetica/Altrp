@@ -15,7 +15,7 @@
   <script>
     window.ALTRP_DEBUG = {!! json_encode( ! ! get_altrp_setting( 'altrp_debug', false ) ) !!};
     window.altrpMenus = [];
-    let _token = '{{ csrf_token() }}';
+    window._token = '{{ csrf_token() }}';
   </script>
   @if( env( 'ALTRP_SETTING_ADMIN_LOGO' ) )
   <script>
@@ -49,9 +49,9 @@
 </body>
 
 @php
-  echo print_statics('style', 'HEAD_BOTTOM_STYLE' );
+  echo print_statics('style', 'ADMIN_BOTTOM_STYLE' );
 @endphp
 @php
-  echo print_statics('script', 'HEAD_BOTTOM_SCRIPTS' );
+  echo print_statics('script', 'ADMIN_BOTTOM_SCRIPTS' );
 @endphp
 </html>

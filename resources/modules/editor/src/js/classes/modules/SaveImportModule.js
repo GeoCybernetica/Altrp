@@ -15,6 +15,7 @@ import {
   getSheet,
   stringifyStylesheet
 } from "../../../../../front-app/src/js/helpers/elements";
+import templateStylesModule from "./TemplateStylesModule";
 
 class SaveImportModule extends BaseModule {
   constructor(modules) {
@@ -31,9 +32,24 @@ class SaveImportModule extends BaseModule {
   /**
    * Загружаем шаблон
    */
-  load() {
+  load(getDataIfExits) {
+    if (getDataIfExits && this.data) {
+      setTitle(this.data.title);
+      let data = JSON.parse(this.data.data);
+      store.dispatch(setTemplateData(this.data));
+      let templateDataStorage = getEditor().modules.templateDataStorage;
+      templateDataStorage.setType(this.data.template_type);
+      let parsedData = this.modules.elementsFactory.parseData(data);
+      templateDataStorage.setTitle(this.data.title);
+      templateDataStorage.replaceAll(parsedData);
+      templateDataStorage.setName(this.data.name);
+      getEditor().endLoading();
+      store.dispatch(changeTemplateStatus(CONSTANTS.TEMPLATE_UPDATED));
+      return
+    }
+
     this.template_id = getTemplateId();
-    // console.log(this.template_id);
+
     store.dispatch(changeTemplateStatus(CONSTANTS.TEMPLATE_SAVING));
     if (this.template_id) {
       let res = this.resource
@@ -41,6 +57,7 @@ class SaveImportModule extends BaseModule {
         .then(templateData => {
           setTitle(templateData.title);
           let data = JSON.parse(templateData.data);
+          this.data = templateData
           store.dispatch(setTemplateData(templateData));
           let templateDataStorage = getEditor().modules.templateDataStorage;
           templateDataStorage.setType(templateData.template_type);
@@ -55,14 +72,13 @@ class SaveImportModule extends BaseModule {
           console.error(err);
           store.dispatch(changeTemplateStatus(CONSTANTS.TEMPLATE_UPDATED));
         });
-    } else {
     }
   }
 
   /**
    * Сохраняем шаблон
    */
-  saveTemplate() {
+  async saveTemplate() {
     store.dispatch(changeTemplateStatus(CONSTANTS.TEMPLATE_SAVING));
     let html_content = "";
     let stylesElements = [];
@@ -72,57 +88,13 @@ class SaveImportModule extends BaseModule {
         "sections-wrapper"
       )[0];
       if (rootElement) {
-        rootElement = rootElement.cloneNode(true);
-        _.toArray(rootElement.getElementsByClassName("overlay")).forEach(
-          overlayElement => {
-            overlayElement.remove();
-          }
-        );
-        _.toArray(
-          rootElement.getElementsByClassName("column-empty-plus")
-        ).forEach(overlayElement => {
-          overlayElement.remove();
-        });
-        _.forEach(rootElement.querySelectorAll("[id]"), item => {
-          item.removeAttribute("id");
-        });
         html_content = rootElement.outerHTML;
+        rootElement = rootElement.cloneNode(true);
       }
-      stylesElements = window.altrpEditorContent.editorWindow.current
-        .getRootNode()
-        .getElementById("styles-container")?.children;
-      stylesElements = _.toArray(stylesElements);
-      stylesElements = stylesElements.filter(style => {
-        return style.tagName === "STYLE";
-      });
-
-      let styledTag = window.altrpEditorContent.editorWindow.current
-        .getRootNode()
-        .querySelector('[data-styled="active"]');
-      if (styledTag) {
-        const contentDocument = styledTag.getRootNode();
-
-        const _styledTag = styledTag.cloneNode(true);
-        _styledTag.removeAttribute("data-styled");
-        _styledTag.removeAttribute("data-styled-version");
-        _styledTag.innerHTML = stringifyStylesheet(
-          getSheet(styledTag, contentDocument)
-        );
-        stylesElements.push(_styledTag);
-      }
-
-      stylesElements = stylesElements.map(style =>
-        style ? style.outerHTML : ""
-      );
     }
     let templateData = getEditor().modules.templateDataStorage.getTemplateDataForSave();
     templateData.html_content = html_content;
-    if (stylesElements.length) {
-      templateData.styles = {
-        all_styles: stylesElements,
-        important_styles: stylesElements
-      };
-    }
+    templateData.styles = await templateStylesModule.generateStyles();
     this.resource
       .put(this.template_id, templateData)
       .then(res => {

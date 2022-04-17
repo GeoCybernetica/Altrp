@@ -59,17 +59,14 @@ class SimpleElementWrapper extends Component {
     })
 
     const {element} = this.props
-    const mountElementEvent = new Event(`altrp-mount-element:${element.getId()}` );
-    const mountElementTypeEvent = new Event(`altrp-mount-element:${element.getName()}` );
-    document.dispatchEvent(mountElementEvent)
-    document.dispatchEvent(mountElementTypeEvent)
+    // const mountElementEvent = new Event(`altrp-mount-element:${element.getId()}` );
+    // const mountElementTypeEvent = new Event(`altrp-mount-element:${element.getName()}` );
+    // document.dispatchEvent(mountElementEvent)
+    // document.dispatchEvent(mountElementTypeEvent)
   }
 
   componentWillUnmount() {
     const {element} = this.props
-    if(element.getId() === '_giafvu4nk'){
-      console.error(this);
-    }
     const unmountElementEvent = new Event(`altrp-unmount-element:${element.getId()}` );
     const unmountElementTypeEvent = new Event(`altrp-unmount-element:${element.getName()}` );
     document.dispatchEvent(unmountElementEvent)
@@ -392,6 +389,7 @@ class SimpleElementWrapper extends Component {
       case "menu":
       case "input-file":
       case "section":
+      case "section_widget":
       case "input-crop-image":
       case "icon":
         WrapperComponent = React.Fragment;

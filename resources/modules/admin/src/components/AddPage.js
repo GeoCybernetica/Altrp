@@ -12,6 +12,9 @@ import "./../sass/components/AddPost.scss";
 import {Alignment, Button, InputGroup, MenuItem, TextArea} from "@blueprintjs/core";
 import {MultiSelect, Select} from "@blueprintjs/select";
 import UserTopPanel from "./UserTopPanel";
+import {compose} from "redux";
+import {connect} from "react-redux";
+import Models from "./Models";
 
 const columns = [
   {
@@ -103,7 +106,8 @@ class AddPage extends Component {
       categoryOptions: data
     }))
 
-    let models_res = await this.model_resource.getAll();
+    let [ getModels ] = await this.model_resource.getAll();
+    const models_res = getModels.options
     if (this.props.modelsState) {
       this.setState(state => {
         return {
@@ -123,7 +127,8 @@ class AddPage extends Component {
               value: '',
               label: 'None',
             },
-            ...models_res.filter(item => item.value >= 5)]
+            ...models_res.filter(item => !this.props.standardModels.some(model => model.label === item.label))]
+
         };
       });
     }
@@ -212,10 +217,10 @@ class AddPage extends Component {
     }
 
     window.addEventListener("scroll", this.listenScrollHeader)
+  }
 
-    return () => {
-      window.removeEventListener("scroll", this.listenScrollHeader)
-    }
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.listenScrollHeader)
   }
 
   listenScrollHeader = () => {
@@ -370,9 +375,7 @@ class AddPage extends Component {
   };
 
   isItemSelectedRoles = (item) => {
-    let itemString = JSON.stringify(item);
-    let selectedString = JSON.stringify(this.state.value.roles);
-    return selectedString.includes(itemString);
+    return this.state.value.roles.some(c=>c.value === item.value);
   };
 
   handleItemSelectRoles = (item) => {
@@ -426,9 +429,7 @@ class AddPage extends Component {
   }
 
   isItemSelectedCategory = (item) => {
-    let itemString = JSON.stringify(item);
-    let selectedString = JSON.stringify(this.state.value.categories);
-    return selectedString.includes(itemString);
+    return this.state.value.categories.some(c=>c.value === item.value);
   }
 
   handleItemSelectCategory = (item) => {
@@ -459,9 +460,7 @@ class AddPage extends Component {
     const {isModalOpened, editingDataSource} = this.state;
     let {dataSources} = this.state;
     let id = this.props.match.params.id
-
-    console.log(this.state)
-
+    console.log(this.state.value.rolesOptions.filter(i=>this.isItemSelectedRoles(i)));
     dataSources = _.sortBy(dataSources, dataSource => dataSource.priority);
     return (
       <div className="admin-pages admin-page">
@@ -678,7 +677,7 @@ class AddPage extends Component {
                                        noResults={<MenuItem disabled={true} text="No results."/>}
                                        fill={true}
                                        placeholder="All..."
-                                       selectedItems={this.state.value.roles}
+                                       selectedItems={this.state.value.rolesOptions.filter(i=>this.isItemSelectedRoles(i))}
                                        onItemSelect={this.handleItemSelectRoles}
                                        itemRenderer={(item, {handleClick, modifiers, query}) => {
                                          return (
@@ -924,4 +923,16 @@ class AddPage extends Component {
   }
 }
 
-export default withRouter(AddPage);
+const mapStateToProps = (state) => {
+  return {
+    standardModels: state.modelsState.standardModels,
+    modelsState: state.modelsState.toggleModels,
+  }
+}
+
+AddPage = compose(
+  connect(mapStateToProps),
+  withRouter
+)(AddPage)
+
+export default AddPage;

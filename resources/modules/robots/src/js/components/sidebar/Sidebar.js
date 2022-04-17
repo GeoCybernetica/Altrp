@@ -4,7 +4,7 @@ import RobotSettingsPanel from "./modules/RobotSettingsPanel";
 import SelectedPanel from "./modules/SelectedPanel";
 import store from "../../store/store";
 import Resource from "../../../../../editor/src/js/classes/Resource";
-import LogoIcon from "../../../../../editor/src/svgs/logo.svg";
+import LogoIcon from "../../../../../editor/src/svgs/logotext.svg";
 import DotsIcon from "../../../../../editor/src/svgs/dots.svg";
 import HamburgerIcon from "../../../../../editor/src/svgs/hamburger.svg";
 import SettingsIcon from "../../../../../editor/src/svgs/settings.svg";
@@ -40,8 +40,13 @@ export default class Sidebar extends React.Component {
 
   async update() {
     const robotId = new URL(window.location).searchParams.get("robot_id");
-    // const robotData = store.getState()?.currentRobot;
-    const robotData = this.state.robot
+    const robot = store.getState()?.currentRobot;
+    const { categories, _categories } = this.state.robot
+    const robotData = {
+      ...robot,
+      categories,
+      _categories
+    }
     const robotChart = store.getState()?.robotSettingsData;
     robotData.chart = JSON.stringify(robotChart);
     console.log(this.props.sources);
@@ -63,9 +68,7 @@ export default class Sidebar extends React.Component {
   };
 
   isItemSelectedCategory = (item) => {
-    let itemString = JSON.stringify(item);
-    let selectedString = JSON.stringify(this.state.robot.categories || []);
-    return selectedString.includes(itemString);
+    return this.state.robot.categories.some(c=>c.value === item.value);
   };
 
   handleItemSelectCategory = (item) => {
@@ -110,7 +113,7 @@ export default class Sidebar extends React.Component {
             {window.admin_logo ? (
               renderAsset(window.admin_logo, { className: "editor__logo" })
             ) : (
-              <LogoIcon viewBox="0 0 97 35" className="editor__logo" />
+              <LogoIcon  className="editor__logo" />
             )}
           </a>
 

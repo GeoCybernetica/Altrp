@@ -11,7 +11,8 @@ import AutoUpdateCheckbox from "./AutoUpdateCheckbox";
 import UserTopPanel from "./UserTopPanel";
 import React from "react";
 import CategoryTable from "./CategoryTable";
-const AdvancedSettings = React.lazy(() => import("./AdvancedSettings"));
+import ImageSettingsTable from "./ImageSettingsTable";
+import AdvancedSettings from "./AdvancedSettings";
 const MailForm = React.lazy(() => import("./settings/MailForm"));
 
 export default class AdminSettings extends Component {
@@ -25,6 +26,8 @@ export default class AdminSettings extends Component {
       SSRConf: false,
       activeTab: parseInt(window.location.hash[1]) || 0,
       modal: false,
+      imageModal: false,
+      idImageSetting: null,
       idModal: null
     };
   }
@@ -156,6 +159,29 @@ export default class AdminSettings extends Component {
     }))
   }
 
+  toggleModalImageSettings = () => {
+    if (this.state.idImageSetting) {
+      this.setState(state => ({
+        ...state,
+        imageModal: !state.imageModal,
+        idImageSetting: null
+      }))
+    } else {
+      this.setState(state => ({
+        ...state,
+        imageModal: !state.imageModal
+      }))
+    }
+  }
+
+  editImageSettings = (id) => {
+    this.setState(state => ({
+      ...state,
+      imageModal: true,
+      idImageSetting: id
+    }))
+  }
+
   render() {
     const { SSRPort, SSRAlias, SSRConf, idModal  } = this.state;
 
@@ -173,6 +199,9 @@ export default class AdminSettings extends Component {
             {this.state.activeTab === 8 && (
               <button className="btn" onClick={this.toggleModalCategory}>Add Category</button>
             )}
+            {this.state.activeTab === 9 && (
+              <button className="btn" onClick={this.toggleModalImageSettings}>Add Image Settings</button>
+            )}
           </div>
           <UserTopPanel />
         </div>
@@ -188,6 +217,7 @@ export default class AdminSettings extends Component {
               <Tab>Import</Tab>
               <Tab>Mail</Tab>
               <Tab>Categories</Tab>
+              <Tab>Image settings</Tab>
             </TabList>
             <TabPanel>
               <table>
@@ -332,9 +362,7 @@ export default class AdminSettings extends Component {
               </div>
             </TabPanel>
             <TabPanel>
-              <React.Suspense fallback={"Loading"}>
-                <AdvancedSettings />
-              </React.Suspense>
+              <AdvancedSettings />
             </TabPanel>
             <TabPanel>
               <Updates attr={"attr"} />
@@ -356,6 +384,14 @@ export default class AdminSettings extends Component {
                 activeMode={this.state.modal}
                 guid={this.state.idModal}
                 onToggle={this.toggleModalCategory}
+              />
+            </TabPanel>
+            <TabPanel className="Image-settings">
+              <ImageSettingsTable
+                onToggle={this.toggleModalImageSettings}
+                activeMode={this.state.imageModal}
+                edit={this.editImageSettings}
+                id={this.state.idImageSetting}
               />
             </TabPanel>
           </Tabs>

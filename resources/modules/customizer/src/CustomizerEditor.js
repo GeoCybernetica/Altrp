@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import ReactFlow, {
   MiniMap,
   ReactFlowProvider,
@@ -10,17 +10,17 @@ import ReactFlow, {
   isEdge
 } from "react-flow-renderer";
 import dagre from 'dagre';
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 import _ from "lodash";
 import "./sass/styles.scss";
 import Resource from "../../editor/src/js/classes/Resource";
-import { hot } from "react-hot-loader";
+import {hot} from "react-hot-loader";
 import store from "./js/store/store";
 import {
   setUpdatedNode,
   setCustomizerSettingsData
 } from "./js/store/customizer-settings/actions";
-import { setCurrentCustomizer } from "./js/store/current-customizer/actions";
+import {setCurrentCustomizer} from "./js/store/current-customizer/actions";
 import Sidebar from "./js/components/sidebar/Sidebar";
 import Switch from "./js/components/sidebar/modules/widgets/Switch";
 import Change from "./js/components/sidebar/modules/widgets/Change";
@@ -31,13 +31,16 @@ import ConnectionLine from './js/components/sidebar/modules/widgets/ConnectionLi
 import ContextMenuCustomizer from "./js/components/sidebar/modules/data/ContextMenuCustomizer";
 import {contextMenu} from "react-contexify";
 import {setCopyNode, setSelectNode} from "./js/store/copy-node/action";
-import {storage} from "./js/storage";
+import {isJSON} from "../../front-app/src/js/helpers";
+import {io} from "socket.io-client";
+import getNodeData from "./js/components/sidebar/modules/robot/getNodeData";
 
 const mapStateToProps = state => {
   return {
     elements: _.cloneDeep(state.customizerSettingsData),
     customizer: _.cloneDeep(state.currentCustomizer),
     other: _.cloneDeep(state.otherData),
+    nodeState: state.nodeStoreData.nodes
   };
 };
 
@@ -59,17 +62,18 @@ class CustomizerEditor extends Component {
     this.setSources = this.setSources.bind(this);
     this.getLayoutedElements = this.getLayoutedElements.bind(this);
     this.onLayout = this.onLayout.bind(this);
-    this.resource = new Resource({ route: "/admin/ajax/customizers" });
+    this.resource = new Resource({route: "/admin/ajax/customizers"});
     this.reactFlowRef = React.createRef();
     this.dagreGraph = new dagre.graphlib.Graph();
 
+    this.getConnect()
   }
 
   // Записьв store в state
   updateCustomizerState() {
     const elements = store.getState()?.customizerSettingsData;
     const customizer = store.getState()?.currentCustomizer;
-    this.setState(s => ({ ...s, elements, customizer, btnActive: "btn_active" }));
+    this.setState(s => ({...s, elements, customizer, btnActive: "btn_active"}));
   }
 
   updateCustomizer = async () => {
@@ -78,22 +82,42 @@ class CustomizerEditor extends Component {
     store.dispatch(setCurrentCustomizer(customizer));
   }
 
-  checkingLocalStorageRelevance = () => {
-    let localObj = storage.getItem('node')
-    if (localObj) {
-      let date = new Date().getTime();
-      if (date - localObj.startTime > localObj.expires) {
-        storage.deleteItem('node')
-        store.dispatch(setCopyNode(false))
-      } else {
-        store.dispatch(setCopyNode(true))
-      }
+  checkingLocalStorageRelevance = async () => {
+    let localObj = await navigator.clipboard?.readText()
+    if (localObj && isJSON(localObj)) {
+      store.dispatch(setCopyNode(true))
+    } else {
+      store.dispatch(setCopyNode(false))
+    }
+  }
+
+  // Подключение вебсокетов
+  async getConnect() {
+    let currentUser = await new Resource({
+      route: "/ajax/current-user"
+    }).getAll();
+    currentUser = currentUser.data;
+
+    if(currentUser.guid && !this.altrpIo) {
+      this.altrpIo = io( {
+        path: '/wsaltrp',
+        auth: {
+          key: currentUser.guid,
+        },
+      })
+      this.altrpIo.on("message", (data) => {
+        console.log(data)
+      })
     }
   }
 
 
   async componentDidMount() {
-    this.checkingLocalStorageRelevance()
+    try{
+      await this.checkingLocalStorageRelevance()
+    }catch (e) {
+      console.error(e);
+    }
     store.subscribe(this.updateCustomizerState.bind(this));
 
     const customizerId = new URL(window.location).searchParams.get("customizer_id");
@@ -102,11 +126,11 @@ class CustomizerEditor extends Component {
     store.dispatch(setCurrentCustomizer(customizer));
     if (customizer.sources) {
       let sources = this.changeSources(customizer.sources);
-      this.setState(s => ({ ...s, sources}));
+      this.setState(s => ({...s, sources}));
     }
-    if(!customizer.data) return;
+    if (!customizer.data) return;
     let data = _.isString(customizer.data) ? JSON.parse(customizer.data) : customizer.data;
-    if( !_.isArray(data)){
+    if (!_.isArray(data)) {
       data = [];
     }
     store.dispatch(setCustomizerSettingsData(data));
@@ -115,13 +139,13 @@ class CustomizerEditor extends Component {
     this.dagreGraph.setDefaultEdgeLabel(() => ({}));
   }
 
-  setSources(sources){
+  setSources(sources) {
     this.setState(s => ({...s, sources}));
   }
 
-  changeSources(sources){
-    if(_.isArray(sources)) {
-      sources.map(item =>{
+  changeSources(sources) {
+    if (_.isArray(sources)) {
+      sources.map(item => {
         item.parameters = item?.pivot?.parameters ?? '';
         return item;
       });
@@ -135,10 +159,10 @@ class CustomizerEditor extends Component {
     const selectNode = this.state.selectNode;
     const selectEdge = this.state.selectEdge;
     const newStore = removeElements(elementsToRemove, customizerStore);
-    if(_.isArray(elementsToRemove)){
-      elementsToRemove.map(item =>{
-        if(item.id == selectNode?.id) this.setState(s => ({ ...s, selectNode: {} }));
-        if(item.id == selectEdge?.id) this.setState(s => ({ ...s, selectEdge: {} }));
+    if (_.isArray(elementsToRemove)) {
+      elementsToRemove.map(item => {
+        if (item.id == selectNode?.id) this.setState(s => ({...s, selectNode: {}}));
+        if (item.id == selectEdge?.id) this.setState(s => ({...s, selectEdge: {}}));
       })
     }
     this.PaneClick();
@@ -168,7 +192,10 @@ class CustomizerEditor extends Component {
     event.preventDefault();
     const reactFlowBounds = this.reactFlowRef.current.getBoundingClientRect();
     const type = event.dataTransfer.getData("reactflow-type");
-    const props = this.getNodeData(type);
+    let props;
+
+    props = this.getNodeData(type);
+
     const position = this.state.reactFlowInstance.project({
       x: event.clientX - reactFlowBounds.left,
       y: event.clientY - reactFlowBounds.top
@@ -201,7 +228,7 @@ class CustomizerEditor extends Component {
   getPosition() {
     const elements = store.getState()?.customizerSettingsData;
     let position = 'vertical';
-    if (_.isArray(elements)){
+    if (_.isArray(elements)) {
       elements.map(item => {
         if (item?.targetPosition === 'left') position = 'horizontal';
         else if (item?.sourcePosition === 'right') position = 'horizontal';
@@ -212,9 +239,9 @@ class CustomizerEditor extends Component {
 
   // Получение data нового элемента (ноды)
   getNodeData(type) {
-    let data = { type };
+    let data = {type};
 
-    switch (type){
+    switch (type) {
       case "switch":
         data = {
           "type": "switch",
@@ -231,8 +258,8 @@ class CustomizerEditor extends Component {
         data = {
           "type": "start",
           "nodeData": {
-              "operator": "",
-              "body": []
+            "operator": "",
+            "body": []
           }
         };
         break;
@@ -240,7 +267,94 @@ class CustomizerEditor extends Component {
         data = {
           "type": "customizer",
           "nodeData": {
-              "id": "",
+            "id": "",
+          }
+        };
+        break;
+      case "bot":
+        data = {
+          "type": "bot",
+          "nodeData": {
+            "type": "bot",
+            "data": {
+              "shortcode": "",
+              "content": [],
+            }
+          }
+        };
+        break;
+      case "documentAction":
+        data = {
+          "type": "documentAction",
+          "nodeData": {
+            "type": "document",
+            "data": {
+            }
+          },
+        };
+        break;
+      case "crudAction":
+        data = {
+          "type": "crudAction",
+          "nodeData": {
+            "type": "crud",
+            "data": {
+              "method": "",
+              "body": {},
+              "record": "",
+              "model_id": "",
+            }
+          }
+        };
+        break;
+      case "apiAction":
+        data = {
+          "type": "apiAction",
+          "nodeData": {
+            "type": "api",
+            "data": {
+              "source": "",
+              "method": "",
+              "headers": "",
+              "name": "",
+              "url": "",
+              "data": ""
+            }
+          },
+        };
+        break;
+      case "messageAction":
+        data = {
+          "type": "messageAction",
+          "nodeData": {
+            "type": "send_notification",
+            "data": {
+              "entities": "",
+              "entitiesData": {
+                "users": [],
+                "roles": [],
+                "dynamicValue": "",
+              },
+              "channel": "",
+              "content": {},
+            }
+          }
+        };
+        break;
+      case "condition":
+        data = {
+          "type": "condition",
+          "nodeData": {
+            "operator": "",
+            "body": []
+          }
+        };
+        break;
+      case "robot":
+        data = {
+          "type": "robot",
+          "nodeData": {
+            "id": "",
           }
         };
         break;
@@ -266,8 +380,8 @@ class CustomizerEditor extends Component {
   }
 
   onLoad = (reactFlowInstance) => {
-    reactFlowInstance.fitView({ includeHiddenNodes: true });
-    this.setState(s => ({ ...s, reactFlowInstance }));
+    reactFlowInstance.fitView({includeHiddenNodes: true});
+    this.setState(s => ({...s, reactFlowInstance}));
   }
 
   onNodeDragStop = (event, node) => {
@@ -287,24 +401,24 @@ class CustomizerEditor extends Component {
   onElementClick = (event, element) => {
     const elements = store.getState()?.customizerSettingsData ?? [];
     let elementStore = {};
-    if (_.isArray(elements)){
-      elements.map(item =>{
-        if(item.id === element.id) elementStore = item;
+    if (_.isArray(elements)) {
+      elements.map(item => {
+        if (item.id === element.id) elementStore = item;
       });
     }
 
-    if(isNode(elementStore)) this.setState(s => ({ ...s, selectNode: elementStore, selectEdge: false }));
-    if(isEdge(elementStore)) this.setState(s => ({ ...s, selectEdge: elementStore, selectNode: false }));
+    if (isNode(elementStore)) this.setState(s => ({...s, selectNode: elementStore, selectEdge: false}));
+    if (isEdge(elementStore)) this.setState(s => ({...s, selectEdge: elementStore, selectNode: false}));
     store.dispatch(setSelectNode(element.type, element.id))
-    this.setState(s => ({ ...s, activePanel: "selected" }));
+    this.setState(s => ({...s, activePanel: "selected"}));
   }
 
   changeTab(item) {
-    this.setState(s => ({ ...s, activePanel: item }));
+    this.setState(s => ({...s, activePanel: item}));
   }
 
   btnChange(item) {
-    this.setState(s => ({ ...s, btnActive: item }));
+    this.setState(s => ({...s, btnActive: item}));
   }
 
   onLayout(item) {
@@ -317,14 +431,14 @@ class CustomizerEditor extends Component {
 
   getLayoutedElements(elements, direction = 'TB') {
     const isHorizontal = direction === 'LR';
-    this.dagreGraph.setGraph({ rankdir: direction });
+    this.dagreGraph.setGraph({rankdir: direction});
 
     const nodeWidth = 172;
     const nodeHeight = 36;
 
     elements.forEach((el) => {
       if (isNode(el)) {
-        this.dagreGraph.setNode(el.id, { width: nodeWidth, height: nodeHeight });
+        this.dagreGraph.setNode(el.id, {width: nodeWidth, height: nodeHeight});
       } else {
         this.dagreGraph.setEdge(el.source, el.target);
       }
@@ -353,63 +467,80 @@ class CustomizerEditor extends Component {
 
   PaneClick = () => {
     if (this.state.activePanel !== 'widgets') {
-      this.setState(state => ({ ...state, activePanel: "widgets" }));
+      this.setState(state => ({...state, activePanel: "widgets"}));
     }
     store.dispatch(setSelectNode(false, false))
   }
 
-  showMenu(e){
+  showMenu(e) {
     contextMenu.show({
       event: e,
       id: "context"
     });
   }
 
-  rightClick = (e, node) => {
+  rightClickNode = async (e, node) => {
+    e.preventDefault();
     this.onElementClick(e, node)
+    let localObj = await navigator.clipboard?.readText()
+    if (localObj && isJSON(localObj)) {
+      store.dispatch(setCopyNode(true))
+    } else {
+      store.dispatch(setCopyNode(false))
+    }
     this.showMenu(e)
   }
 
+  rightClickPanel = async (e) => {
+    e.preventDefault();
+    this.PaneClick()
+    let localObj = await navigator.clipboard?.readText()
+    if (localObj && isJSON(localObj)) {
+      store.dispatch(setCopyNode(true))
+    } else {
+      store.dispatch(setCopyNode(false))
+    }
+    this.showMenu(e)
+  }
 
   render() {
+    let nodesTypesObj = {}
+    this.props.nodeState.forEach(el => {
+      nodesTypesObj[el.name] = el.node
+    })
     return (
       <div className="page__content">
         <ReactFlowProvider>
           <Sidebar changeTab={this.changeTab}
-                  activePanel={ this.state.activePanel }
-                  customizer={ this.state.customizer }
-                  sources={ this.state.sources }
-                  elements={ this.state.elements }
-                  selectNode={ this.state.selectNode }
-                  selectEdge={ this.state.selectEdge }
-                  onLoad={ this.onLoad }
-                  btnActive={ this.state.btnActive }
-                  btnChange={ this.btnChange }
-                  setSources={ this.setSources }
-                   onLayout={ this.onLayout }
-                   updateCustomizer={ this.updateCustomizer }
+                   activePanel={this.state.activePanel}
+                   customizer={this.state.customizer}
+                   sources={this.state.sources}
+                   elements={this.state.elements}
+                   selectNode={this.state.selectNode}
+                   selectEdge={this.state.selectEdge}
+                   onLoad={this.onLoad}
+                   btnActive={this.state.btnActive}
+                   btnChange={this.btnChange}
+                   setSources={this.setSources}
+                   onLayout={this.onLayout}
+                   updateCustomizer={this.updateCustomizer}
           />
-          <div className="content" ref={this.reactFlowRef }>
+          <div className="content" ref={this.reactFlowRef}>
             <ReactFlow
-              elements={ this.props.elements }
-              onConnect={ this.onConnect }
-              onElementsRemove={ this.onElementsRemove }
+              elements={this.props.elements}
+              onConnect={this.onConnect}
+              onElementsRemove={this.onElementsRemove}
               deleteKeyCode={'Delete'}
-              onElementClick={ this.onElementClick }
-              onNodeContextMenu={this.rightClick}
-              onPaneContextMenu={(e) => this.showMenu(e)}
+              onElementClick={this.onElementClick}
+              onNodeContextMenu={this.rightClickNode}
+              onPaneContextMenu={this.rightClickPanel}
               onPaneClick={(e) => this.PaneClick(e)}
-              onLoad={ this.onLoad }
-              onDrop={ this.onDrop }
-              onNodeDragStart={ this.onNodeDragStart }
-              onNodeDragStop={ this.onNodeDragStop }
-              onDragOver={ this.onDragOver }
-              nodeTypes={{
-                start: Start,
-                switch: Switch,
-                change: Change,
-                return: Return,
-              }}
+              onLoad={this.onLoad}
+              onDrop={this.onDrop}
+              onNodeDragStart={this.onNodeDragStart}
+              onNodeDragStop={this.onNodeDragStop}
+              onDragOver={this.onDragOver}
+              nodeTypes={nodesTypesObj}
               onEdgeUpdate={this.onEdgeUpdate}
               edgeTypes={{
                 custom: CustomEdge,
@@ -417,21 +548,28 @@ class CustomizerEditor extends Component {
               connectionLineComponent={ConnectionLine}
               selectNodesOnDrag={false}
             >
-              <Controls />
+              <Controls/>
               <MiniMap
                 nodeColor={node => {
                   switch (node.type) {
-                    case 'condition': return '#FF4E6E';
-                    case 'action': return '#315EFB';
-                    case 'customizer': return '#87CA00';
-                    default: return '#8E94AA';
+                    case 'condition':
+                      return '#FF4E6E';
+                    case 'action':
+                      return '#315EFB';
+                    case 'customizer':
+                      return '#87CA00';
+                    default:
+                      return '#8E94AA';
                   }
                 }}
                 nodeClassName={node => {
                   switch (node.type) {
-                    case 'customizer': return 'customizer-node-map';
-                    case 'condition': return 'condition-node-map';
-                    default: return 'flow-node';
+                    case 'customizer':
+                      return 'customizer-node-map';
+                    case 'condition':
+                      return 'condition-node-map';
+                    default:
+                      return 'flow-node';
                   }
                 }}
               />

@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import FromIcon from "../../../svgs/form-horizontal.svg";
+import FromIcon from "../../../svgs/date.svg";
 import { advancedTabControllers } from "../../decorators/register-controllers";
 import {
   CONTROLLER_TEXTAREA,
@@ -25,13 +25,16 @@ class InputDate extends BaseElement {
     return "input-date";
   }
   static getTitle() {
-    return "Input Date";
+    return "Date";
   }
   static getIconComponent() {
     return FromIcon;
   }
   static getType() {
     return "widget";
+  }
+  static getGroup() {
+    return "Form";
   }
   _registerControls() {
     if (this.controllersRegistered) {
@@ -60,7 +63,8 @@ class InputDate extends BaseElement {
           value: "dateTime",
           label: "date and time"
         }
-      ]
+      ],
+      locked: true,
     });
 
     this.addControl("content_locale", {
@@ -76,7 +80,8 @@ class InputDate extends BaseElement {
           value: "ru",
           label: "RU"
         }
-      ]
+      ],
+      locked: true,
     });
 
     this.addControl("form_id", {
@@ -92,7 +97,8 @@ class InputDate extends BaseElement {
     this.addControl("nullable", {
       type: CONTROLLER_SWITCHER,
       label: "Nullable",
-      default: false
+      default: false,
+      locked: true,
     });
 
     const optionsRepeater = new Repeater();
@@ -114,7 +120,8 @@ class InputDate extends BaseElement {
 
     this.addControl("content_label", {
       type: CONTROLLER_TEXT,
-      label: "Label"
+      label: "Label",
+      locked: true,
     });
 
     this.addControl("content_label_position_type", {
@@ -142,12 +149,14 @@ class InputDate extends BaseElement {
           value: "absolute",
           label: "Absolute"
         }
-      ]
+      ],
+      locked: true,
     });
 
     this.addControl("label_icon", {
       type: CONTROLLER_MEDIA,
-      label: "Choose Icon"
+      label: "Choose Icon",
+      locked: true,
     });
 
     this.addControl("label_icon_position", {
@@ -177,7 +186,8 @@ class InputDate extends BaseElement {
     this.addControl("content_placeholder", {
       type: CONTROLLER_TEXT,
       label: "Placeholder",
-      default: "Placeholder"
+      default: "Placeholder",
+      locked: true,
     });
 
     this.addControl("content_format", {
@@ -186,29 +196,34 @@ class InputDate extends BaseElement {
       placeholder: 'YYYY-MM-DD',
       responsive: false,
       stateless: true,
-      description : '<a href="https://momentjs.com/" target="_blank">Documentation</a>'
+      description : '<a href="https://momentjs.com/" target="_blank">Documentation</a>',
+      locked: true,
     });
 
     this.addControl("content_required", {
       type: CONTROLLER_SWITCHER,
-      label: "Required"
+      label: "Required",
+      locked: true,
     });
 
     this.addControl("content_readonly", {
       type: CONTROLLER_SWITCHER,
-      label: "Readonly"
+      label: "Readonly",
+      locked: true,
     });
 
     this.addControl("content_timestamp", {
       type: CONTROLLER_SWITCHER,
       label: "Timestamp",
-      default: false
+      default: false,
+      locked: true,
     });
 
     this.addControl("content_default_value", {
       type: CONTROLLER_TEXTAREA,
       default: "",
-      label: "Default Value"
+      label: "Default Value",
+      locked: true,
     });
 
     // this.addControl("content_calculation", {
@@ -357,7 +372,7 @@ class InputDate extends BaseElement {
       units: ["px", "%", "vh"],
       max: 60,
       min: 0,
-
+      locked: true,
     });
 
     this.addControl("label_background_color", {
@@ -404,7 +419,8 @@ class InputDate extends BaseElement {
       },
       units: ["px", "%", "vh"],
       max: 100,
-      min: -100
+      min: -100,
+      locked: true,
       // rules: {
       //   "{{ELEMENT}} .altrp-field-label-container{{STATE}}":
       //     "top: {{SIZE}}{{UNIT}};"
@@ -746,6 +762,7 @@ class InputDate extends BaseElement {
     this.addControl('picker_minimal', {
       type: CONTROLLER_SWITCHER,
       label: 'Minimal',
+      locked: true,
     });
 
     this.addControl('picker_padding', {

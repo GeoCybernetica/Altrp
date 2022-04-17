@@ -96,14 +96,17 @@ class Models extends Component {
    */
   getDataSources = async () => {
     let res = await this.dataSourcesResource.getQueried({
-
       s: this.state.dataSourcesSearch,
-      ...this.state.dataSourcesSorting
+      ...this.state.dataSourcesSorting,
+      page: this.state.currentPageDataSources,
+      pageSize: this.itemsPerPage
     });
     this.setState(state => {
       return {
         ...state,
         dataSources: res.data_sources,
+        dataSourcesCount: res.count,
+        dataSourcesPageCount: res.pageCount
       }
     });
   };
@@ -122,7 +125,7 @@ class Models extends Component {
       this.setState(state => {
         return {
           ...state,
-          modelsDidMount: res.models.filter(item => item.id >= 5),
+          modelsDidMount: res.models.filter(item => !this.props.standardModels.some(model => model.name === item.name)),
         }
       });
     }
@@ -141,12 +144,16 @@ class Models extends Component {
       res = await this.modelsResource.getQueried({
         categories: urlCategories,
         s: urlS === null ? this.state.modelsSearch : urlS,
-        ...this.state.modelsSorting
+        ...this.state.modelsSorting,
+        page: this.state.currentPageModels,
+        pageSize: this.itemsPerPage,
       });
     } else {
         res = await this.modelsResource.getQueried({
         s: urlS === null ? this.state.modelsSearch : urlS,
-        ...this.state.modelsSorting
+        ...this.state.modelsSorting,
+        page: this.state.currentPageModels,
+        pageSize: this.itemsPerPage,
       });
     }
     this.props.updateModels()
@@ -156,17 +163,19 @@ class Models extends Component {
           ...state,
           models: res.models,
           modelsSearch: urlS === null ? this.state.modelsSearch : urlS,
+          modelsCount: res.count,
           modelsPageCount: res.pageCount,
-          activeCategory: urlCategories === null ? 'All' : urlCategories
+          activeCategory: urlCategories === null ? 'All' : urlCategories,
         }
       });
     } else {
       this.setState(state => {
         return {
           ...state,
-          models: res.models.filter(item => item.id >= 5),
-          modelsSearch: urlS === null ? this.state.modelsSearch : urlS,
+          models: res.models.filter(item => !this.props.standardModels.some(model => model.name === item.name)),
+          modelsCount: res.count,
           modelsPageCount: res.pageCount,
+          modelsSearch: urlS === null ? this.state.modelsSearch : urlS,
           activeCategory: urlCategories === null ? 'All' : urlCategories
         }
       });
@@ -201,7 +210,7 @@ class Models extends Component {
       } else {
         this.setState(state => ({
           ...state,
-          models: models.filter(item => item.id >= 5),
+          models: models.filter(item => !this.props.standardModels.some(model => model.name === item.name)),
           activeCategory: guid
         }))
       }
@@ -220,7 +229,7 @@ class Models extends Component {
       } else {
         this.setState(state => ({
           ...state,
-          models: models.filter(item => item.id >= 5),
+          models: models.filter(item => !this.props.standardModels.some(model => model.name === item.name)),
           activeCategory: all
         }))
       }
@@ -244,10 +253,10 @@ class Models extends Component {
     }))
 
     window.addEventListener("scroll", this.listenScrollHeader)
+  }
 
-    return () => {
-      window.removeEventListener("scroll", this.listenScrollHeader)
-    }
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.listenScrollHeader)
   }
 
   listenScrollHeader = () => {
@@ -302,13 +311,13 @@ class Models extends Component {
       activeTab,
       models,
       dataSources,
-      modelsCurrentPage,
       modelsSearch,
       dataSourcesSearch,
       categoryOptions,
       modelsPageCount,
       modelsCount,
       dataSourcesCount,
+      dataSourcesPageCount,
       modelsSorting,
       dataSourcesSorting,
       currentPageDataSources,
@@ -388,10 +397,7 @@ class Models extends Component {
                 getCategories: this.getCategory,
                 activeCategory: this.state.activeCategory
               }}
-              rows={modelsMap.slice(
-                currentPageModels * this.itemsPerPage - this.itemsPerPage,
-                currentPageModels * this.itemsPerPage
-              )}
+              rows={modelsMap}
               sortingHandler={this.modelsSortingHandler}
               sortingField={modelsSorting.order_by}
 
@@ -401,15 +407,16 @@ class Models extends Component {
                 change: this.changeModel
               }}
 
-              pageCount={Math.ceil(modelsMap.length / this.itemsPerPage) || 1}
+              pageCount={modelsPageCount || 1}
               currentPage={currentPageModels}
-              changePage={page => {
+              changePage={async (page) => {
                 if (currentPageModels !== page) {
-                  this.setState({currentPageModels: page});
+                  await this.setState({currentPageModels: page})
+                  await this.getModels()
                 }
               }
               }
-              itemsCount={modelsMap.length}
+              itemsCount={modelsCount}
               openPagination={true}
             />
           </TabPanel>
@@ -434,10 +441,7 @@ class Models extends Component {
                   title: 'Delete'
                 }
               ]}
-              rows={dataSourcesMap.slice(
-                currentPageDataSources * this.itemsPerPage - this.itemsPerPage,
-                currentPageDataSources * this.itemsPerPage
-              )}
+              rows={dataSourcesMap}
               sortingHandler={this.dataSourcesSortingHandler}
               sortingField={dataSourcesSorting.order_by}
 
@@ -447,14 +451,15 @@ class Models extends Component {
                 change: this.changeDataSource
               }}
 
-              pageCount={Math.ceil(dataSourcesMap.length / this.itemsPerPage) || 1}
+              pageCount={dataSourcesPageCount}
               currentPage={currentPageDataSources}
-              changePage={page => {
+              changePage={async (page) => {
                 if (currentPageDataSources !== page) {
-                  this.setState({currentPageDataSources: page});
+                  await this.setState({currentPageDataSources: page})
+                  await this.getDataSources()
                 }
               }}
-              itemsCount={dataSourcesMap.length}
+              itemsCount={dataSourcesCount}
               openPagination={true}
             />
           </TabPanel>
@@ -466,7 +471,8 @@ class Models extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    modelsState: state.modelsState.toggleModels
+    modelsState: state.modelsState.toggleModels,
+    standardModels: state.modelsState.standardModels
   }
 }
 

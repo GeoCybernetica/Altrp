@@ -8,11 +8,11 @@ export default class AltrpColumns extends BaseSchema {
 
       this.schema.createTable(this.tableName, (table) => {
         table.bigIncrements('id')
-        table.string('name').unique()
+        table.string('name').index()
         table.string('title').nullable()
         table.text('description').nullable()
         table.string('type')
-        table.bigInteger('size', 11)
+        table.bigInteger('size')
         table.boolean('null').nullable()
         table.string('default').nullable()
         table.boolean('primary').nullable()
@@ -41,6 +41,7 @@ export default class AltrpColumns extends BaseSchema {
 
         table.foreign('user_id').references('users.id')
         table.foreign('model_id').references('altrp_models.id')
+        table.foreign('table_id').references('tables.id')
 
       })
     }

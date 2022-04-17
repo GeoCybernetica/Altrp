@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import HeadingIcon from "../../../svgs/t-letter.svg";
+import HeadingIcon from "../../../svgs/text.svg";
 import {
   CONTROLLER_TEXTAREA,
   CONTROLLER_COLOR,
@@ -32,6 +32,9 @@ class Heading extends BaseElement {
   }
   static getType() {
     return "widget";
+  }
+  static getGroup() {
+    return "Basic";
   }
   _registerControls() {
     if (this.controllersRegistered) {
@@ -1008,10 +1011,6 @@ class Heading extends BaseElement {
     this.addControl("style_border_color", {
       type: CONTROLLER_COLOR,
       label: "Border color",
-      default: {
-        color: "rgb(50,168,82)",
-        colorPickedHex: "#32a852"
-      },
     });
 
     this.addControl("style_border_radius", {

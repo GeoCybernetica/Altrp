@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import FromIcon from "../../../svgs/form-horizontal.svg";
+import FromIcon from "../../../svgs/select.svg";
 import { advancedTabControllers } from "../../decorators/register-controllers";
 import {
   CONTROLLER_TEXTAREA,
@@ -26,13 +26,16 @@ class InputSelect extends BaseElement {
     return "input-select";
   }
   static getTitle() {
-    return "Input Select";
+    return "Select";
   }
   static getIconComponent() {
     return FromIcon;
   }
   static getType() {
     return "widget";
+  }
+  static getGroup() {
+    return "Form";
   }
   _registerControls() {
     if (this.controllersRegistered) {
@@ -56,7 +59,8 @@ class InputSelect extends BaseElement {
 
     this.addControl("content_label", {
       type: CONTROLLER_TEXT,
-      label: "Label"
+      label: "Label",
+      locked: true,
     });
 
     this.addControl("content_label_position_type", {
@@ -88,23 +92,14 @@ class InputSelect extends BaseElement {
 
     this.addControl('full_width', {
       type: CONTROLLER_SWITCHER,
-      label: 'Full width',
+      label: 'Full Width',
+      locked: true,
     });
-
-    this.addControl('remove', {
-      type: CONTROLLER_SWITCHER,
-      label: 'Remove button',
-    });
-
-    this.addControl('remove_label', {
-      type: CONTROLLER_TEXT,
-      label: 'Remove label',
-    });
-
 
     this.addControl("label_icon", {
       type: CONTROLLER_MEDIA,
-      label: "Choose Icon"
+      label: "Label Icon",
+      locked: true,
     });
 
     this.addControl("label_icon_position", {
@@ -134,36 +129,42 @@ class InputSelect extends BaseElement {
       type: CONTROLLER_TEXT,
       label: "Search Placeholder",
       responsive: false,
+      locked: true,
     });
 
     this.addControl("hide_search", {
       type: CONTROLLER_SWITCHER,
       responsive: false,
-      label: "Hide Filter"
+      label: "Hide Filter",
+      locked: true,
     });
 
     this.addControl("minimal", {
       type: CONTROLLER_SWITCHER,
       responsive: false,
-      label: "Minimal"
+      label: "Minimal",
+      locked: true,
     });
 
     this.addControl("content_required", {
       type: CONTROLLER_SWITCHER,
       responsive: false,
-      label: "Required"
+      label: "Required",
+      locked: true,
     });
 
     this.addControl("content_readonly", {
       type: CONTROLLER_SWITCHER,
       responsive: false,
-      label: "Readonly"
+      label: "Readonly",
+      locked: true,
     });
 
     this.addControl("content_options_nullable", {
       type: CONTROLLER_SWITCHER,
       label: "Select Nullable",
       responsive: false,
+      locked: true,
     });
 
     this.addControl("nulled_option_title", {
@@ -173,6 +174,7 @@ class InputSelect extends BaseElement {
       conditions:{
         content_options_nullable: true,
       },
+      locked: true,
     });
 
     this.addControl("options_sorting", {
@@ -192,12 +194,14 @@ class InputSelect extends BaseElement {
           value: "desc",
           label: "DESC"
         }
-      ]
+      ],
+      locked: true,
     });
 
     this.addControl("sort_default", {
       type: CONTROLLER_SWITCHER,
-      label: "Sort Default"
+      label: "Sort Default",
+      locked: true,
     });
 
     this.addControl("model_for_options", {
@@ -205,8 +209,8 @@ class InputSelect extends BaseElement {
       label: "Choose Datasource for Select Options",
       nullable: true,
       isClearable: true,
-      options_resource:
-        "/admin/ajax/models_options?with_names=1&not_plural=1&with_sql_queries=1"
+      options_resource: "/admin/ajax/models_options?with_names=1&not_plural=1&with_sql_queries=1",
+      locked: true,
     });
 
     this.addControl("params_for_update", {
@@ -215,8 +219,8 @@ class InputSelect extends BaseElement {
       conditions: {
         "model_for_options!": ""
       },
-      description:
-        'Enter each param for Query in a separate line.<br/>To differentiate between label and value, separate them with a pipe char ("|").<br/>For example: title | Post.<br/>Or<br/>title | {\'{{title}}\'} for Take Value from This Form Field with Name "title" \n'
+      description: 'Enter each param for Query in a separate line.<br/>To differentiate between label and value, separate them with a pipe char ("|").<br/>For example: title | Post.<br/>Or<br/>title | {\'{{title}}\'} for Take Value from This Form Field with Name "title" \n',
+      locked: true,
     });
 
     this.addControl("params_as_filters", {
@@ -224,26 +228,28 @@ class InputSelect extends BaseElement {
       label: "Use Params as Filters",
       conditions: {
         "params_for_update!": ""
-      }
+      },
+      locked: true,
     });
 
     this.addControl("content_options", {
       type: CONTROLLER_TEXTAREA,
       label: "Or Type Select Options",
-      description:
-        'Enter each option in a separate line. To differentiate between label and value, separate them with a pipe char ("|"). For example: f_name | First Name'
+      description: 'Enter each option in a separate line. To differentiate between label and value, separate them with a pipe char ("|"). For example: f_name | First Name',
+      locked: true,
     });
 
     this.addControl("content_default_value", {
       type: CONTROLLER_TEXTAREA,
-      label: "Default Value"
+      label: "Default Value",
+      locked: true,
     });
 
     this.addControl("content_calculation", {
       type: CONTROLLER_TEXTAREA,
       label: "Calculation",
-      description:
-        "E.g {{altrpforms.form_id.field_id}}*{{altrpforms.form_id.field_id_2}}+10"
+      description: "E.g {{altrpforms.form_id.field_id}}*{{altrpforms.form_id.field_id_2}}+10",
+      locked: true,
     });
 
     this.endControlSection();
@@ -278,11 +284,13 @@ class InputSelect extends BaseElement {
     this.addControl('right_icon', {
       label: 'Right Icon',
       type: CONTROLLER_MEDIA,
+      locked: true,
     })
 
     this.addControl('left_icon', {
       label: 'Left Icon',
       type: CONTROLLER_MEDIA,
+      locked: true,
     })
 
     this.endControlSection();
@@ -300,7 +308,8 @@ class InputSelect extends BaseElement {
     this.addControl("create", {
       type: CONTROLLER_SWITCHER,
       responsive: false,
-      label: "Allow Creating New Items"
+      label: "Allow Creating New Items",
+      locked: true,
     });
 
     this.addControl("create_text", {
@@ -311,6 +320,7 @@ class InputSelect extends BaseElement {
       },
       label: "Create Text",
       description:'Create {{__query__}}',
+      locked: true,
     });
 
     this.addControl("create_url", {
@@ -319,6 +329,7 @@ class InputSelect extends BaseElement {
         create: true,
       },
       label: "POST URL",
+      locked: true,
     });
 
     this.addControl("create_params", {
@@ -329,16 +340,19 @@ class InputSelect extends BaseElement {
       },
       label: "POST Params",
       description:'Enter each param for Query in a separate line.<br/>To differentiate between label and value, separate them with a pipe char ("|").<br/>For example: title | Post.<br/>Or<br/>title | {\'{{title}}\'} for Take Value from This Form Field with Name "title" \n',
+      locked: true,
     });
 
     this.addControl('label_path', {
       label: 'Label Alias',
       responsive: false,
+      locked: true,
     })
 
     this.addControl('value_path', {
       label: 'Value Alias',
       responsive: false,
+      locked: true,
     })
 
     this.endControlSection()
@@ -364,7 +378,7 @@ class InputSelect extends BaseElement {
       units: ["px", "%", "vh"],
       max: 60,
       min: 0,
-
+      locked: true,
     });
 
     this.addControl("label_padding", {
@@ -400,7 +414,8 @@ class InputSelect extends BaseElement {
       },
       units: ["px", "%", "vh"],
       max: 100,
-      min: -100
+      min: -100,
+      locked: true,
       // rules: {
       //   "{{ELEMENT}} .altrp-field-label-container{{STATE}}":
       //     "top: {{SIZE}}{{UNIT}};"
@@ -518,7 +533,7 @@ class InputSelect extends BaseElement {
       label: "Padding",
       units: ["px", "%", "vh"]
     });
-    
+
     this.endControlSection();
 
     this.startControlSection("font_style_section", {
@@ -550,10 +565,32 @@ class InputSelect extends BaseElement {
 
     this.endControlSection();
 
+    this.startControlSection("required_style_section", {
+      tab: TAB_STYLE,
+      label: "Required"
+    });
+
+    this.addControl("required_style_font_color", {
+      type: CONTROLLER_COLOR,
+      label: "Font Color"
+    });
+
+    this.addControl("required_style_font_typographic", {
+      type: CONTROLLER_TYPOGRAPHIC,
+      label: "Typographic",
+    });
+
+    this.endControlSection();
+
     this.startControlSection("background_section", {
       tab: TAB_STYLE,
       label: "Background"
     });
+
+    this.addControl('button_background_color', {
+      type: CONTROLLER_COLOR,
+      label: 'Button Background Color'
+    })
 
     this.addControl("button_gradient", {
       type: CONTROLLER_GRADIENT,
@@ -771,23 +808,6 @@ class InputSelect extends BaseElement {
     this.addControl("a_color", {
       type:   CONTROLLER_COLOR,
       label: "Icon Color"
-    });
-
-    this.endControlSection();
-
-    this.startControlSection("required_style_section", {
-      tab: TAB_STYLE,
-      label: "Required"
-    });
-
-    this.addControl("required_style_font_color", {
-      type: CONTROLLER_COLOR,
-      label: "font color"
-    });
-
-    this.addControl("required_style_font_typographic", {
-      type: CONTROLLER_TYPOGRAPHIC,
-      label: "Typographic",
     });
 
     this.endControlSection();

@@ -5,8 +5,19 @@ coverage
 .DS_STORE
 .env
 tmp
-views/templates
+.env-prod
 
 #bundles
-public/
+public/*
+!public/css
 storage/
+app/AltrpModels/
+app/AltrpControllers/
+app/AltrpPlugins/
+app/AltrpListeners/
+app/AltrpOther/
+start/altrp-routes/
+/resources/views/altrp
+
+cert.pem
+key.pem

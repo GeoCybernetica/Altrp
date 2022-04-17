@@ -26,13 +26,17 @@ class InputImageSelect extends BaseElement {
     return "input-image-select";
   }
   static getTitle() {
-    return "Input Img Select";
+    return "Img Select";
   }
   static getIconComponent() {
     return FromIcon;
   }
   static getType() {
     return "widget";
+  }
+
+  static getGroup() {
+    return "Form";
   }
   _registerControls() {
     if (this.controllersRegistered) {
@@ -106,7 +110,8 @@ class InputImageSelect extends BaseElement {
       label: "Options",
       type: CONTROLLER_REPEATER,
       fields: optionsRepeater.getControls(),
-      default: []
+      default: [],
+      locked: true,
     });
 
     this.addControl("image_select_item_width", {
@@ -203,7 +208,8 @@ class InputImageSelect extends BaseElement {
 
     this.addControl("content_label", {
       type: CONTROLLER_TEXT,
-      label: "Label"
+      label: "Label",
+      locked: true,
     });
 
     this.addControl("content_label_position_type", {
@@ -236,7 +242,8 @@ class InputImageSelect extends BaseElement {
 
     this.addControl("label_icon", {
       type: CONTROLLER_MEDIA,
-      label: "Choose Icon"
+      label: "Choose Icon",
+      locked: true,
     });
 
     this.addControl("label_icon_position", {
@@ -271,12 +278,14 @@ class InputImageSelect extends BaseElement {
 
     this.addControl("content_required", {
       type: CONTROLLER_SWITCHER,
-      label: "Required"
+      label: "Required",
+      locked: true,
     });
 
     this.addControl("content_readonly", {
       type: CONTROLLER_SWITCHER,
-      label: "Readonly"
+      label: "Readonly",
+      locked: true,
     });
 
     this.addControl("content_timestamp", {
@@ -288,12 +297,14 @@ class InputImageSelect extends BaseElement {
     this.addControl("select2_multiple", {
       type: CONTROLLER_SWITCHER,
       label: "Multiple",
-      default: false
+      default: false,
+      locked: true,
     });
 
     this.addControl("content_default_value", {
       type: CONTROLLER_TEXTAREA,
-      label: "Default Value"
+      label: "Default Value",
+      locked: true,
     });
 
     this.addControl("content_calculation", {
@@ -325,7 +336,8 @@ class InputImageSelect extends BaseElement {
       description: "/ajax/models/tests",
       conditions: {
         create_allowed: true
-      }
+      },
+      locked: true,
     });
 
     this.addControl("create_label", {
@@ -334,7 +346,8 @@ class InputImageSelect extends BaseElement {
       responsive: false,
       conditions: {
         create_allowed: true
-      }
+      },
+      locked: true,
     });
 
     this.addControl("create_data", {
@@ -343,8 +356,8 @@ class InputImageSelect extends BaseElement {
       conditions: {
         create_allowed: true
       },
-      description:
-        'Enter additional data for new item in a separate line.<br/>To differentiate between label and value, separate them with a pipe char ("|").<br/>For example: title | Post.<br/>Or<br/>title | {\'{{title}}\'} for Take Value from This Form Field with Name "title" \n'
+      description: 'Enter additional data for new item in a separate line.<br/>To differentiate between label and value, separate them with a pipe char ("|").<br/>For example: title | Post.<br/>Or<br/>title | {\'{{title}}\'} for Take Value from This Form Field with Name "title" \n',
+      locked: true,
     });
 
     this.endControlSection();
@@ -446,7 +459,7 @@ class InputImageSelect extends BaseElement {
       units: ["px", "%", "vh"],
       max: 60,
       min: 0,
-
+      locked: true,
     });
 
     this.addControl("label_background_color", {
@@ -493,7 +506,8 @@ class InputImageSelect extends BaseElement {
       },
       units: ["px", "%", "vh"],
       max: 100,
-      min: -100
+      min: -100,
+      locked: true,
       // rules: {
       //   "{{ELEMENT}} .altrp-field-label-container{{STATE}}":
       //     "top: {{SIZE}}{{UNIT}};"

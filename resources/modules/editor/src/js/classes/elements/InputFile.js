@@ -1,5 +1,5 @@
 import BaseElement from './BaseElement';
-import FromIcon from '../../../svgs/form-horizontal.svg';
+import FromIcon from '../../../svgs/file_add.svg';
 import { advancedTabControllers } from '../../decorators/register-controllers';
 import {
   CONTROLLER_TEXTAREA,
@@ -25,13 +25,16 @@ class InputFile extends BaseElement {
     return 'input-file';
   }
   static getTitle() {
-    return 'Input File';
+    return 'File';
   }
   static getIconComponent() {
     return FromIcon;
   }
   static getType() {
     return 'widget';
+  }
+  static getGroup() {
+    return "Form";
   }
   _registerControls() {
     if (this.controllersRegistered) {
@@ -59,7 +62,8 @@ class InputFile extends BaseElement {
     this.addControl('accept', {
       type: CONTROLLER_TEXT,
       responsive: false,
-      label: 'Accept'
+      label: 'Accept',
+      locked: true,
     });
 
     this.addControl('placeholder', {
@@ -70,6 +74,7 @@ class InputFile extends BaseElement {
     this.addControl('button_text', {
       type: CONTROLLER_TEXT,
       label: 'Button Text',
+      locked: true,
     });
 
     this.addControl('required', {
@@ -81,7 +86,8 @@ class InputFile extends BaseElement {
     this.addControl('multiple', {
       type: CONTROLLER_SWITCHER,
       responsive: false,
-      label: 'Multiple'
+      label: 'Multiple',
+      locked: true,
     });
 
     this.addControl('limit', {
@@ -96,13 +102,15 @@ class InputFile extends BaseElement {
     this.addControl('readonly', {
       type: CONTROLLER_SWITCHER,
       responsive: false,
-      label: 'Readonly'
+      label: 'Readonly',
+      locked: true,
     });
 
     this.addControl('preview', {
       type: CONTROLLER_SWITCHER,
       responsive: false,
-      label: 'Preview (Only for Image)'
+      label: 'Preview (Only for Image)',
+      locked: true,
     });
 
     this.addControl('preview_placeholder', {
@@ -110,7 +118,8 @@ class InputFile extends BaseElement {
       conditions:{
         preview: true,
       },
-      label: 'Preview Placeholder'
+      label: 'Preview Placeholder',
+      locked: true,
     });
 
     this.addControl('default_value', {
