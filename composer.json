@@ -18,7 +18,6 @@
         "ixudra/curl": "^6.20",
         "jackiedo/dotenv-editor": "1.*",
         "jenssegers/date": "^3.2",
-        "jhnbrn90/socialite-passport": "^1.0",
         "joshbrw/laravel-module-installer": "^1.0",
         "kint-php/kint": "^3.3",
         "laravel-notification-channels/telegram": "^0.5.1",
