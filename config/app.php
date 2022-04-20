@@ -185,9 +185,10 @@ return [
         // App\Providers\AltrpBroadcastServiceProvider::class,
 
         Laratrust\LaratrustServiceProvider::class,
-        Laravel\Passport\PassportServiceProvider::class,
-        // Laravel\Socialite\SocialiteServiceProvider::class,
-        \SocialiteProviders\Manager\ServiceProvider::class,
+        // Laravel\Passport\PassportServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
+        // \SocialiteProviders\Manager\ServiceProvider::class,
+        // Laravel\Socialite\Manager\ServiceProvider::class,
         App\Providers\CrudGeneratorServiceProvider::class,
         NotificationChannels\Telegram\TelegramServiceProvider::class,
 
