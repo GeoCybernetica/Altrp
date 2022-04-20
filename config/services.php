@@ -36,7 +36,10 @@ return [
 
     'geobuilder' => [
       'client_id' => env('GEOBUILDER_CLIENT_ID'),
-      'redirect' => env('GEOBUILDER_REDIRECT_URI')
+      'client_secret' => env('GEOBUILDER_CLIENT_SECRET'),
+      'redirect' => env('GEOBUILDER_REDIRECT_URI'),
+      'response_type' => env('GEOBUILDER_RESPONSE_TYPE'),
+      'scope' => env('GEOBUILDER_SCOPE'),
     ]
 
 ];

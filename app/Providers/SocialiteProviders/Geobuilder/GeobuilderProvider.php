@@ -14,6 +14,7 @@ class GeobuilderProvider extends AbstractProvider
 
     private const URL = 'https://fs.geobuilder.ru/idp/connect';
 
+
     /**
      * {@inheritdoc}
      */
@@ -43,6 +44,29 @@ class GeobuilderProvider extends AbstractProvider
 
         return json_decode($response->getBody(), true);
     }
+
+    /**
+      * Get the GET parameters for the code request.
+      *
+      * @param  string|null  $state
+      * @return array
+      */
+     protected function getCodeFields($state = null)
+     {
+         $fields = [
+             'client_id' => $this->clientId,
+             'redirect_uri' => $this->redirectUrl,
+             'scope' => 'openid profile authz.grants orgstruct.read',
+             'response_type' => 'token id_token',
+             'state' => '4d6021430fec40ec8a9872e89be8247a',
+             'nonce' => 'f8c167c0ba0949bfaa07fa40ab824e02',
+         ];
+
+         return array_merge($fields, $this->parameters);
+     }
+
+
+
 
     /**
      * {@inheritdoc}
