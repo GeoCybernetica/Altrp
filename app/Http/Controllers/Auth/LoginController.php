@@ -57,7 +57,7 @@ class LoginController extends Controller
    * @return \Illuminate\Http\JsonResponse
    */
   public function logout( Request $request )
-  { 
+  {
 
     unset($_COOKIE['uid']);
     setcookie('uid', null, -1, '/');
@@ -99,7 +99,7 @@ class LoginController extends Controller
     }
 
     if ($this->attemptLogin($request)) {
-      
+
       CacheService::setUserCookie();
 
       return $this->sendLoginResponse($request);
@@ -110,11 +110,6 @@ class LoginController extends Controller
     // user surpasses their maximum number of attempts they will get locked out.
     $this->incrementLoginAttempts($request);
     return $this->sendFailedLoginResponse($request);
-  }
-
-  public function loginWithPassport($user)
-  {
-    print '<pre>'; print_r($user); die();
   }
 
   /**

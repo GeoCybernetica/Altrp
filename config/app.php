@@ -186,9 +186,8 @@ return [
 
         Laratrust\LaratrustServiceProvider::class,
         // Laravel\Passport\PassportServiceProvider::class,
-        Laravel\Socialite\SocialiteServiceProvider::class,
-        // \SocialiteProviders\Manager\ServiceProvider::class,
-        // Laravel\Socialite\Manager\ServiceProvider::class,
+        // Laravel\Socialite\SocialiteServiceProvider::class,
+        \SocialiteProviders\Manager\ServiceProvider::class,
         App\Providers\CrudGeneratorServiceProvider::class,
         NotificationChannels\Telegram\TelegramServiceProvider::class,
 
@@ -255,6 +254,7 @@ return [
         'Laratrust' => Laratrust\LaratrustFacade::class,
         'Curl' => Ixudra\Curl\Facades\Curl::class,
         'CacheService' => App\Altrp\Facades\CacheService::class,
+        // 'Socialite' => Laravel\Socialite\Facades\Socialite::class,
     ],
 
 ];
