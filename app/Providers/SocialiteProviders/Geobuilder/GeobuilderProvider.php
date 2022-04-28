@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
 use Laravel\Socialite\Two\InvalidStateException;
 use SocialiteProviders\Manager\OAuth2\AbstractProvider;
 use SocialiteProviders\Manager\OAuth2\User;
@@ -39,12 +40,26 @@ class GeobuilderProvider extends AbstractProvider
         'openid',
     ];
 
-    public function __construct()
+    /**
+     * Create a new provider instance.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $clientId
+     * @param  string  $clientSecret
+     * @param  string  $redirectUrl
+     * @param  array  $guzzle
+     * @return void
+     */
+    public function __construct(Request $request, $clientId, $clientSecret, $redirectUrl)
     {
-      // TODO: bad idea, add cert locally
-      $this->httpClient = new Client([
-          'verify' => false
-      ]);
+        $this->request = $request;
+        $this->clientId = $clientId;
+        $this->redirectUrl = $redirectUrl;
+        $this->clientSecret = $clientSecret;
+        // TODO: bad idea, add cert locally
+        $this->httpClient = new Client([
+            'verify' => false
+        ]);
     }
 
     /**
@@ -182,6 +197,17 @@ class GeobuilderProvider extends AbstractProvider
     }
 
     /**
+     * Get the code from the request.
+     *
+     * @return string
+     */
+    protected function getCode()
+    {
+        // print '<pre>'; print_r($this->request->getAll()); die;
+        return $this->request->input('id_token');
+    }
+
+    /**
       * Get the GET parameters for the code request.
       *
       * @param  string|null  $state
@@ -192,6 +218,8 @@ class GeobuilderProvider extends AbstractProvider
          $fields = parent::getCodeFields($state);
          $fields['state'] = $this->getConfig('state');
          $fields['nonce'] = $this->getConfig('nonce');
+         $fields['scope'] = 'openid profile authz.grants orgstruct.read';
+         $fields['response_type'] = 'token id_token';
          return $fields;
      }
 
