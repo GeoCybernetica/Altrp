@@ -35,11 +35,12 @@ return [
     ],
 
     'geobuilder' => [
+      'oidc_url' => env('GEOBUILDER_OIDC_URL'),
       'client_id' => env('GEOBUILDER_CLIENT_ID'),
       'client_secret' => env('GEOBUILDER_CLIENT_SECRET'),
       'redirect' => env('GEOBUILDER_REDIRECT_URI'),
-      'response_type' => env('GEOBUILDER_RESPONSE_TYPE'),
-      'scope' => env('GEOBUILDER_SCOPE'),
+      'state' => env('GEOBUILDER_STATE'),
+      'nonce' => env('GEOBUILDER_NONCE'),
     ]
 
 ];

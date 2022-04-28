@@ -2,6 +2,12 @@
 
 namespace App\Providers\SocialiteProviders\Geobuilder;
 
+use Exception;
+use GuzzleHttp\Client;
+use Firebase\JWT\JWK;
+use Firebase\JWT\JWT;
+use Illuminate\Support\Arr;
+use Laravel\Socialite\Two\InvalidStateException;
 use SocialiteProviders\Manager\OAuth2\AbstractProvider;
 use SocialiteProviders\Manager\OAuth2\User;
 
@@ -13,12 +19,11 @@ class GeobuilderProvider extends AbstractProvider
     public const IDENTIFIER = 'SOCIALITE_GEOBUILDER';
 
     /**
-     * Base OAuth service URL
-     * TODO: move out to config?
+     * The HTTP Client instance.
      *
-     * @var string
+     * @var \GuzzleHttp\Client
      */
-    private const URL = 'https://fs.geobuilder.ru/idp/connect';
+    protected $httpClient;
 
     /**
      * Indicates if the session state should be utilized.
@@ -27,25 +32,49 @@ class GeobuilderProvider extends AbstractProvider
      */
     protected $stateless = true;
 
-    // protected $scopeSeparator = ' ';
-    // protected $scopes = ['openid'];
-
     /**
      * {@inheritdoc}
      */
-    public static function additionalConfigKeys()
+    protected $scopes = [
+        'openid',
+    ];
+
+    public function __construct()
     {
-        return ['client_secret', 'nonce', 'realms'];
+      // TODO: bad idea, add cert locally
+      $this->httpClient = new Client([
+          'verify' => false
+      ]);
     }
 
-    // protected function getBaseUrl()
-    // {
-    //     return rtrim(rtrim($this->getConfig('base_url'), '/').'/realms/'.$this->getConfig('realms', 'master'), '/');
-    // }
-
-    protected function getBaseUrl()
+    /**
+     * Get OpenID Configuration.
+     *
+     * @throws Laravel\Socialite\Two\InvalidStateException
+     *
+     * @return mixed
+     */
+    private function getOpenIdConfiguration()
     {
-        return self::URL;
+        try {
+            $response = $this->getHttpClient()->get($this->getConfig('oidc_url') . '/.well-known/openid-configuration');
+        } catch (Exception $ex) {
+            throw new InvalidStateException("Error getting OpenID Configuration. {$ex}");
+        }
+
+        return json_decode((string) $response->getBody());
+    }
+
+    /**
+     * Get public keys to verify id_token from jwks_uri.
+     *
+     * @return array
+     */
+    private function getJWTKeys()
+    {
+        $response = $this->getHttpClient()->get($this->getOpenIdConfiguration()->jwks_uri);
+
+        return json_decode((string) $response->getBody(), true);
     }
 
     /**
@@ -53,7 +82,10 @@ class GeobuilderProvider extends AbstractProvider
      */
     protected function getAuthUrl($state)
     {
-        return $this->buildAuthUrlFromBase($this->getBaseUrl().'/authorize', $state);
+        return $this->buildAuthUrlFromBase(
+            $this->getOpenIdConfiguration()->authorization_endpoint,
+            $state
+        );
     }
 
     /**
@@ -61,41 +93,69 @@ class GeobuilderProvider extends AbstractProvider
      */
     protected function getTokenUrl()
     {
-        return $this->getBaseUrl().'/token';
+        return $this->getOpenIdConfiguration()->token_endpoint;
     }
-
-    /**
-     * Get the access token response for the given code.
-     *
-     * @param  string  $code
-     * @return array
-     */
-    // public function getAccessTokenResponse($code)
-    // {
-    //     $response = $this->getHttpClient()->post($this->getTokenUrl(), [
-    //         'headers' => RequestOptions::HEADERS => [
-    //             'Authorization' => 'Bearer '.$token,
-    //             'Accept' => 'application/json'
-    //         ],
-    //         'form_params' => $this->getTokenFields($code),
-    //     ]);
-    //
-    //     return json_decode($response->getBody(), true);
-    // }
 
     /**
      * {@inheritdoc}
      */
     protected function getUserByToken($token)
     {
-        $response = $this->getHttpClient()->get($this->getBaseUrl().'/userinfo', [
-            RequestOptions::HEADERS => [
-                'Authorization' => 'Bearer '.$token,
-            ],
-        ]);
+        // No implementation for OIDC
+    }
 
-        print '<pre>'; print_r($response->getBody()); die;
-        return json_decode((string) $response->getBody(), true);
+    /**
+     * Additional implementation to get user claims from id_token.
+     *
+     * @return \SocialiteProviders\Manager\OAuth2\User
+     */
+    public function user()
+    {
+        $response = $this->getAccessTokenResponse($this->getCode());
+        $claims = $this->validateIdToken(Arr::get($response, 'id_token'));
+
+        return $this->mapUserToObject($claims);
+    }
+
+    /**
+     * validate id_token
+     * - signature validation using firebase/jwt library.
+     * - claims validation
+     *   iss: MUST much iss = issuer value on metadata.
+     *   aud: MUST include client_id for this client.
+     *   exp: MUST time() < exp.
+     *
+     * @param string $idToken
+     *
+     * @throws Laravel\Socialite\Two\InvalidStateException
+     *
+     * @return array
+     */
+    private function validateIdToken($idToken)
+    {
+        try {
+            // payload validation
+            $payload = explode('.', $idToken);
+            $payloadJson = json_decode(base64_decode(str_pad(strtr($payload[1], '-_', '+/'), strlen($payload[1]) % 4, '=', STR_PAD_RIGHT)), true);
+
+            // iss validation
+            if (strcmp($payloadJson['iss'], $this->getOpenIdConfiguration()->issuer)) {
+                throw new InvalidStateException('iss on id_token does not match issuer value on the OpenID configuration');
+            }
+            // aud validation
+            if (strpos($payloadJson['aud'], $this->config['client_id']) === false) {
+                throw new InvalidStateException('aud on id_token does not match the client_id for this application');
+            }
+            // exp validation
+            if ((int) $payloadJson['exp'] < time()) {
+                throw new InvalidStateException('id_token is expired');
+            }
+
+            // signature validation and return claims
+            return (array) JWT::decode($idToken, JWK::parseKeySet($this->getJWTKeys()), $this->getOpenIdConfiguration()->id_token_signing_alg_values_supported);
+        } catch (Exception $ex) {
+            throw new InvalidStateException("Error on validationg id_token. {$ex}");
+        }
     }
 
     /**
@@ -104,32 +164,22 @@ class GeobuilderProvider extends AbstractProvider
     protected function mapUserToObject(array $user)
     {
         return (new User())->setRaw($user)->map([
-            'id'        => Arr::get($user, 'sub'),
-            'name'      => Arr::get($user, 'name'),
-            'email'     => Arr::get($user, 'email'),
+            'id'   => $user['sub'],
+            'name' => $user['name'],
         ]);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getTokenFields($code)
-    {
-        return array_merge(parent::getTokenFields($code), [
-            'grant_type' => 'authorization_code',
-        ]);
-    }
-
-    /**
-     * Return logout endpoint with redirect_uri query parameter.
+     * return logout endpoint with post_logout_uri paramter.
      *
      * @return string
      */
-    public function getLogoutUrl(string $redirectUri)
+    public function logout($post_logout_uri)
     {
-        return $this->getBaseUrl().'/logout?redirect_uri='.urlencode($redirectUri);
+        return $this->getOpenIdConfiguration()->end_session_endpoint
+            .'?logout&post_logout_redirect_uri='
+            .urlencode($post_logout_uri);
     }
-
 
     /**
       * Get the GET parameters for the code request.
@@ -139,15 +189,22 @@ class GeobuilderProvider extends AbstractProvider
       */
      protected function getCodeFields($state = null)
      {
-         $fields = [
-             'client_id' => $this->clientId,
-             'redirect_uri' => $this->redirectUrl,
-             'scope' => 'openid profile authz.grants orgstruct.read',
-             'response_type' => 'token id_token',
-             'state' => '4d6021430fec40ec8a9872e89be8247a',
-             'nonce' => 'f8c167c0ba0949bfaa07fa40ab824e02',
-         ];
-
-         return array_merge($fields, $this->parameters);
+         $fields = parent::getCodeFields($state);
+         $fields['state'] = $this->getConfig('state');
+         $fields['nonce'] = $this->getConfig('nonce');
+         return $fields;
      }
+
+    /**
+     * @return array
+     */
+    public static function additionalConfigKeys()
+    {
+        return [
+            'oidc_url',
+            'policy',
+            'state',
+            'nonce',
+        ];
+    }
 }
