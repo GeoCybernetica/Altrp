@@ -16,7 +16,7 @@ if(document?.location?.hash && document?.location?.hash.indexOf('=') !== -1){
   // Dirty hack for OAuth OpenID redirection
   if (hashParams.id_token) {
     const redirectUrl = '/login/callback/geobuilder';
-    url = `${redirectUrl}?${queryString.stringify(hashParams)}`;
+    const url = `${redirectUrl}?${queryString.stringify(hashParams)}`;
     console.info('Redirect to OAuth callback', hashParams);
     window?.location?.replace(url);
   }

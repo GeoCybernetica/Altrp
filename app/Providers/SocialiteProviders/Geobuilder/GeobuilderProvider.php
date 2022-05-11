@@ -126,9 +126,8 @@ class GeobuilderProvider extends AbstractProvider
      */
     public function user()
     {
-        $response = $this->getAccessTokenResponse($this->getCode());
-        $claims = $this->validateIdToken(Arr::get($response, 'id_token'));
-
+        $token = $this->request->input('id_token');
+        $claims = $this->validateIdToken($token);
         return $this->mapUserToObject($claims);
     }
 
@@ -180,7 +179,7 @@ class GeobuilderProvider extends AbstractProvider
     {
         return (new User())->setRaw($user)->map([
             'id'   => $user['sub'],
-            'name' => $user['name'],
+            'name' => $user['name'] ?? '',
         ]);
     }
 
@@ -203,8 +202,7 @@ class GeobuilderProvider extends AbstractProvider
      */
     protected function getCode()
     {
-        // print '<pre>'; print_r($this->request->getAll()); die;
-        return $this->request->input('id_token');
+        return $this->request->input('code');
     }
 
     /**
@@ -218,7 +216,6 @@ class GeobuilderProvider extends AbstractProvider
          $fields = parent::getCodeFields($state);
          $fields['state'] = $this->getConfig('state');
          $fields['nonce'] = $this->getConfig('nonce');
-         $fields['scope'] = 'openid profile authz.grants orgstruct.read';
          $fields['response_type'] = 'token id_token';
          return $fields;
      }

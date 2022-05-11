@@ -1,5 +1,6 @@
 <?php
 /*Api routes*/
+Route::group(['before' => 'auth'], function () {
 // Routes for the user_altrps resource
 Route::get('/user_altrps', ['uses' =>'AltrpControllers\user_altrpController@index']);
 Route::get('/user_altrp_options', ['uses' =>'AltrpControllers\user_altrpController@options']);
@@ -296,3 +297,4 @@ Route::put('/zayavka_galleries/{zayavka_gallery}', ['middleware' => ['auth:api',
 Route::delete('/zayavka_galleries/{zayavka_gallery}', ['middleware' => ['auth:api','role:admin'], 'uses' =>'AltrpControllers\zayavka_galleryController@destroy']);
 Route::put('/zayavka_galleries/{zayavka_gallery}/{column}', ['middleware' => ['auth:api','role:admin'], 'uses' =>'AltrpControllers\zayavka_galleryController@updateColumn']);
 Route::get('/filters/zayavka_galleries/{column}', ['middleware' => ['auth:api','role:admin'], 'uses' =>'AltrpControllers\zayavka_galleryController@getIndexedColumnsValueWithCount']);
+});
