@@ -10,6 +10,7 @@ launch.json
 /storage/tmp/
 /storage/logs/backups
 /backups
+/data
 
 /vendor
 .env

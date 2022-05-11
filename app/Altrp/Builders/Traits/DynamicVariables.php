@@ -119,7 +119,7 @@ trait DynamicVariables
                 $wrapStart = '';
                 $parts[3] .= '(';
                 $wrapEnd = " . ')'";
-                $request = "'\"' . implode('\",\"', explode(',', request()->name )). '\"'";
+                $request = "'\'' . implode('\',\'', explode(',', request()->{$parts[2]} )). '\''";
             }
             $this->str = str_replace($this->match,
                 $this->getValue( '(request()->' . $parts[2]
