@@ -848,7 +848,7 @@ class InputSelectWidget extends Component {
   }
 
   async onItemSelect(value) {
-    if (value.value !== undefined && ! isNaN(value.value)){
+    if (value.value !== undefined){
       value = value.value;
     }
 
@@ -893,6 +893,7 @@ class InputSelectWidget extends Component {
           options,
         }))
     }
+    console.log(value);
     this.setState(state => ({
         ...state,
         value
@@ -920,10 +921,13 @@ class InputSelectWidget extends Component {
     );
     const content_options = this.props.element.getResponsiveSetting('content_options');
     const model_for_options = this.props.element.getResponsiveSetting('model_for_options');
-    if(_.isString(content_options)
-      && content_options.indexOf('{{') === 0
-      && ! model_for_options){
-      options = getDataByPath(content_options.replace('{{', '').replace('}}', ''))
+    if(_.isString(content_options)) {
+      if (content_options.indexOf('{{') === 0 && ! model_for_options) {
+        options = getDataByPath(content_options.replace('{{', '').replace('}}', ''))
+      } else {
+        options = parseOptionsFromSettings(this.props.element.getSettings("content_options"));
+      }
+      
       if( ! _.isArray(options)){
         options = [];
       }
@@ -944,13 +948,6 @@ class InputSelectWidget extends Component {
         label: this.props.element.getResponsiveSetting('nulled_option_title') || '',
         value: '',
       })
-    }
-
-    if(this.props.element.getResponsiveSetting("remove") && this.state.value) {
-      options = [{
-        value: -1,
-        label: this.props.element.getResponsiveSetting("remove_label", "", "remove"),
-      }, ...options]
     }
 
     return options;
@@ -1096,9 +1093,7 @@ class InputSelectWidget extends Component {
    * @return {JSX.Element|null}
    */
 
-  createNewItemRenderer = ( query,
-                         active,
-                         handleClick) => {
+  createNewItemRenderer = (query, active, handleClick) => {
     /**
      * @type {FrontElement}
      */
@@ -1171,12 +1166,11 @@ class InputSelectWidget extends Component {
       label_icon
     } = settings;
 
-    const fullWidth = element.getSettings("full_width") || false
+    const fullWidth = element.getSettings("full_width")
     this.popoverProps.onOpening = (e) => {
       if(fullWidth) {
         const inputWidth = this.inputRef.current.offsetWidth;
-
-        console.log(inputWidth, e)
+        
         e.style.width = `${inputWidth}px`
       } else if(e.style.width) {
         e.style.width = ""

@@ -30,6 +30,9 @@ class Accordion extends BaseElement {
   static getType() {
     return "widget";
   }
+  static getGroup() {
+    return "Basic";
+  }
   _registerControls() {
     if (this.controllersRegistered) {
       return;
@@ -88,7 +91,8 @@ class Accordion extends BaseElement {
           title_repeater: "Title #3",
           wysiwyg_repeater: "Content #3"
         }
-      ]
+      ],
+      locked: true,
     });
 
     this.addControl("title_html_tag_accordion_content", {
@@ -131,18 +135,20 @@ class Accordion extends BaseElement {
           value: "p",
           label: "p"
         },
-
       ],
+      locked: true,
     });
 
     this.addControl('icon_accordion_content', {
       type: CONTROLLER_MEDIA,
       label: 'Icon',
+      locked: true,
     });
 
     this.addControl('active_icon_accordion_content', {
       type: CONTROLLER_MEDIA,
       label: 'Active icon',
+      locked: true,
     });
 
     this.endControlSection();
@@ -155,11 +161,13 @@ class Accordion extends BaseElement {
     this.addControl('multiple_additional_content', {
       type: CONTROLLER_SWITCHER,
       label: 'Multiple open',
+      locked: true,
     });
 
     this.addControl("active_item_additional_content", {
       type: CONTROLLER_NUMBER,
       label: "Acitve item no",
+      locked: true,
     });
 
     this.endControlSection();

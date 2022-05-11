@@ -1,20 +1,61 @@
 import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
-import {column, beforeSave, BaseModel, ManyToMany, manyToMany} from '@ioc:Adonis/Lucid/Orm'
 import Role from "App/Models/Role";
+import UserMeta from "App/Models/UserMeta";
+import Permission from "App/Models/Permission";
+import empty from "../../helpers/empty";
+import {
+  column,
+  beforeSave,
+  BaseModel,
+  manyToMany,
+  ManyToMany,
+  hasOne,
+  HasOne,
+  computed,
+  afterCreate, beforeDelete
+} from '@ioc:Adonis/Lucid/Orm'
+import { v4 as uuid } from "uuid";
 
 export default class User extends BaseModel {
+
   @column({ isPrimary: true })
   public id: number
 
   @column()
   public email: string
 
+  @column()
+  public name: string
+
+  @column()
+  public last_name: string
+
+  @column()
+  public local_storage: string
+
+  @column()
+  public telegram_user_id: string
+
   @column({ serializeAs: null })
   public password: string
 
+  @computed()
+  public get fullName():string{
+    if( !this.usermeta){
+      return ''
+    }
+    return `${this.usermeta.first_name} ${this.usermeta.second_name}`
+  }
+
   @column()
-  public rememberMeToken?: string
+  public guid: string
+
+  @column()
+  public rememberMeToken: string | null
+
+  @column.dateTime()
+  public last_login_at: DateTime
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -29,27 +70,58 @@ export default class User extends BaseModel {
     }
   }
 
+  @beforeSave()
+  public static async addGuid (user: User) {
+    if (!user.$dirty.guid) {
+      user.guid = uuid()
+    }
+  }
+
   /**
    *
    */
-  isAdmin():boolean {
-    return this.hasRole('admin');
+  async isAdmin():Promise<boolean> {
+    return await this.hasRole('admin');
   }
 
   @manyToMany(() => Role, {
-    pivotTable: ''
+    pivotTable: 'role_user',
+    localKey: 'id',
+    relatedKey: 'id',
+    pivotForeignKey: 'user_id',
+    pivotRelatedForeignKey: 'role_id',
   })
   public roles: ManyToMany<typeof Role>
+
+  @manyToMany(() => Permission, {
+    pivotTable: 'permission_user',
+    localKey: 'id',
+    relatedKey: 'id',
+    pivotForeignKey: 'permission_id',
+    pivotRelatedForeignKey: 'user_id',
+  })
+  public permissions: ManyToMany<typeof Permission>
+
+  @hasOne(() => UserMeta, {
+    foreignKey: 'user_id',
+  })
+  public usermeta: HasOne<typeof UserMeta>
 
   /**
    *
    * @param roles
    * @private
    */
-  private hasRole(roles: string|number|Array<string|number>):boolean {
+  async hasRole(roles: string|number|Array<string|number>):Promise<boolean> {
+    if(empty(roles)){
+      return  true
+    }
     if(typeof roles === 'string' || typeof roles === 'number'){
       roles = [roles]
     }
+    // @ts-ignore
+    await this.load('roles')
+
     return ! ! roles.filter((roleName)=>{
       return this.roles.map((role:Role)=>{
         if(typeof roleName === 'string'){
@@ -59,4 +131,101 @@ export default class User extends BaseModel {
       }).indexOf(roleName) !== -1;
     })
   }
+
+  @afterCreate()
+  public static async createUserMeta(user: User) {
+    await UserMeta.create({
+      user_id: user.id
+    })
+  }
+
+  @beforeDelete()
+  public static async deleteUserMeta(user: User) {
+    const userMeta = await UserMeta.query().where("user_id", user.id).first()
+
+    if(userMeta) {
+      await userMeta.delete()
+    }
+  }
+
+  public async hasPermission(value: Permission|number|string): Promise<boolean> {
+    //@ts-ignore
+    const relation = this.related("permissions");
+
+    if(typeof value === "object") {
+      const permission = await relation.query().where("id", value.id).first();
+
+      return !!permission
+    } else if(typeof value === "number") {
+      const permission = await relation.query().where("id", value).first();
+
+      return !!permission
+    }else  {
+      const permission = await relation.query().where("name", value).first();
+
+      return !!permission
+    }
+
+  }
+
+  public async can(value: Permission|number|number[]|Permission[]): Promise<boolean> {
+
+    if(!(value instanceof Array)) {
+      if(typeof value === "object" || typeof value === "number") {
+        const userPermission = await this.hasPermission(value)
+
+        if(!userPermission) {
+          //@ts-ignore
+          const roles = await this.related("roles").query()
+
+          let out = false;
+
+          for (let key in roles) {
+            // @ts-ignore
+            if(await roles[key].hasPermission(value)) {
+              out = true
+              break;
+            }
+          }
+          return out
+        }
+
+        return userPermission
+      }
+    } else {
+      let finalOut = true
+
+      for (let valueKey in value) {
+        const userPermission = await this.hasPermission(value[valueKey])
+
+        if(!userPermission) {
+          //@ts-ignore
+          const roles = await this.related("roles").query()
+
+          let out = false;
+
+          for (let key in roles) {
+            // @ts-ignore
+            if(await roles[key].hasPermission(value[valueKey])) {
+              out = true
+              break;
+            }
+          }
+
+          if(!out) {
+            finalOut = false
+            break
+          }
+        }
+        return finalOut
+      }
+    }
+
+
+    return false
+  }
+
+  @hasOne(() => UserMeta)
+  public user_meta: HasOne<typeof UserMeta>
+
 }

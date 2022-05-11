@@ -1,6 +1,6 @@
 import Schemes from "../../../components/altrp-dashboards/settings/NivoColorSchemes.js";
 import BaseElement from ".././BaseElement";
-import PieIcon from "../../../../svgs/skill-bar.svg";
+import PieIcon from "../../../../svgs/radar.svg";
 import { advancedTabControllers } from "../../../decorators/register-controllers";
 import {
   CONTROLLER_DIMENSIONS,
@@ -37,6 +37,9 @@ class RadarDiagram extends BaseElement {
   static getType() {
     return "widget";
   }
+  static getGroup() {
+    return "Diagrams";
+  }
   _registerControls() {
     if (this.controllersRegistered) {
       return;
@@ -50,28 +53,33 @@ class RadarDiagram extends BaseElement {
     this.addControl("datasource_path", {
       dynamic: false,
       type: CONTROLLER_TEXTAREA,
-      label: "Path to Data"
+      label: "Path to Data",
+      locked: true,
     });
 
     this.addControl('dataKeys', {
       type: CONTROLLER_TEXTAREA,
-      label: 'Data Keys'
+      label: 'Data Keys',
+      locked: true,
     })
 
     this.addControl('indexBy', {
-      label: 'Index By'
+      label: 'Index By',
+      locked: true,
     })
 
     this.addControl("data_name", {
-        dynamic: false,
-        label: "Data Field"
+      dynamic: false,
+      label: "Data Field",
+      locked: true,
     });
 
     this.addControl("use_legend", {
       type: CONTROLLER_SWITCHER,
       label: "Use Legend?",
+      locked: true,
     });
-    
+
     this.endControlSection();
 
     this.startControlSection("style", {
@@ -99,7 +107,8 @@ class RadarDiagram extends BaseElement {
           label: 'Basics Closed',
           value: 'basicsClosed'
         },
-      ]
+      ],
+      locked: true,
     })
 
     this.addControl('fillOpacity', {
@@ -107,7 +116,8 @@ class RadarDiagram extends BaseElement {
       label: 'Fill Opacity',
       min: 0,
       max: 1,
-      step: 0.01
+      step: 0.01,
+      locked: true,
     })
 
     this.addControl('borderWidth', {
@@ -115,7 +125,8 @@ class RadarDiagram extends BaseElement {
       label: 'Border Width',
       min: 0,
       max: 20,
-      step: 1
+      step: 1,
+      locked: true,
     })
 
     this.addControl('blendMode', {
@@ -130,7 +141,8 @@ class RadarDiagram extends BaseElement {
           label: 'Normal',
           value: 'normal'
         },
-      ]
+      ],
+      locked: true,
     })
 
     this.addControl('gridLevels', {
@@ -138,7 +150,8 @@ class RadarDiagram extends BaseElement {
       label: 'Grid Levels',
       min: 0,
       max: 12,
-      step: 1
+      step: 1,
+      locked: true,
     })
 
     this.addControl('gridShape', {
@@ -153,12 +166,14 @@ class RadarDiagram extends BaseElement {
           label: 'Linear',
           value: 'linear'
         },
-      ]
+      ],
+      locked: true,
     })
 
     this.addControl('enableDots', {
       type: CONTROLLER_SWITCHER,
-      label: 'Enable Dots'
+      label: 'Enable Dots',
+      locked: true,
     })
 
     this.addControl('dotSize', {
@@ -166,7 +181,8 @@ class RadarDiagram extends BaseElement {
       label: 'Dot Size',
       min: 0,
       max: 32,
-      step: 1
+      step: 1,
+      locked: true,
     })
 
     const colors = Schemes.map(object => {
@@ -176,7 +192,8 @@ class RadarDiagram extends BaseElement {
     this.addControl("colorScheme", {
       type: CONTROLLER_SELECT,
       label: "Color Scheme",
-      options: colors
+      options: colors,
+      locked: true,
     });
     this.endControlSection();
 
@@ -184,7 +201,8 @@ class RadarDiagram extends BaseElement {
 
     this.startControlSection("custom_color_scheme", {
       tab: TAB_STYLE,
-      label: "Custom Color Scheme"
+      label: "Custom Color Scheme",
+      locked: true,
     });
 
     let repeaterScheme = new Repeater();
@@ -192,24 +210,28 @@ class RadarDiagram extends BaseElement {
     repeaterScheme.addControl("color", {
       label: "Color",
       type: CONTROLLER_COLOR,
-      dynamic: false
+      dynamic: false,
+      locked: true,
     });
 
     this.addControl("isCustomColor", {
       type: CONTROLLER_SWITCHER,
       label: "Use Custom Color Scheme?",
+      locked: true,
     });
 
     this.addControl("customScheme", {
       type: CONTROLLER_REPEATER,
-      fields: repeaterScheme.getControls()
+      fields: repeaterScheme.getControls(),
+      locked: true,
     });
 
     this.endControlSection();
 
     this.startControlSection("size", {
       tab: TAB_STYLE,
-      label: "Size"
+      label: "Size",
+      locked: true,
     });
 
     this.addControl("width", {
@@ -218,6 +240,7 @@ class RadarDiagram extends BaseElement {
       units: ["px", "%", "vh"],
       max: 1000,
       min: 0,
+      locked: true,
     });
 
     this.addControl("height", {
@@ -226,12 +249,14 @@ class RadarDiagram extends BaseElement {
       units: ["px", "%", "vh"],
       max: 1000,
       min: 0,
+      locked: true,
     });
 
     this.addControl("margin", {
       type: CONTROLLER_DIMENSIONS,
       label: "Margin",
       units: ["px", "%", "vh"],
+      locked: true,
     });
 
     advancedTabControllers(this);

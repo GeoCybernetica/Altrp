@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import IconIcon from '../../../svgs/favorite.svg';
+import IconIcon from '../../../svgs/icon.svg';
 import {advancedTabControllers} from "../../decorators/register-controllers";
 import {
   CONTROLLER_TEXTAREA,
@@ -40,6 +40,9 @@ class Icon extends BaseElement {
   static getType() {
     return 'widget';
   }
+  static getGroup() {
+    return "Basic";
+  }
   _registerControls() {
     if (this.controllersRegistered) {
       return
@@ -58,11 +61,13 @@ class Icon extends BaseElement {
     this.addControl('title_text', {
       type: CONTROLLER_TEXT,
       label: 'Title',
+      locked: true,
     })
 
     this.addControl('description', {
       type: CONTROLLER_TEXT,
       label: 'Description',
+      locked: true,
     })
 
     this.addControl('content_alignment', {
@@ -192,7 +197,8 @@ class Icon extends BaseElement {
           label: 'div',
           value: 'div'
         },
-      ]
+      ],
+      locked: true,
     })
 
     this.addControl('title_typography', {
@@ -209,7 +215,7 @@ class Icon extends BaseElement {
       label: 'Padding',
       type: CONTROLLER_DIMENSIONS
     })
-    
+
     this.addControl('title_margin', {
       label: 'Margin',
       type: CONTROLLER_DIMENSIONS
@@ -219,7 +225,7 @@ class Icon extends BaseElement {
 
     this.startControlSection('description_styles', {
       label: 'Description',
-      tab: TAB_STYLE
+      tab: TAB_STYLE,
     })
 
     this.addControl('description_typography', {
@@ -236,7 +242,7 @@ class Icon extends BaseElement {
       label: 'Padding',
       type: CONTROLLER_DIMENSIONS
     })
-    
+
     this.addControl('description_margin', {
       label: 'Margin',
       type: CONTROLLER_DIMENSIONS
@@ -246,7 +252,8 @@ class Icon extends BaseElement {
 
     this.startControlSection('icon_styles', {
       label: 'Icon',
-      tab: TAB_STYLE
+      tab: TAB_STYLE,
+      locked: true,
     })
 
     this.addControl('icon_margin', {
@@ -274,7 +281,7 @@ class Icon extends BaseElement {
     //   label: 'Padding',
     //   type: CONTROLLER_DIMENSIONS
     // })
-    
+
     // this.addControl('icon_opacity', {
     //   type: CONTROLLER_SLIDER,
     //   label: 'Opacity',

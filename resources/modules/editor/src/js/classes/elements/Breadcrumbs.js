@@ -1,5 +1,5 @@
 import BaseElement from './BaseElement';
-import NavIcon from '../../../svgs/nav-menu.svg';
+import NavIcon from '../../../svgs/Breadcrumbs.svg';
 import {advancedTabControllers} from '../../decorators/register-controllers';
 import {
   CONTROLLER_DIMENSIONS,
@@ -29,6 +29,10 @@ class Breadcrumbs extends BaseElement {
     return 'widget';
   }
 
+  static getGroup() {
+    return "Basic";
+  }
+
   _registerControls() {
     if (this.controllersRegistered) {
       return;
@@ -41,6 +45,7 @@ class Breadcrumbs extends BaseElement {
     this.addControl('collapse', {
       label: 'Collapse From',
       type: CONTROLLER_SELECT,
+      locked: true,
       options: [
         {
           label: 'Start',
@@ -52,6 +57,7 @@ class Breadcrumbs extends BaseElement {
         },
       ],
       stateless: true,
+      locked: true,
     });
 
     this.addControl('delimiter', {

@@ -96,7 +96,6 @@ const Checkbox = window.altrpLibs.Blueprint.Checkbox;
   padding-left: 10px;
 }
 .altrp-field-label {
-  font-size: 16px;
   font-family: "Open Sans";
   line-height: 1.5;
   letter-spacing: 0;
@@ -119,6 +118,7 @@ const Checkbox = window.altrpLibs.Blueprint.Checkbox;
   border-width: 1px;
 }
 .altrp-field-container {
+  min-height: 10px;
   margin: 0;
 }
 .altrp-field::placeholder, .altrp-field-select2__placeholder {
@@ -793,7 +793,6 @@ class InputCheckboxWidget extends Component {
     if (_.isArray(e)) {
       value = _.cloneDeep(e);
     }
-    console.log(value);
     this.setState(
       state => ({
         ...state,
@@ -1006,8 +1005,9 @@ class InputCheckboxWidget extends Component {
     let label = null;
     const settings = this.props.element.getSettings();
     const {
-      select2_multiple: isMultiple,
-      label_icon
+      label_icon,
+      position_css_id: cssId,
+      position_css_classes: cssClasses
     } = settings;
 
     let value = this.state.value;
@@ -1096,18 +1096,19 @@ class InputCheckboxWidget extends Component {
     let autocomplete = "off";
     if (this.state.settings.content_autocomplete) {
       autocomplete = "on";
-    } else {
-      autocomplete = "off";
     }
 
     let input = null;
 
     input = this.renderRepeatedInput();
 
+    console.log({settings});
+
     return (
       <AltrpFieldContainer
         settings={settings}
-        className={"altrp-field-container "}
+        className={`altrp-field-container ${cssClasses ? cssClasses : ''}`}
+        id={cssId ? cssId : ''}
       >
         {content_label_position_type === "top" ? label : ""}
         {content_label_position_type === "left" ? label : ""}
@@ -1124,8 +1125,9 @@ class InputCheckboxWidget extends Component {
    * Выводит input type=checkbox|radio
    */
   renderRepeatedInput() {
-    const { options = [] } = this.state;
+    let { options = [] } = this.state;
     let { value = "" } = this.state;
+
     const fieldName =
       this.props.element.getFieldId() ||
       Math.random()
@@ -1136,7 +1138,7 @@ class InputCheckboxWidget extends Component {
       Math.random()
         .toString(36)
         .substr(2, 9);
-
+    
     return (
       <div className="altrp-field-subgroup">
         {options.map((option, idx) => {

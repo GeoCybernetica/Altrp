@@ -5,13 +5,18 @@
   ],
   "exclude": [
     "node_modules",
-    "resources/modules",
+    "app/AltrpModels",
+    "app/AltrpControllers",
     "build"
   ],
+
   "compilerOptions": {
+    "allowJs": true,
     "outDir": "build",
+    "module": "commonjs",
     "rootDir": "./",
     "sourceMap": true,
+    "esModuleInterop": true,
     "paths": {
       "App/*": [
         "./app/*"
@@ -34,6 +39,10 @@
       "@adonisjs/auth",
       "@adonisjs/session",
       "@adonisjs/shield"
+    ],
+    "jsx": "react",
+    "lib": [
+      "dom"
     ]
   }
 }

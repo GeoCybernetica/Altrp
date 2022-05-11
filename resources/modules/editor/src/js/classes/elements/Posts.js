@@ -36,6 +36,9 @@ class Table extends BaseElement {
   static getType() {
     return "widget";
   }
+  static getGroup() {
+    return "Advanced";
+  }
   _registerControls() {
     if (this.controllersRegistered) {
       return;
@@ -60,6 +63,7 @@ class Table extends BaseElement {
         },
       ],
       default: 'datasource',
+      locked: true,
     });
 
     this.addControl("posts_datasource", {
@@ -68,6 +72,7 @@ class Table extends BaseElement {
       conditions: {
         'choose_datasource': 'datasource',
       },
+      locked: true,
     });
 
     this.addControl("posts_query_heading", {

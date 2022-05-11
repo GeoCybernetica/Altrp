@@ -16,15 +16,18 @@ class Templates extends Component {
     super(props);
     this.state = {
       templates: [],
-      templatesDidMount: [],
       activeHeader: 0,
       allTemplates: [],
       templateAreas: [],
+      templateAreasModal: [],
       activeTemplateArea: {},
       pageCount: 1,
       currentPage: 1,
       templateSearch: '',
-      sorting: {},
+      sorting: {
+        order_by: 'title',
+        order: 'ASC',
+      },
       categoryOptions: [],
       activeCategory: 'All',
       modal: false
@@ -77,7 +80,6 @@ class Templates extends Component {
    */
   setActiveArea(activeTemplateArea) {
     this.updateTemplates(1, activeTemplateArea);
-    this.DidMountTemplates(activeTemplateArea)
     this.setState(state => {
       return {...state, activeTemplateArea};
     })
@@ -161,29 +163,6 @@ class Templates extends Component {
     }
   }
 
-  DidMountTemplates = async (activeTemplateArea = this.state.activeTemplateArea) => {
-    if (activeTemplateArea.name === 'all') {
-      let { templates } = await this.resource.getQueried({
-        s: this.state.templateSearch,
-        ...this.state.sorting
-      })
-      this.setState(state => ({
-        ...state,
-        templatesDidMount: templates
-      }))
-    } else {
-      let { templates } = await this.resource.getQueried({
-        area: activeTemplateArea.name,
-
-        s: this.state.templateSearch,
-        ...this.state.sorting
-      })
-      this.setState(state => ({
-        ...state,
-        templatesDidMount: templates
-      }))
-    }
-  }
 
   /** @function generateTemplateJSON
    * Генерируем контент файла template в формате JSON
@@ -246,10 +225,8 @@ class Templates extends Component {
     }
 
     this.setState(state => {
-      return {...state, templateAreas: templateAreasNew}
+      return {...state, templateAreas: templateAreasNew, templateAreasModal: templateAreas}
     });
-    this.updateTemplates(this.state.currentPage, this.state.activeTemplateArea)
-    await this.DidMountTemplates(this.state.activeTemplateArea)
     const { data } = await this.categoryOptions.getAll();
     this.setState(state => ({
       ...state,
@@ -257,10 +234,10 @@ class Templates extends Component {
     }))
 
     window.addEventListener("scroll", this.listenScrollHeader)
+  }
 
-    return () => {
-      window.removeEventListener("scroll", this.listenScrollHeader)
-    }
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.listenScrollHeader)
   }
 
   listenScrollHeader = () => {
@@ -470,7 +447,7 @@ class Templates extends Component {
   }
 
   render() {
-    const {templateSearch, categoryOptions, templatesDidMount, sorting, templates} = this.state
+    const {templateSearch, categoryOptions, sorting, templates} = this.state
 
     let templatesMap = templates.map(template => {
       let categories = template.categories.map(item => {
@@ -543,7 +520,7 @@ class Templates extends Component {
             }
           ]}
           filterPropsCategories={{
-            DidMountArray: templatesDidMount,
+            DidMountArray: templates,
             categoryOptions: categoryOptions,
             getCategories: this.getCategory,
             activeCategory: this.state.activeCategory
@@ -576,7 +553,9 @@ class Templates extends Component {
             route: '/admin/ajax/templates/:id',
             method: 'delete',
             confirm: 'Are You Sure?',
-            after: () => this.updateTemplates(this.state.currentPage, this.state.activeTemplateArea),
+            after: () => {
+              this.updateTemplates(this.state.currentPage, this.state.activeTemplateArea)
+            },
             className: 'quick-action-menu__item_danger',
             title: 'Delete'
           }]}
@@ -603,7 +582,7 @@ class Templates extends Component {
       </div>
       {this.state.modal && (
         <SmallModal toggleModal={this.toggleModal} activeMode={this.state.modal}>
-          <TemplateChildrenModal toggleModal={this.toggleModal} categoryOptions={this.state.categoryOptions} templateAreas={this.state.templateAreas} />
+          <TemplateChildrenModal toggleModal={this.toggleModal} categoryOptions={this.state.categoryOptions} templateAreas={this.state.templateAreasModal} />
         </SmallModal>
       )}
     </div>;

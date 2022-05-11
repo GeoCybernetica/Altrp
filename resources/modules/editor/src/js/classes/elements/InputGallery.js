@@ -1,5 +1,5 @@
 import BaseElement from './BaseElement';
-import FromIcon from '../../../svgs/form-horizontal.svg';
+import FromIcon from '../../../svgs/gallery_add.svg';
 import { advancedTabControllers } from '../../decorators/register-controllers';
 import {
   CONTROLLER_TEXTAREA,
@@ -23,13 +23,16 @@ class InputGallery extends BaseElement {
     return 'input-gallery';
   }
   static getTitle() {
-    return 'Input Gallery';
+    return 'Gallery Add';
   }
   static getIconComponent() {
     return FromIcon;
   }
   static getType() {
     return 'widget';
+  }
+  static getGroup() {
+    return "Form";
   }
   _registerControls() {
     if (this.controllersRegistered) {
@@ -56,7 +59,8 @@ class InputGallery extends BaseElement {
     this.addControl('accept', {
       type: CONTROLLER_TEXT,
       responsive: false,
-      label: 'Accept'
+      label: 'Accept',
+      locked: true,
     });
 
     this.addControl('required', {
@@ -68,17 +72,20 @@ class InputGallery extends BaseElement {
     this.addControl('limit', {
       type: CONTROLLER_NUMBER,
       responsive: false,
-      label: 'Limit Files'
+      label: 'Limit Files',
+      locked: true,
     });
 
     this.addControl('placeholder', {
       type: CONTROLLER_MEDIA,
-      label: 'Add New Placeholder'
+      label: 'Add New Placeholder',
+      locked: true,
     });
 
     this.addControl('default_value', {
       type: CONTROLLER_TEXTAREA,
-      label: 'Default Value'
+      label: 'Default Value',
+      locked: true,
     });
 
     this.endControlSection();
@@ -90,7 +97,8 @@ class InputGallery extends BaseElement {
     });
 
     this.addControl('delete', {
-      label: 'Delete Text'
+      label: 'Delete Text',
+      locked: true,
     });
 
     this.addControl('delete_s', {

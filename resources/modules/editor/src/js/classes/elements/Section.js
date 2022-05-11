@@ -14,7 +14,7 @@ import {
   CONTROLLER_COLWIDTH,
   TAB_STYLE,
   CONTROLLER_GRADIENT,
-  CONTROLLER_MEDIA
+  CONTROLLER_MEDIA, CONTROLLER_FILTERS
 } from "../modules/ControllersManager";
 import {advancedTabControllers} from "../../decorators/register-controllers";
 
@@ -57,7 +57,8 @@ class Section extends BaseElement{
         //   label: 'full fill'
         // }
       ],
-      prefixClass: 'altrp-section_'
+      prefixClass: 'altrp-section_',
+      locked: true,
     });
 
     this.addControl(
@@ -83,7 +84,7 @@ class Section extends BaseElement{
 
     this.addControl('layout_column_position', {
       type: CONTROLLER_SELECT,
-      label: 'Vertical Alignment',
+      label: 'Vertical Align',
       options: [
         {
           'value': 'stretch',
@@ -127,7 +128,7 @@ class Section extends BaseElement{
 
     this.addControl('layout_justify_content', {
         type: CONTROLLER_SELECT,
-        label: 'Horizontal Alignment',
+        label: 'Horizontal Align',
         options: [
           {
             'value': 'baseline',
@@ -204,36 +205,42 @@ class Section extends BaseElement{
       min: 0,
     });
 
-    this.addControl('layout_columns_gap', {
-      type: CONTROLLER_SELECT,
+    // this.addControl('layout_columns_gap', {
+    //   type: CONTROLLER_SELECT,
+    //   label: 'Columns',
+    //   default: 'none',
+    //   options: [
+    //     {
+    //       value: '',
+    //       label: 'none'
+    //     },
+    //     {
+    //       value: '0',
+    //       label: 'No gap'
+    //     },
+    //     {
+    //       value: '5',
+    //       label: 'Narrow'
+    //     },
+    //     {
+    //       value: '15',
+    //       label: 'Extended'
+    //     },
+    //     {
+    //       value: '20',
+    //       label: 'Wide'
+    //     },
+    //     {
+    //       value: '30',
+    //       label: 'Winder'
+    //     }
+    //   ],
+    // });
+
+    this.addControl('layout_columns_gap-margin', {
+      type: CONTROLLER_DIMENSIONS,
       label: 'Columns gap',
-      default: 'none',
-      options: [
-        {
-          value: '',
-          label: 'none'
-        },
-        {
-          value: '0',
-          label: 'No gap'
-        },
-        {
-          value: '5',
-          label: 'Narrow'
-        },
-        {
-          value: '15',
-          label: 'Extended'
-        },
-        {
-          value: '20',
-          label: 'Wide'
-        },
-        {
-          value: '30',
-          label: 'Winder'
-        }
-      ],
+      units: ["px", "%", "vh"],
     });
 
     this.addControl('layout_height', {
@@ -254,11 +261,12 @@ class Section extends BaseElement{
           label: 'min height'
         }
       ],
+      locked: true,
     });
 
     this.addControl("label_style_min_height", {
       type: CONTROLLER_SLIDER,
-      label: "Minimum height",
+      label: "Min height",
       default: {
         unit: "px"
       },
@@ -324,7 +332,15 @@ class Section extends BaseElement{
           value: 'form',
           label: 'form',
         },
-      ]
+      ],
+      locked: true,
+    });
+
+    this.addControl('layout_columns_height', {
+      // type: CONTROLLER_NUMBER,
+      label: 'Columns height (%)',
+      dynamic: false,
+      default: null,
     });
 
     this.endControlSection();
@@ -342,6 +358,7 @@ class Section extends BaseElement{
         noFollow: false
       },
       label: 'Link',
+      locked: true,
     });
 
     this.endControlSection();
@@ -384,10 +401,10 @@ class Section extends BaseElement{
       default: {
         isWithGradient: false,
         firstColor: "rgba(97,206,112,1)",
-        firstPoint: '100',
+        firstPoint: '0',
         secondColor: "rgba(242,41,91,1)",
-        secondPoint: "0",
-        angle: "0",
+        secondPoint: "90",
+        angle: "260",
         value: ""
       },
     });
@@ -396,6 +413,7 @@ class Section extends BaseElement{
       type: CONTROLLER_MEDIA,
       label: 'Background Image',
       default: {url: ""},
+      locked: true,
     });
 
     this.addControl('background_position', {
@@ -591,18 +609,13 @@ class Section extends BaseElement{
     });
 
     this.addControl("section_style_border_radius", {
-      type: CONTROLLER_SLIDER,
+      type: CONTROLLER_DIMENSIONS,
       label: 'Border radius',
-      default:{
-        unit: 'px',
-      },
       units:[
         'px',
         '%',
         'vh',
       ],
-      max: 100,
-      min: 0,
     });
 
     this.addControl('section_style_box_shadow', {
@@ -651,19 +664,34 @@ class Section extends BaseElement{
 
     this.addControl("position_style_css_id", {
       type: CONTROLLER_TEXT,
-      label: "CSS ID"
+      label: "CSS ID",
+      locked: true,
     });
 
     this.addControl("position_style_css_classes", {
       type: CONTROLLER_TEXT,
-      label: "CSS Classes"
+      label: "CSS Classes",
+      locked: true,
     });
 
     this.endControlSection();
 
-    this.startControlSection("position_fixed", {
+    this.startControlSection("filter_background", {
       tab: TAB_STYLE,
-      label: "Fixed Positioning"
+      label: "Filter Background"
+    });
+
+    this.addControl('background_style_filter', {
+      hideOnEmail: true,
+      type: CONTROLLER_FILTERS,
+      label: 'filters',
+      default: {
+        blur: 0,
+        brightness: 100,
+        contrast: 100,
+        saturate: 100,
+        hue: 0,
+      },
     });
 
     // this.addControl('isFixed', {
@@ -671,45 +699,119 @@ class Section extends BaseElement{
     //   label: 'Enable Fixed',
     // });
 
-    this.addControl("position_top", {
-      type: CONTROLLER_TEXT,
-      label: "Top",
-      conditions: {
-        'isFixed': [true],
-      },
+    // this.addControl("position_top", {
+    //   type: CONTROLLER_TEXT,
+    //   label: "Top",
+    //   conditions: {
+    //     'isFixed': [true],
+    //   },
+    // });
+    //
+    // this.addControl("position_right", {
+    //   type: CONTROLLER_TEXT,
+    //   label: "Right",
+    //   conditions: {
+    //     'isFixed': [true],
+    //   },
+    // });
+    //
+    // this.addControl("position_left", {
+    //   type: CONTROLLER_TEXT,
+    //   label: "Left",
+    //   conditions: {
+    //     'isFixed': [true],
+    //   },
+    // });
+    //
+    // this.addControl("position_bottom", {
+    //   type: CONTROLLER_TEXT,
+    //   label: "Bottom",
+    //   conditions: {
+    //     'isFixed': [true],
+    //   },
+    // });
+    //
+    // this.addControl("custom_width", {
+    //   type: CONTROLLER_TEXT,
+    //   label: "Width",
+    //   conditions: {
+    //     'isFixed': [true],
+    //   },
+    // });
+
+    this.endControlSection();
+
+    this.startControlSection("background_video_tab", {
+      tab: TAB_STYLE,
+      label: "Background Video"
     });
 
-    this.addControl("position_right", {
+    this.addControl("url_video-poster", {
       type: CONTROLLER_TEXT,
-      label: "Right",
-      conditions: {
-        'isFixed': [true],
-      },
+      label: "Poster"
     });
 
-    this.addControl("position_left", {
+    this.addControl("url_video", {
       type: CONTROLLER_TEXT,
-      label: "Left",
-      conditions: {
-        'isFixed': [true],
-      },
+      label: "Url Video mp4"
     });
 
-    this.addControl("position_bottom", {
+    this.addControl("url_video-webm", {
       type: CONTROLLER_TEXT,
-      label: "Bottom",
-      conditions: {
-        'isFixed': [true],
-      },
+      label: "Url Video webm"
     });
 
-    this.addControl("custom_width", {
-      type: CONTROLLER_TEXT,
-      label: "Width",
-      conditions: {
-        'isFixed': [true],
-      },
+    this.addControl('object_fit_select', {
+      type: CONTROLLER_SELECT,
+      label: 'object-fit',
+      default: 'cover',
+      options: [
+        {
+          value: 'initial',
+          label: 'initial'
+        },
+        {
+          value: 'none',
+          label: 'none'
+        },
+        {
+          value: 'fill',
+          label: 'fill'
+        },
+        {
+          value: 'contain',
+          label: 'contain'
+        },
+        {
+          value: 'cover',
+          label: 'cover'
+        },
+        {
+          value: 'scale-down',
+          label: 'scale-down'
+        }
+      ],
     });
+
+    // this.addControl('preload_select', {
+    //   type: CONTROLLER_SELECT,
+    //   label: 'preload',
+    //   default: 'metadata',
+    //   options: [
+    //     {
+    //       value: 'metadata',
+    //       label: 'metadata'
+    //     },
+    //     {
+    //       value: 'none',
+    //       label: 'none'
+    //     },
+    //     {
+    //       value: 'auto',
+    //       label: 'auto'
+    //     }
+    //   ],
+    // });
 
     this.endControlSection();
 

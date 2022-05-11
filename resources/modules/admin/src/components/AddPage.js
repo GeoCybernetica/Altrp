@@ -212,10 +212,10 @@ class AddPage extends Component {
     }
 
     window.addEventListener("scroll", this.listenScrollHeader)
+  }
 
-    return () => {
-      window.removeEventListener("scroll", this.listenScrollHeader)
-    }
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.listenScrollHeader)
   }
 
   listenScrollHeader = () => {
@@ -370,9 +370,7 @@ class AddPage extends Component {
   };
 
   isItemSelectedRoles = (item) => {
-    let itemString = JSON.stringify(item);
-    let selectedString = JSON.stringify(this.state.value.roles);
-    return selectedString.includes(itemString);
+    return this.state.value.roles.some(c=>c.value === item.value);
   };
 
   handleItemSelectRoles = (item) => {
@@ -426,9 +424,7 @@ class AddPage extends Component {
   }
 
   isItemSelectedCategory = (item) => {
-    let itemString = JSON.stringify(item);
-    let selectedString = JSON.stringify(this.state.value.categories);
-    return selectedString.includes(itemString);
+    return this.state.value.categories.some(c=>c.value === item.value);
   }
 
   handleItemSelectCategory = (item) => {
@@ -459,8 +455,6 @@ class AddPage extends Component {
     const {isModalOpened, editingDataSource} = this.state;
     let {dataSources} = this.state;
     let id = this.props.match.params.id
-
-    console.log(this.state)
 
     dataSources = _.sortBy(dataSources, dataSource => dataSource.priority);
     return (

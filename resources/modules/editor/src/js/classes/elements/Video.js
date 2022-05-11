@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import VideoIcon from "../../../svgs/widescreen.svg";
+import VideoIcon from "../../../svgs/video.svg";
 import { advancedTabControllers } from "../../decorators/register-controllers";
 import {
   CONTROLLER_TEXT,
@@ -27,6 +27,9 @@ class Video extends BaseElement {
   static getType() {
     return "widget";
   }
+  static getGroup() {
+    return "Advanced";
+  }
   _registerControls() {
     if (this.controllersRegistered) {
       return;
@@ -45,12 +48,14 @@ class Video extends BaseElement {
     this.addControl('is_youtube', {
       type: CONTROLLER_SWITCHER,
       label: 'Youtube Video',
+      locked: true,
     });
 
     this.addControl('youtube_id', {
       type: CONTROLLER_TEXT,
       label: 'Youtube Video ID',
       conditions: { 'is_youtube': true },
+      locked: true,
     });
 
     this.addControl('content_path', {
@@ -58,6 +63,7 @@ class Video extends BaseElement {
       dynamic: false,
       responsive: false,
       label: 'Path',
+      locked: true,
     });
 
     this.addControl('video_width', {

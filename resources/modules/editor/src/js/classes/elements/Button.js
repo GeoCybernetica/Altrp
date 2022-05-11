@@ -42,6 +42,9 @@ class Button extends BaseElement {
   static getType() {
     return 'widget';
   }
+  static getGroup() {
+    return "Basic";
+  }
   _registerControls() {
     if (this.controllersRegistered) {
       return
@@ -55,7 +58,8 @@ class Button extends BaseElement {
     this.addControl('button_text', {
       type: CONTROLLER_TEXTAREA,
       label: 'Button Text',
-      default: 'Click Me'
+      default: 'Click Me',
+      locked: true,
     });
 
     this.addControl('button_alignment', {
@@ -103,21 +107,25 @@ class Button extends BaseElement {
     this.addControl('button_icon_right', {
       type: CONTROLLER_MEDIA,
       label: 'Right Icon',
+      locked: true,
     });
 
     this.addControl('button_icon_left', {
       type: CONTROLLER_MEDIA,
       label: 'Left Icon',
+      locked: true,
     });
 
     this.addControl('button_icon_top', {
       type: CONTROLLER_MEDIA,
       label: 'Top Icon',
+      locked: true,
     });
 
     this.addControl('button_icon_bottom', {
       type: CONTROLLER_MEDIA,
       label: 'Bottom Icon',
+      locked: true,
     });
 
     // this.addControl('button_icon_position', {
@@ -159,6 +167,7 @@ class Button extends BaseElement {
         tag: 'Link'
       },
       label: 'Link',
+      locked: true,
     });
 
     this.endControlSection();
@@ -175,6 +184,20 @@ class Button extends BaseElement {
     this.addControl('position_padding', {
       type: CONTROLLER_DIMENSIONS,
       label: 'Padding',
+      default: {
+        unit: 'px',
+        bind: true
+      },
+      units: [
+        'px',
+        '%',
+        'vh',
+      ],
+    });
+
+    this.addControl('position_margin', {
+      type: CONTROLLER_DIMENSIONS,
+      label: 'Margin',
       default: {
         unit: 'px',
         bind: true
@@ -225,8 +248,8 @@ class Button extends BaseElement {
         firstColor: "rgba(97,206,112,1)",
         firstPoint: '0',
         secondColor: "rgba(242,41,91,1)",
-        secondPoint: "100",
-        angle: "0",
+        secondPoint: "90",
+        angle: "260",
         value: ""
       },
     });
@@ -235,6 +258,7 @@ class Button extends BaseElement {
       type: CONTROLLER_MEDIA,
       label: 'Background Image',
       default: { url: "" },
+      locked: true,
     });
 
     this.addControl('background_position', {
@@ -498,7 +522,6 @@ class Button extends BaseElement {
         '%',
         'vh',
       ],
-      stateless: true,
     });
 
     this.addControl('icon_padding_left', {
@@ -513,7 +536,6 @@ class Button extends BaseElement {
         '%',
         'vh',
       ],
-      stateless: true,
     });
 
     this.addControl('icon_padding_top', {
@@ -528,7 +550,6 @@ class Button extends BaseElement {
         '%',
         'vh',
       ],
-      stateless: true,
     });
 
     this.addControl('icon_padding_bottom', {
@@ -543,7 +564,62 @@ class Button extends BaseElement {
         '%',
         'vh',
       ],
-      stateless: true,
+    });
+
+    this.addControl('icon_margin_right', {
+      type: CONTROLLER_DIMENSIONS,
+      label: 'Margin for icon right',
+      default: {
+        unit: 'px',
+        bind: true
+      },
+      units: [
+        'px',
+        '%',
+        'vh',
+      ],
+    });
+
+    this.addControl('icon_margin_left', {
+      type: CONTROLLER_DIMENSIONS,
+      label: 'Margin for icon left',
+      default: {
+        unit: 'px',
+        bind: true
+      },
+      units: [
+        'px',
+        '%',
+        'vh',
+      ],
+    });
+
+    this.addControl('icon_margin_top', {
+      type: CONTROLLER_DIMENSIONS,
+      label: 'Margin for icon top',
+      default: {
+        unit: 'px',
+        bind: true
+      },
+      units: [
+        'px',
+        '%',
+        'vh',
+      ],
+    });
+
+    this.addControl('icon_margin_bottom', {
+      type: CONTROLLER_DIMENSIONS,
+      label: 'Margin for icon bottom',
+      default: {
+        unit: 'px',
+        bind: true
+      },
+      units: [
+        'px',
+        '%',
+        'vh',
+      ],
     });
 
     this.addControl('icon_color', {
@@ -572,7 +648,6 @@ class Button extends BaseElement {
       ],
       max: 100,
       min: 0,
-      stateless: true,
     });
 
     this.addControl('icon_size_left', {
@@ -585,7 +660,6 @@ class Button extends BaseElement {
       ],
       max: 100,
       min: 0,
-      stateless: true,
     });
 
     this.addControl('icon_size_top', {
@@ -598,7 +672,6 @@ class Button extends BaseElement {
       ],
       max: 100,
       min: 0,
-      stateless: true,
     });
 
     this.addControl('icon_size_bottom', {
@@ -611,7 +684,6 @@ class Button extends BaseElement {
       ],
       max: 100,
       min: 0,
-      stateless: true,
     });
 
     this.endControlSection();

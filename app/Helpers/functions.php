@@ -1069,7 +1069,8 @@ function _extractElementsNames( $element,  &$elementNames, $only_react_elements 
     'tree',
     'list',
     'stars',
-    'progress-bar'
+    'progress-bar',
+    'tournament',//todo: move to plugin
   ]);
   if( ! is_array( $elementNames ) ){
     $elementNames = [];
@@ -1882,3 +1883,14 @@ function print_statics( string $type, string $place, $attributes  = []): string
   }
   return $content;
 }
+
+/**
+ * @param string $type
+ * @param string $place
+ * @return string
+ */
+function str_replace_once($search, $replace, $text) 
+{ 
+   $pos = strpos($text, $search); 
+   return $pos!==false ? substr_replace($text, $replace, $pos, strlen($search)) : $text; 
+} 

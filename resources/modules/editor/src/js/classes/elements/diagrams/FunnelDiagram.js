@@ -1,6 +1,6 @@
 import Schemes from "../../../components/altrp-dashboards/settings/NivoColorSchemes.js";
 import BaseElement from ".././BaseElement";
-import PieIcon from "../../../../svgs/skill-bar.svg";
+import PieIcon from "../../../../svgs/funnel.svg";
 import { advancedTabControllers } from "../../../decorators/register-controllers";
 import {
   CONTROLLER_DIMENSIONS,
@@ -38,6 +38,9 @@ class FunnelDiagram extends BaseElement {
   static getType() {
     return "widget";
   }
+  static getGroup() {
+    return "Diagrams";
+  }
   _registerControls() {
     if (this.controllersRegistered) {
       return;
@@ -51,12 +54,14 @@ class FunnelDiagram extends BaseElement {
     this.addControl("datasource_path", {
       dynamic: false,
       type: CONTROLLER_TEXTAREA,
-      label: "Path to Data"
+      label: "Path to Data",
+      locked: true,
     });
 
     this.addControl("use_legend", {
       type: CONTROLLER_SWITCHER,
       label: "Use legend?",
+      locked: true,
     });
 
     this.endControlSection();
@@ -73,43 +78,50 @@ class FunnelDiagram extends BaseElement {
     this.addControl("colorScheme", {
       type: CONTROLLER_SELECT,
       label: "Color Scheme",
-      options: colors
+      options: colors,
+      locked: true,
     });
 
     this.addControl("fillOpacity", {
       type: CONTROLLER_SLIDER,
-      label: "Fill opacity",
+      label: "Fill Opacity",
       min: 0,
       max: 1,
-      step: 0.01
+      step: 0.01,
+      locked: true,
     });
 
     this.addControl("borderOpacity", {
       type: CONTROLLER_SLIDER,
-      label: "Border opacity",
+      label: "Border Opacity",
       min: 0,
       max: 1,
-      step: 0.01
+      step: 0.01,
+      locked: true,
     });
 
     this.addControl('borderWidth', {
       type: CONTROLLER_NUMBER,
-      label: 'Border width'
+      label: 'Border Width',
+      locked: true,
     })
 
     this.addControl('borderColor', {
       type: CONTROLLER_COLOR,
-      label: 'Border color'
+      label: 'Border Color',
+      locked: true,
     })
 
     this.addControl('enableLabels', {
       type: CONTROLLER_SWITCHER,
-      label: 'Enable labels'
+      label: 'Enable Labels',
+      locked: true,
     })
 
     this.addControl('labelsColor', {
       type: CONTROLLER_COLOR,
-      label: 'Label color'
+      label: 'Label Color',
+      locked: true,
     })
 
     this.addControl('interpolation', {
@@ -124,7 +136,8 @@ class FunnelDiagram extends BaseElement {
           label: 'Linear',
           value: 'linear'
         },
-      ]
+      ],
+      locked: true,
     })
 
     this.addControl("spacing", {
@@ -132,15 +145,17 @@ class FunnelDiagram extends BaseElement {
       label: "Spacing",
       min: 0,
       max: 50,
-      step: 1
+      step: 1,
+      locked: true,
     });
 
     this.addControl("shapeBlending", {
       type: CONTROLLER_SLIDER,
-      label: "Shape blending",
+      label: "Shape Blending",
       min: 0,
       max: 1,
-      step: 0.05
+      step: 0.05,
+      locked: true,
     });
 
     this.addControl('direction', {
@@ -155,12 +170,14 @@ class FunnelDiagram extends BaseElement {
           label: 'Horizontal',
           value: 'horizontal'
         },
-      ]
+      ],
+      locked: true,
     })
 
     this.addControl("isInteractive", {
       type: CONTROLLER_SWITCHER,
       label: "Is Interactive",
+      locked: true,
     });
 
     this.addControl("currentPartSizeExtension", {
@@ -171,7 +188,8 @@ class FunnelDiagram extends BaseElement {
       step: 1,
       conditions: {
         isInteractive: true
-      }
+      },
+      locked: true,
     });
 
     this.addControl("currentBorderWidth", {
@@ -182,7 +200,8 @@ class FunnelDiagram extends BaseElement {
       step: 1,
       conditions: {
         isInteractive: true
-      }
+      },
+      locked: true,
     });
 
     this.endControlSection();
@@ -208,7 +227,8 @@ class FunnelDiagram extends BaseElement {
           label: 'Brighter',
           value: 'brighter'
         }
-      ]
+      ],
+      locked: true,
     })
 
     this.addControl('label_modifier', {
@@ -219,12 +239,14 @@ class FunnelDiagram extends BaseElement {
       step: 0.1,
       conditions: {
         label_color_type: ['darker', 'brighter']
-      }
+      },
+      locked: true,
     })
 
     this.addControl('label_color', {
       type: CONTROLLER_COLOR,
-      label: 'Color'
+      label: 'Color',
+      locked: true,
     })
 
     this.endControlSection()
@@ -243,17 +265,20 @@ class FunnelDiagram extends BaseElement {
     repeaterScheme.addControl("color", {
       label: "Color",
       type: CONTROLLER_COLOR,
-      dynamic: false
+      dynamic: false,
+      locked: true,
     });
 
     this.addControl("isCustomColor", {
       type: CONTROLLER_SWITCHER,
       label: "Use custom color scheme?",
+      locked: true,
     });
 
     this.addControl("customScheme", {
       type: CONTROLLER_REPEATER,
-      fields: repeaterScheme.getControls()
+      fields: repeaterScheme.getControls(),
+      locked: true,
     });
 
     this.endControlSection();
@@ -269,6 +294,7 @@ class FunnelDiagram extends BaseElement {
       units: ["px", "%", "vh"],
       max: 1000,
       min: 0,
+      locked: true,
     });
 
     this.addControl("height", {
@@ -277,12 +303,14 @@ class FunnelDiagram extends BaseElement {
       units: ["px", "vh"],
       max: 1000,
       min: 0,
+      locked: true,
     });
 
     this.addControl("margin", {
       type: CONTROLLER_DIMENSIONS,
       label: "Margin",
       units: ["px", "%", "vh"],
+      locked: true,
     });
 
     advancedTabControllers(this);

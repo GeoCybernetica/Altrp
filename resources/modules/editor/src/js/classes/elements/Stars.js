@@ -16,7 +16,7 @@ import {
   CONTROLLER_GRADIENT,
   CONTROLLER_MEDIA, CONTROLLER_TEXTAREA, CONTROLLER_CHOOSE
 } from "../modules/ControllersManager";
-import RowIcon from "../../../svgs/row.svg";
+import RowIcon from "../../../svgs/stars.svg";
 import { advancedTabControllers } from "../../decorators/register-controllers";
 import {actionsControllers} from "../../decorators/actions-controllers";
 
@@ -35,6 +35,10 @@ class Stars extends BaseElement {
   static getType() {
     return "widget";
   }
+
+  static getGroup() {
+    return "Advanced";
+  }
   _registerControls() {
     if (this.controllersRegistered) {
       return;
@@ -51,6 +55,7 @@ class Stars extends BaseElement {
       },
       max: 10,
       min: 1,
+      locked: true,
     });
 
     this.addControl("form_id", {
@@ -67,12 +72,14 @@ class Stars extends BaseElement {
 
     this.addControl("default_value", {
       type: CONTROLLER_TEXTAREA,
-      label: "Default Value"
+      label: "Default Value",
+      locked: true,
     });
 
     this.addControl("second_default_value", {
       type: CONTROLLER_TEXTAREA,
       label: "Not changed value",
+      locked: true,
     });
 
     this.endControlSection();

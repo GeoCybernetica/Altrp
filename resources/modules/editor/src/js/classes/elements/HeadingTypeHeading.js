@@ -1,5 +1,5 @@
 import BaseElement from "./BaseElement";
-import HeadingIcon from "../../../svgs/t-letter.svg";
+import HeadingIcon from "../../../svgs/text.svg";
 import {
   CONTROLLER_TEXTAREA,
   CONTROLLER_COLOR,
@@ -16,8 +16,9 @@ import {
   CONTROLLER_TRANSFORM,
   CONTROLLER_CHOOSE,
   CONTROLLER_GRADIENT,
-  CONTROLLER_MEDIA, CONTROLLER_SWITCHER, CONTROLLER_HEADING, CONTROLLER_CREATIVE_LINK
+  CONTROLLER_MEDIA, CONTROLLER_SWITCHER, CONTROLLER_HEADING, CONTROLLER_CREATIVE_LINK, CONTROLLER_REPEATER, CONTROLLER_RANGE
 } from "../modules/ControllersManager";
+import Repeater from "../Repeater";
 import { advancedTabControllers } from "../../decorators/register-controllers";
 
 class HeadingTypeHeading extends BaseElement {
@@ -25,13 +26,16 @@ class HeadingTypeHeading extends BaseElement {
     return "heading";
   }
   static getTitle() {
-    return "Heading";
+    return "Text";
   }
   static getIconComponent() {
     return HeadingIcon;
   }
   static getType() {
     return "widget";
+  }
+  static getGroup() {
+    return "Basic";
   }
   _registerControls() {
     if (this.controllersRegistered) {
@@ -47,22 +51,7 @@ class HeadingTypeHeading extends BaseElement {
       type: CONTROLLER_TEXTAREA,
       label: "Text",
       default: "I Am Advanced Heading",
-    });
-
-    this.addControl('text_sub_switch', {
-      hideOnEmail: true,
-      type: CONTROLLER_SWITCHER,
-      label: 'Sub heading',
-      default: false
-    });
-
-    this.addControl("text_sub", {
-      conditions: {
-        'text_sub_switch': true,
-      },
-      type: CONTROLLER_TEXTAREA,
-      label: "Sub text",
-      default: "I Am Sub Heading",
+      locked: true,
     });
 
     this.endControlSection();
@@ -95,38 +84,10 @@ class HeadingTypeHeading extends BaseElement {
       ],
     });
 
-    this.addControl('sub_heading_settings_alignment', {
-      conditions: {
-        'text_sub_switch': true,
-      },
-      type: CONTROLLER_CHOOSE,
-      label: 'Sub alignment',
-      default: 'left',
-      options: [
-        {
-          icon: 'left',
-          value: 'flex-start',
-        },
-        {
-          icon: 'center',
-          value: 'center',
-        },
-        {
-          icon: 'right',
-          value: 'flex-end',
-        },
-        {
-          icon: 'in_width',
-          value: 'stretch',
-        }
-      ],
-      prefixClass: 'altrp-alignment_',
-    });
-
     this.addControl('heading_settings_html_tag', {
       hideOnEmail: true,
       type: CONTROLLER_SELECT,
-      label: 'HTML tag',
+      label: 'HTML Tag',
       default: 'h2',
       options: [
         {
@@ -165,81 +126,8 @@ class HeadingTypeHeading extends BaseElement {
           value: 'div',
           label: 'div'
         }
-      ]
-    });
-
-    this.addControl('sub_heading_settings_html_tag', {
-      conditions: {
-        'text_sub_switch': true,
-      },
-      type: CONTROLLER_SELECT,
-      label: 'Sub HTML tag',
-      default: 'h5',
-      options: [
-        {
-          value: 'h1',
-          label: 'h1'
-        },
-        {
-          value: 'h2',
-          label: 'h2'
-        },
-        {
-          value: 'h3',
-          label: 'h3'
-        },
-        {
-          value: 'h4',
-          label: 'h4'
-        },
-        {
-          value: 'h5',
-          label: 'h5'
-        },
-        {
-          value: 'h6',
-          label: 'h6'
-        },
-        {
-          value: 'p',
-          label: 'p'
-        },
-        {
-          value: 'span',
-          label: 'span'
-        },
-        {
-          value: 'div',
-          label: 'div'
-        }
-      ]
-    });
-
-    this.addControl('sub_heading_settings_position', {
-      conditions: {
-        'text_sub_switch': true,
-      },
-      type: CONTROLLER_SELECT,
-      label: 'Sub position',
-      default: 'bottom',
-      options: [
-        {
-          value: 'bottom',
-          label: 'Bottom'
-        },
-        {
-          value: 'top',
-          label: 'Top'
-        },
-        {
-          value: 'right',
-          label: 'Right'
-        },
-        {
-          value: 'left',
-          label: 'Left'
-        }
-      ]
+      ],
+      locked: true,
     });
 
     this.addControl('link_link', {
@@ -250,141 +138,9 @@ class HeadingTypeHeading extends BaseElement {
         tag: 'Link',
         noFollow: false
       },
-      label: 'link',
+      label: 'Link',
+      locked: true,
     });
-
-    this.endControlSection();
-
-    this.startControlSection('advanced_heading_content', {
-      hideOnEmail: true,
-      tab: TAB_CONTENT,
-      label: 'Advanced heading',
-    });
-
-    this.addControl('switch_advanced_heading_content', {
-      type: CONTROLLER_SWITCHER,
-      label: 'Advanced heading',
-    });
-
-    this.addControl('text_advanced_heading_content', {
-      conditions: {
-        'switch_advanced_heading_content': true,
-      },
-      type: CONTROLLER_TEXTAREA,
-      label: 'Text',
-      default: 'Advanced heading'
-    });
-
-    this.addControl('alignment_advanced_heading_content', {
-      type: CONTROLLER_CHOOSE,
-      label: 'Alignment',
-      options: [
-        {
-          icon: 'left',
-          value: 'left',
-        },
-        {
-          icon: 'center',
-          value: 'center',
-        },
-        {
-          icon: 'right',
-          value: 'right',
-        }
-      ],
-    });
-
-    this.addControl("horizontal_offset_advanced_heading_content", {
-      type: CONTROLLER_SLIDER,
-      label: 'Horizontal offset',
-      max: 800,
-      min: -800,
-    });
-
-    this.addControl("vertical_offset_advanced_heading_content", {
-      type: CONTROLLER_SLIDER,
-      label: 'Vertical offset',
-      max: 800,
-      min: -800,
-    });
-
-    this.addControl("rotate_offset_advanced_heading_content", {
-      type: CONTROLLER_SLIDER,
-      label: 'Rotate',
-      max: 360,
-      min: -360,
-    });
-
-    this.addControl('transform_origin_offset_advanced_heading_content', {
-      type: CONTROLLER_SELECT,
-      label: 'Rotate origin',
-      options: [
-        {
-          'value': "default",
-          'label': 'Default',
-        },
-        {
-          'value': 'topLeft',
-          'label': 'Top left',
-        },
-        {
-          'value': 'topCenter',
-          'label': 'Top center',
-        },
-        {
-          'value': 'topRight',
-          'label': 'Top right',
-        },
-        {
-          'value': 'centerLeft',
-          'label': 'Center left',
-        },
-        {
-          'value': 'center',
-          'label': 'Center',
-        },
-        {
-          'value': 'centerRight',
-          'label': 'Center right',
-        },
-        {
-          'value': 'bottomLeft',
-          'label': 'Bottom left',
-        },
-        {
-          'value': 'bottomCenter',
-          'label': 'Bottom center',
-        },
-        {
-          'value': 'bottomRight',
-          'label': 'Bottom right',
-        },
-      ],
-    }
-    );
-
-    this.addControl('hide_at_offset_advanced_heading_content', {
-      type: CONTROLLER_SELECT,
-      label: 'Hide at',
-      options: [
-        {
-          'value': "never",
-          'label': 'Nothing',
-        },
-        {
-          'value': 'tablet',
-          'label': 'Tablet and mobile (1025)',
-        },
-        {
-          'value': 'mobile',
-          'label': 'Mobile (768)',
-        },
-      ],
-      rules: {
-        '.{{ELEMENT}} .altrp-nav-menu-ul-dropdown-hor-ver{{STATE}}': 'border-style: {{VALUE}};',
-      },
-    }
-    );
 
     this.endControlSection();
 
@@ -420,8 +176,7 @@ class HeadingTypeHeading extends BaseElement {
         color: 'rgb(0, 0, 0)',
         colorPickedHex: '#000000',
       },
-    }
-    );
+    });
 
     this.endControlSection();
 
@@ -463,18 +218,20 @@ class HeadingTypeHeading extends BaseElement {
     this.addControl('position_z_index', {
       hideOnEmail: true,
       type: CONTROLLER_NUMBER,
-      label: "Z-index",
+      label: "Z-Index",
       default: 0,
     });
 
     this.addControl("position_css_id", {
       type: CONTROLLER_TEXT,
-      label: "CSS ID"
+      label: "CSS ID",
+      locked: true,
     });
 
     this.addControl("position_css_classes", {
       type: CONTROLLER_TEXT,
-      label: "CSS Classes"
+      label: "CSS Classes",
+      locked: true,
     });
 
     this.endControlSection();
@@ -486,7 +243,7 @@ class HeadingTypeHeading extends BaseElement {
 
     this.addControl("style_background_color", {
       type: CONTROLLER_COLOR,
-      label: "Background color",
+      label: "Background Color",
       default: {
         color: "",
         colorPickedHex: "",
@@ -522,6 +279,7 @@ class HeadingTypeHeading extends BaseElement {
       type: CONTROLLER_MEDIA,
       label: 'Background Image',
       default: { url: "" },
+      locked: true,
     });
 
     this.addControl('background_position', {
@@ -673,7 +431,7 @@ class HeadingTypeHeading extends BaseElement {
 
     this.addControl("style_border_type", {
       type: CONTROLLER_SELECT,
-      label: "Border type",
+      label: "Border Type",
       options: [
         {
           value: "none",
@@ -704,13 +462,13 @@ class HeadingTypeHeading extends BaseElement {
 
     this.addControl("style_border_width", {
       type: CONTROLLER_DIMENSIONS,
-      label: "Border width",
+      label: "Border Width",
       units: ["px", "%", "vh"],
     });
 
     this.addControl("style_border_color", {
       type: CONTROLLER_COLOR,
-      label: "Border color",
+      label: "Border Color",
       default: {
         color: "rgb(50,168,82)",
         colorPickedHex: "#32a852"
@@ -719,7 +477,7 @@ class HeadingTypeHeading extends BaseElement {
 
     this.addControl("style_border_radius", {
       type: CONTROLLER_SLIDER,
-      label: 'Border radius',
+      label: 'Border Radius',
       default: {
         size: 0,
         unit: 'px',
@@ -741,142 +499,64 @@ class HeadingTypeHeading extends BaseElement {
       label: 'Transform',
     });
 
-    this.addControl("transform_style", {
-      type: CONTROLLER_TRANSFORM,
-      label: "Transform",
-      default: {
-        size: 0,
-      },
-    });
-
-    this.endControlSection();
-
-    this.startControlSection('advanced_heading_style', {
-      hideOnEmail: true,
-      tab: TAB_STYLE,
-      label: 'Advanced heading',
-    });
-
-    this.addControl('main_fill_advanced_heading_style', {
-      type: CONTROLLER_SWITCHER,
-      label: 'Main heading fill',
-    });
-
-    this.addControl('background_color_advanced_heading_style', {
-      type: CONTROLLER_COLOR,
-      label: 'Background color',
-
-    }
-    );
-
-    this.addControl('color_advanced_heading_style', {
-      type: CONTROLLER_COLOR,
-      label: 'Color',
-
-    }
-    );
-
-    this.addControl('padding_advanced_heading_style', {
-      type: CONTROLLER_DIMENSIONS,
-      label: 'Padding',
-      units: [
-        'px',
-        '%',
-        'vh',
-      ],
-    });
-
-    this.addControl('typography_advanced_heading_style', {
-      type: CONTROLLER_TYPOGRAPHIC,
-      label: 'Typography',
-    }
-    );
-
-    this.addControl('text_shadow_advanced_heading_style', {
-      type: CONTROLLER_SHADOW,
-      label: 'Text shadow',
-      default: {
-        blur: 0,
-        horizontal: 0,
-        vertical: 0,
-        opacity: 1,
-        spread: 1,
-        colorRGB: 'rgb(0, 0, 0)',
-        color: 'rgb(0, 0, 0)',
-        colorPickedHex: '#000000',
-        type: "outline"
-      },
-    }
-    );
-
-    this.addControl('border_heading_advanced_heading_style', {
-      type: CONTROLLER_HEADING,
-      label: 'Border',
-    });
-
-    this.addControl('border_type_advanced_heading_style', {
-      type: CONTROLLER_SELECT,
-      label: 'Border Type',
-      options: [
-        {
-          'value': 'none',
-          'label': 'None',
-        },
-        {
-          'value': 'solid',
-          'label': 'Solid',
-        },
-        {
-          'value': 'double',
-          'label': 'Double',
-        },
-        {
-          'value': 'dotted',
-          'label': 'Dotted',
-        },
-        {
-          'value': 'dashed',
-          'label': 'Dashed',
-        },
-        {
-          'value': 'groove',
-          'label': 'Groove',
-        },
-      ],
-    }
-    );
-
-    this.addControl('border_width_advanced_heading_style', {
-      type: CONTROLLER_DIMENSIONS,
-      label: 'Border width',
-      units: [
-        'px',
-        '%',
-        'vh',
-      ],
-    }
-    );
-
-    this.addControl('border_color_advanced_heading_style', {
-      type: CONTROLLER_COLOR,
-      label: 'Color',
-    }
-    );
-
-    this.addControl("border_radius_advanced_heading_style", {
-      type: CONTROLLER_DIMENSIONS,
-      label: "Radius",
-      units: ["px", "%", "vh"],
-    });
-
-
-    this.addControl("opacity_advanced_heading_style", {
+    this.addControl('transform_rotate', {
       type: CONTROLLER_SLIDER,
-      label: 'Opacity',
-      max: 1,
-      step: 0.05,
-      min: 0,
-    });
+      label: 'Rotate',
+      min: -360,
+      max: 360,
+      step: 0.5,
+      units: ['deg'],
+    })
+
+    this.addControl('transform_scaleX', {
+      type: CONTROLLER_SLIDER,
+      label: 'ScaleX',
+      min: -5,
+      max: 5,
+      step: 0.1
+    })
+
+    this.addControl('transform_scaleY', {
+      type: CONTROLLER_SLIDER,
+      label: 'ScaleY',
+      min: -5,
+      max: 5,
+      step: 0.1
+    })
+
+    this.addControl('transform_skewY', {
+      type: CONTROLLER_SLIDER,
+      label: 'SkewY',
+      min: -180,
+      max: 180,
+      step: 0.5,
+      units: ['deg']
+    })
+
+    this.addControl('transform_skewX', {
+      type: CONTROLLER_SLIDER,
+      label: 'SkewX',
+      min: -180,
+      max: 180,
+      step: 0.5,
+      units: ['deg']
+    })
+
+    this.addControl('transform_translateX', {
+      type: CONTROLLER_SLIDER,
+      label: 'TranslateX',
+      min: -100,
+      max: 100,
+      step: 1
+    })
+
+    this.addControl('transform_translateY', {
+      type: CONTROLLER_SLIDER,
+      label: 'TranslateY',
+      min: -100,
+      max: 100,
+      step: 1
+    })
 
     this.endControlSection();
 
@@ -884,8 +564,7 @@ class HeadingTypeHeading extends BaseElement {
       hideOnEmail: true,
       tab: TAB_STYLE,
       label: 'Creative Link',
-    }
-    );
+    });
 
     this.addControl('creative_link_controller', {
       type: CONTROLLER_CREATIVE_LINK,
@@ -954,102 +633,9 @@ class HeadingTypeHeading extends BaseElement {
         "{{ELEMENT}} .altrp-link-cl-style-28::before{{STATE}}": "background-color: {{COLOR}};",
         "{{ELEMENT}} .altrp-link-cl-style-29::after{{STATE}}": "background-color: {{COLOR}};",
         "{{ELEMENT}} .altrp-link-cl-style-29::before{{STATE}}": "background-color: {{COLOR}};",
-      }
-    });
-
-    this.endControlSection();
-
-    this.startControlSection('sub_heading', {
-      hideOnEmail: true,
-      tab: TAB_STYLE,
-      label: 'Sub heading',
-    });
-
-    this.addControl("spacing_sub_heading", {
-      type: CONTROLLER_SLIDER,
-      label: 'Space heading',
-      default: {
-        size: 0,
-        unit: 'px',
       },
-      units: [
-        'px',
-        '%',
-      ],
-      max: 1200,
-      min: 0,
+      locked: true,
     });
-
-    this.addControl("width_sub_heading", {
-      type: CONTROLLER_SLIDER,
-      label: 'Width',
-      default: {
-        unit: '%',
-      },
-      units: [
-        '%',
-      ],
-      max: 100,
-      min: 0,
-    });
-
-
-    this.addControl('bg_sub_heading', {
-      type: CONTROLLER_COLOR,
-      label: 'Background color',
-    }
-    );
-
-    this.addControl('color_sub_heading', {
-      type: CONTROLLER_COLOR,
-      label: 'text color',
-    }
-    );
-
-    this.addControl('padding_sub_heading', {
-      type: CONTROLLER_DIMENSIONS,
-      label: 'Padding',
-      default: {
-        unit: 'px',
-        bind: true
-      },
-      units: [
-        'px',
-        '%',
-        'vh',
-      ],
-    });
-
-    this.addControl('typographic_sub_heading', {
-      type: CONTROLLER_TYPOGRAPHIC,
-      label: 'Typographic',
-      default: {
-        lineHeight: 1,
-        spacing: 0,
-        size: 16,
-        weight: "normal",
-        family: 'roboto',
-        decoration: ""
-      },
-    }
-    );
-
-    this.addControl('text_shadow_sub_heading', {
-      type: CONTROLLER_SHADOW,
-      label: 'Text shadow',
-      default: {
-        blur: 0,
-        horizontal: 0,
-        vertical: 0,
-        opacity: 1,
-        spread: 0,
-        colorRGB: 'rgb(0, 0, 0)',
-        color: 'rgb(0, 0, 0)',
-        colorPickedHex: '#000000',
-        type: ""
-      },
-    }
-    );
 
     this.endControlSection();
 

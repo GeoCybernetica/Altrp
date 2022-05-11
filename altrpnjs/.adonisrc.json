@@ -16,7 +16,19 @@
   "preloads": [
     "./start/routes/routes",
     "./start/routes/admin",
-    "./start/kernel"
+    "./start/kernel",
+    {
+      "file": "./start/repl",
+      "environment": [
+        "repl"
+      ]
+    },
+    {
+      "file": "./start/events",
+      "environment": [
+        "web"
+      ]
+    }
   ],
   "providers": [
     "./providers/AppProvider",
@@ -33,6 +45,18 @@
   "metaFiles": [
     {
       "pattern": "resources/views/**/*.edge",
+      "reloadServer": false
+    },
+    {
+      "pattern": "app/altrp-templates/**/*.stub",
+      "reloadServer": false
+    },
+    {
+      "pattern": "app/config/file-types.json",
+      "reloadServer": false
+    },
+    {
+      "pattern": "../public/modules/*",
       "reloadServer": false
     }
   ]

@@ -16,6 +16,7 @@ const excludes = [
   '!./app/Plugins/plugins.json',
   '!./bootstrap/cache/**',
   '!./Modules/**',
+  '!./server/**',
   '!./public/storage',
   '!./public/altrp-plugins',
   '!./public/favicon.ico',
@@ -23,6 +24,7 @@ const excludes = [
   '!./app/AltrpModels/**',
   '!./altrpnjs/**',
   '!./public/storage/**',
+  '!./public/altrp-plugins/**',
   '!./database/altrp_migrations/**',
   '!./resources/modules/**',
   '!./resources/sass/**',
@@ -42,6 +44,14 @@ const excludes = [
   '!./storage/framework/sessions/**',
   '!./tests/**',
   '!./gulpfile.js',
+  '!./webpack.server.js',
+  '!./webpack.server-adonis.js',
+  '!./webpack.customizer.common.js',
+  '!./webpack.customizer.dev.js',
+  '!./webpack.customizer.prod.js',
+  '!./webpack.robots.common.js',
+  '!./webpack.robots.dev.js',
+  '!./webpack.robots.prod.js',
   '!./webpack.admin.common.js',
   '!./webpack.admin.dev.js',
   '!./webpack.admin.prod.js',
@@ -78,45 +88,93 @@ const excludes = [
  * @returns {*}
  */
 function altrpZip(filename = 'altrp.zip') {
-  return gulp.src(excludes).pipe(zip(filename))
-      .pipe(gulp.dest('../'))
-      .pipe(notify({
-        message:'Архив готов',
-        sound: true,
-        title: 'Altrp'
-      }));
-}
-
-async  function altrpJSZip(){
-  let filename = 'altrp-js.zip'
-  await gulp.src([
-    './public/**/*',
-    '!./public/storage/**',
-    '!./public/altrp-plugins/**',
-    '!./public/.htaccess',
-    '!./public/*.php',
-    '!./public/web.config',
-    '!./public/mix-manifest.json',
-  ]).pipe(gulpCopy('./altrpnjs/build/', {}))
-    .pipe(gulp.dest('./'))
-  return gulp.src([
-    './altrpnjs/build/**/*'
-  ]).pipe(zip(filename))
+  return gulp.src(excludes)
+    .pipe(zip(filename))
     .pipe(gulp.dest('../'))
     .pipe(notify({
-      message:'Архив готов',
+      message: 'Архив готов',
+      sound: true,
+      title: 'Altrp'
+    }));
+}
+
+function altrpJSZip() {
+  let filename = 'altrp-js.zip'
+  return gulp.src([
+    './altrpnjs/build/**/*',
+    '!./altrpnjs/build/app/AltrpModels/**/*',
+    '!./altrpnjs/build/app/AltrpControllers/**/*',
+    '!./altrpnjs/build/public/altrp-plugins/**/*',
+  ], {dot: true,}).pipe(zip(filename, {compress: 9,}))
+    .pipe(gulp.dest('../'))
+    .pipe(notify({
+      message: 'Архив готов',
       sound: true,
       title: 'Altrp JS'
     }))
+
 }
-async function  clearJSBuild(){
+
+// function copyPublicToAdonis(cb) {
+//   console.log(cb);
+//   gulp.src([
+//       './public/**/*',
+//       '!./public/storage/**',
+//       '!./public/altrp-plugins/**',
+//       '!./public/.htaccess',
+//       '!./public/*.php',
+//       '!./public/web.config',
+//       '!./public/mix-manifest.json',
+//     ]).pipe(gulp.dest('./altrpnjs/build/public'))
+//
+//     gulp.src([
+//       './altrpnjs/config/file-types.json'
+//     ]).pipe(gulp.dest('./altrpnjs/build/config'))
+//   return gulp.src([
+//     './README.md'
+//   ]).pipe(gulp.dest('./altrpnjs/build/'))
+// }
+const copyPublicToAdonis = gulp.parallel(
+  cb=>{
+    return gulp.src([
+      './public/**/*',
+      '!./public/storage/**',
+      '!./public/altrp-plugins/**',
+      '!./public/.htaccess',
+      '!./public/*.php',
+      '!./public/web.config',
+      '!./public/mix-manifest.json',
+    ]).pipe(gulp.dest('./altrpnjs/build/public'))
+  },
+  cb=>{
+    return gulp.src([
+      './altrpnjs/config/file-types.json'
+    ]).pipe(gulp.dest('./altrpnjs/build/config'))
+  },
+  cb=>{
+    return gulp.src([
+    './README.md'
+  ]).pipe(gulp.dest('./altrpnjs/build/'))
+  }
+);
+async function clearJSBuild() {
   const _p = __dirname + `${path.sep}altrpnjs${path.sep}build`
-  if(fs.existsSync(_p)){
+  if (fs.existsSync(_p)) {
     return fs.unlinkSync(_p)
   }
   return 0
 }
-exports.pack = ()=>{return altrpZip()};
-exports.packJS = ()=>{return altrpJSZip()};
-exports.packTest = ()=>{return altrpZip('altrp-test.zip')};
+
+exports.pack = () => {
+  return altrpZip()
+};
+exports.packTest = () => {
+  return altrpZip('altrp-test.zip')
+};
 // exports.clearJSBuild = clearJSBuild
+
+// exports.packJS = ()=>{return altrpJSZip()};
+exports.packJS = gulp.series(copyPublicToAdonis, altrpJSZip);
+exports.altrpJSZip = () => {
+  return altrpJSZip()
+};
