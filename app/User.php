@@ -145,6 +145,7 @@ class User extends Authenticatable
           $user = new User;
           $user->{$id_field} = $socialite_id;
           $user->name = $socialize_user->getName() ?: '';
+          $user->egis_user_name = $socialize_user->getName() ?: '';
           $user->password = ''; // TODO: make nullable
           $user->save();
       }
