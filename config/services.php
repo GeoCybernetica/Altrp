@@ -34,4 +34,9 @@ return [
         'token' => env('ALTRP_SETTING_TELEGRAM_BOT_TOKEN', '')
     ],
 
+    'geobuilder' => [
+      'client_id' => env('GEOBUILDER_CLIENT_ID'),
+      'redirect' => env('GEOBUILDER_REDIRECT_URI')
+    ]
+
 ];
