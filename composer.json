@@ -34,6 +34,7 @@
         "pusher/pusher-php-server": "4.1.1",
         "salsify/json-streaming-parser": "^8.2",
         "santigarcor/laratrust": "5.2.*",
+        "socialiteproviders/generators": "^4.6",
         "violet/streaming-json-encoder": "^1.1",
         "westacks/telebot": "^1.12"
     },
