@@ -1,6 +1,6 @@
 <?php
 
-namespace SocialiteProviders\Geobuilder;
+namespace App\Providers\SocialiteProviders\Geobuilder;
 
 use SocialiteProviders\Manager\SocialiteWasCalled;
 
