@@ -52,10 +52,10 @@ trait DynamicVariables
             $this->replacePrefix()
                 ->replaceCurrentUser()
                 ->replaceRequest()
-                ->replaceAndRequest()
-                ->replaceIfAndRequest('_AND')
                 ->replaceAndRequest('', '_NULLABLE')
+                ->replaceAndRequest()
                 ->replaceAndRequest('_AND', '_NULLABLE')
+                ->replaceIfAndRequest('_AND')
                 ->replaceCurrentDate()
                 ->replaceCurrentDay()
                 ->replaceCurrentDayOfWeek()
@@ -118,11 +118,12 @@ trait DynamicVariables
             $parts[2] = $value;
             $request = "request()->{$parts[2]}";
             if ($postfix == '_NULLABLE') {
-              $postfix = ". ' OR ' . $parts[1] . ' IS NULL'";
-              $emptyCondition = "$parts[1] . ' IS NULL'";
+              $postfix = ". ' OR {$parts[1]} IS NULL'";
+              $emptyConditionOperator = $and ? trim($and, '_') . ' ' : '';
+              $emptyCondition = "'${emptyConditionOperator}{$parts[1]} IS NULL'";
             } else {
               $postfix = '';
-              $emptyCondition = '';
+              $emptyCondition = "''";
             }
             if (Str::contains($parts[3], 'IN')) {
                 $wrapStart = '';
@@ -133,7 +134,7 @@ trait DynamicVariables
             $this->str = str_replace($this->match,
                 $this->getValue( '(request()->' . $parts[2]
                 . " ? ' " . ($and ? ' ' . trim($and, '_') : '')
-                . " {$parts[1]} {$parts[3]} ' . {$wrapStart}{$request}{$postfix}{$wrapEnd} : {$emptyCondition})", $this->outer),
+                . " ({$parts[1]} {$parts[3]} ' . {$wrapStart}{$request}{$wrapEnd}{$postfix} . ')' : {$emptyCondition})", $this->outer),
                 $this->str
             );
         }
