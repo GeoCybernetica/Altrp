@@ -317,6 +317,9 @@ class AltrpAction extends AltrpModel {
       alertText = this.getProperty('alert');
     } else {
       alertText = this.getProperty('reject');
+      if (alertText.toLowerCase() == 'js') {
+        return await this.doActionCustomCode();
+      }
     }
     if (alertText) {
       alertText = replaceContentWithData(alertText, this.getCurrentModel().getData());
