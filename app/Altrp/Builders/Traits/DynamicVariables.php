@@ -431,13 +431,23 @@ trait DynamicVariables
     {
         $startLike = '';
         $endLike = '';
+        $operator = '';
         if ($operator == 'START_LIKE' || $operator == 'LIKE') {
             $startLike = '%';
+            $operator = 'LIKE';
         }
         if ($operator == 'END_LIKE' || $operator == 'LIKE') {
             $endLike = '%';
+            $operator = 'LIKE';
         }
-        $operator = 'LIKE';
+        if ($operator == 'START_ILIKE' || $operator == 'ILIKE') {
+            $startLike = '%';
+            $operator = 'ILIKE';
+        }
+        if ($operator == 'END_ILIKE' || $operator == 'ILIKE') {
+            $endLike = '%';
+            $operator = 'ILIKE';
+        }
         return [$startLike, $endLike, $operator];
     }
 }
