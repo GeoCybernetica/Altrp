@@ -54,6 +54,8 @@ trait DynamicVariables
                 ->replaceRequest()
                 ->replaceAndRequest()
                 ->replaceIfAndRequest('_AND')
+                ->replaceAndRequest('', '_NULLABLE')
+                ->replaceAndRequest('_AND', '_NULLABLE')
                 ->replaceCurrentDate()
                 ->replaceCurrentDay()
                 ->replaceCurrentDayOfWeek()
@@ -100,9 +102,9 @@ trait DynamicVariables
      * @param string $and
      * @return $this
      */
-    protected function replaceAndRequest($and = '')
+    protected function replaceAndRequest($and = '', $postfix = '')
     {
-        if (Str::contains($this->match, 'IF' . $and . '_REQUEST')) {
+        if (Str::contains($this->match, 'IF' . $and . '_REQUEST' . $postfix)) {
             $trimedMatch = trim($this->match, '{}');
             $parts = explode(':', $trimedMatch);
             $parts[3] = $parts[3] ?? '=';
@@ -115,6 +117,13 @@ trait DynamicVariables
             $wrapEnd = $wrapEnd ? $wrapEnd : ". '{$startLike}\''";
             $parts[2] = $value;
             $request = "request()->{$parts[2]}";
+            if ($postfix == '_NULLABLE') {
+              $postfix = ". ' OR ' . $parts[1] . ' IS NULL'";
+              $emptyCondition = "$parts[1] . ' IS NULL'";
+            } else {
+              $postfix = '';
+              $emptyCondition = '';
+            }
             if (Str::contains($parts[3], 'IN')) {
                 $wrapStart = '';
                 $parts[3] .= '(';
@@ -124,7 +133,7 @@ trait DynamicVariables
             $this->str = str_replace($this->match,
                 $this->getValue( '(request()->' . $parts[2]
                 . " ? ' " . ($and ? ' ' . trim($and, '_') : '')
-                . " {$parts[1]} {$parts[3]} ' . {$wrapStart}{$request}{$wrapEnd} : '')", $this->outer),
+                . " {$parts[1]} {$parts[3]} ' . {$wrapStart}{$request}{$postfix}{$wrapEnd} : {$emptyCondition})", $this->outer),
                 $this->str
             );
         }
