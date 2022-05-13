@@ -129,8 +129,8 @@ class GeobuilderProvider extends AbstractProvider
         $token = $this->request->input('id_token');
         $accessToken = $this->request->input('token');
         $claims = $this->validateIdToken($token);
-        $permissions = $this->loadPermissions($accessToken);
-        return $this->mapUserToObject($claims, $permissions);
+        $laims['permissions'] = $this->loadPermissions($accessToken);
+        return $this->mapUserToObject($claims);
     }
 
     /**
@@ -177,12 +177,12 @@ class GeobuilderProvider extends AbstractProvider
     /**
      * {@inheritdoc}
      */
-    protected function mapUserToObject(array $user, array $permissions)
+    protected function mapUserToObject(array $user)
     {
         return (new User())->setRaw($user)->map([
             'id'   => $user['sub'],
             'name' => $user['name'] ?? '',
-            'permissions' => $permissions ?? []
+            'permissions' => $user['permissions'] ?? []
         ]);
     }
 

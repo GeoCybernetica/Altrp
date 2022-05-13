@@ -35,6 +35,7 @@
         "salsify/json-streaming-parser": "^8.2",
         "santigarcor/laratrust": "5.2.*",
         "socialiteproviders/generators": "^4.6",
+        "socialiteproviders/google": "^4.1",
         "violet/streaming-json-encoder": "^1.1",
         "westacks/telebot": "^1.12"
     },
