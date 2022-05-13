@@ -11,6 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use Laratrust\Traits\LaratrustUserTrait;
 
 use Laravel\Passport\HasApiTokens;
+use Laravel\Socialite\Contracts\User as SocialiteUser;
 
 use Illuminate\Support\Facades\DB;
 
@@ -128,18 +129,42 @@ class User extends Authenticatable
     }
 
 
-    public function getUserRoles(){
+    /**
+     * @param SocialiteUser $socialize_user
+     * @param string        $provider
+     *
+     * @return User
+     */
+    public static function socialite(SocialiteUser $socialize_user, $provider)
+    {
+      $id_field = $provider == 'geobuilder' ? 'egis_user_id' : $provider . '_id';
+      $socialite_id = $socialize_user->getId();
+      $user = User::where($id_field, $socialite_id)->first();
 
-      $roles_ = DB::table( 'role_user' )->where( 'user_id', $this->id )
-        ->select('role_id')->get();
-
-      $roles = [];
-      if ($roles_) {
-        foreach ($roles_ as $key => $role) {
-          $roles[$key] = $role->role_id;
-        }
+      if (!$user) {
+          $user = new User;
+          $user->{$id_field} = $socialite_id;
+          $user->name = $socialize_user->getName() ?: '';
+          $user->password = ''; // TODO: make nullable
+          $user->save();
       }
-      return $roles;
+
+      return $user;
+    }
+
+
+    public function getUserRoles()
+    {
+        $roles_ = DB::table( 'role_user' )->where( 'user_id', $this->id )
+          ->select('role_id')->get();
+
+        $roles = [];
+        if ($roles_) {
+          foreach ($roles_ as $key => $role) {
+            $roles[$key] = $role->role_id;
+          }
+        }
+        return $roles;
     }
 
 }
