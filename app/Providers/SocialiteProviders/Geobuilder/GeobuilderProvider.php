@@ -127,8 +127,10 @@ class GeobuilderProvider extends AbstractProvider
     public function user()
     {
         $token = $this->request->input('id_token');
+        $accessToken = $this->request->input('token');
         $claims = $this->validateIdToken($token);
-        return $this->mapUserToObject($claims);
+        $permissions = $this->loadPermissions($accessToken);
+        return $this->mapUserToObject($claims, $permissions);
     }
 
     /**
@@ -175,11 +177,12 @@ class GeobuilderProvider extends AbstractProvider
     /**
      * {@inheritdoc}
      */
-    protected function mapUserToObject(array $user)
+    protected function mapUserToObject(array $user, array $permissions)
     {
         return (new User())->setRaw($user)->map([
             'id'   => $user['sub'],
             'name' => $user['name'] ?? '',
+            'permissions' => $permissions ?? []
         ]);
     }
 
@@ -219,6 +222,28 @@ class GeobuilderProvider extends AbstractProvider
          $fields['scope'] = 'openid profile authz.grants orgstruct.read';
          $fields['response_type'] = 'token id_token';
          return $fields;
+     }
+
+    /**
+      * Load user permissions from Geoserver.
+      *
+      * @param  string|null  $state
+      * @return array
+      */
+     protected function loadPermissions($token)
+     {
+         $url = 'https://egis-app2.mvk.ru/mvk-egis/integration/authz/permissions'; // TODO: to config
+         try {
+             $response = $this->getHttpClient()->get($url, [  // $this->getConfig('permissions_url')
+                 'headers' => [
+                     'Authorization' => 'Bearer '. $token,
+                 ],
+             ]);
+         } catch (Exception $ex) {
+             throw new InvalidStateException("Error getting user permissions. {$ex}");
+         }
+
+       return json_decode((string) $response->getBody());
      }
 
     /**
