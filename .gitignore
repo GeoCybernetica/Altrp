@@ -11,6 +11,7 @@ launch.json
 /storage/logs/backups
 /backups
 /dist
+/storage
 /data
 
 /vendor
