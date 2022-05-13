@@ -216,6 +216,7 @@ class GeobuilderProvider extends AbstractProvider
          $fields = parent::getCodeFields($state);
          $fields['state'] = $this->getConfig('state');
          $fields['nonce'] = $this->getConfig('nonce');
+         $fields['scope'] = 'openid profile authz.grants orgstruct.read';
          $fields['response_type'] = 'token id_token';
          return $fields;
      }
