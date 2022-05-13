@@ -25,10 +25,10 @@ class FormsManager {
    * @param {{}} options
    * @return {AltrpForm}
    */
-  registerForm(formId, modelName, method, options = {}){
+  registerForm(formId, modelName, method, options = null){
     let form = this.getForm(formId);
-    if(! form){
-      form = new AltrpForm(formId, modelName, method, options);
+    if(! form && formId !== 'edit_form'){
+      form = new AltrpForm(formId, modelName, method, options || {});
       /**
        * Если в хранилище есть список полей для указанной формы,
        * то передаем их в форму, а на список ссылку удаляем
@@ -39,7 +39,8 @@ class FormsManager {
         delete this.fieldsStorage[formId]
       }
       this.forms.push(form);
-    } else if (! _.isEmpty(options)){
+    } else if (options){
+      console.info('Set form options', options)
       form.options = options
     }
     return form;
