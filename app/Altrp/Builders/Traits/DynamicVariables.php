@@ -108,10 +108,9 @@ trait DynamicVariables
         if (Str::contains($this->match, 'IS_NULL')) {
             $trimedMatch = trim($this->match, '{}');
             $parts = explode(':', $trimedMatch);
-            $relations = $this->getNesting(explode('.', $parts[1]));
             $this->str = str_replace(
                 $this->match,
-                $this->getValue('request()->' . $relations . ' IS NULL', $this->outer),
+                '" . (request()->' . $parts[1] .' ? (\'\\\'\' . request()->' . $parts[1] . ' . \'\\\'\') : \'NULL\') . " IS NULL',
                 $this->str
             );
         }
