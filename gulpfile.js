@@ -9,6 +9,9 @@ const excludes = [
   './**/*',
   './.htaccess',
   './**/.htaccess',
+  '!./backups/**',
+  '!./data/**',
+  '!./dist/**',
   '!./app/Http/Controllers/AltrpControllers/**',
   '!./app/Http/Requests/AltrpRequests/**',
   '!./app/Providers/AltrpProviders/AppServiceProvider.php',
@@ -88,25 +91,21 @@ const excludes = [
  * @returns {*}
  */
 function altrpZip(filename = 'altrp.zip') {
-  return gulp.src(excludes)
-    .pipe(zip(filename))
-    .pipe(gulp.dest('../'))
-    .pipe(notify({
-      message:'Архив готов',
-      sound: true,
-      title: 'Altrp'
-    }));
+  return gulp.src(excludes).pipe(zip(filename))
+      .pipe(gulp.dest('./dist'))
+      .pipe(notify({
+        message:'Архив готов',
+        sound: true,
+        title: 'Altrp'
+      }));
 }
 
-function altrpJSZip(){
+async function altrpJSZip(){
   let filename = 'altrp-js.zip'
   return gulp.src([
-    './altrpnjs/build/**/*',
-    '!./altrpnjs/build/app/AltrpModels/**/*',
-    '!./altrpnjs/build/app/AltrpControllers/**/*',
-    '!./altrpnjs/build/public/altrp-plugins/**/*',
-  ],{ dot: true,}).pipe(zip(filename))
-    .pipe(gulp.dest('../'))
+    './altrpnjs/build/**/*'
+  ]).pipe(zip(filename))
+    .pipe(gulp.dest('./dist'))
     .pipe(notify({
       message:'Архив готов',
       sound: true,
