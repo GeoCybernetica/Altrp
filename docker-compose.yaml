@@ -1,6 +1,13 @@
 version: "3.9"
 services:
     postgre:
+        # ### TODO: make an image
+        # cd ~
+        # apt-get update
+        # apt-get install git make gcc postgresql-server-dev-14 freetds-dev freetds-common
+        # git clone https://github.com/tds-fdw/tds_fdw.git
+        # cd tds_fdw
+        # make USE_PGXS=1 install
         container_name: gtfb_postgres
         image: postgres
         restart: always
