@@ -128,7 +128,7 @@ trait DynamicVariables
             $parts = explode(':', $trimedMatch);
             $parts[3] = $parts[3] ?? '=';
             list($wrapStart, $value, $wrapEnd) = $this->checkUnixTime($parts[2]);
-            list($startLike, $endLike, $operator) = isset($parts[3]) && \Str::contains($parts[3], 'LIKE')
+            list($startLike, $endLike, $operator) = isset($parts[3]) && Str::contains($parts[3], 'LIKE')
                 ? $this->getSqlLikeExp($parts[3])
                 : ['','',$parts[3]];
             $parts[3] = $operator;
@@ -423,7 +423,7 @@ trait DynamicVariables
     }
 
     /**
-     * Сформировать и получить выражение для SQL оператора LIKE
+     * Сформировать и получить выражение для SQL операторов LIKE и ILIKE
      * @param $operator
      * @return string[]
      */
@@ -431,23 +431,21 @@ trait DynamicVariables
     {
         $startLike = '';
         $endLike = '';
-        $operator = '';
-        if ($operator == 'START_LIKE' || $operator == 'LIKE') {
-            $startLike = '%';
-            $operator = 'LIKE';
-        }
-        if ($operator == 'END_LIKE' || $operator == 'LIKE') {
-            $endLike = '%';
-            $operator = 'LIKE';
-        }
+        $sqlOperator = 'LIKE';
         if ($operator == 'START_ILIKE' || $operator == 'ILIKE') {
             $startLike = '%';
-            $operator = 'ILIKE';
+            $sqlOperator = 'ILIKE';
         }
         if ($operator == 'END_ILIKE' || $operator == 'ILIKE') {
             $endLike = '%';
-            $operator = 'ILIKE';
+            $sqlOperator = 'ILIKE';
         }
-        return [$startLike, $endLike, $operator];
+        if ($operator == 'START_LIKE' || $operator == 'LIKE') {
+            $startLike = '%';
+        }
+        if ($operator == 'END_LIKE' || $operator == 'LIKE') {
+            $endLike = '%';
+        }
+        return [$startLike, $endLike, $sqlOperator];
     }
 }
