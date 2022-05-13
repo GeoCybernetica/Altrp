@@ -52,6 +52,7 @@ trait DynamicVariables
             $this->replacePrefix()
                 ->replaceCurrentUser()
                 ->replaceRequest()
+                ->replaceIsNull()
                 ->replaceAndRequest('', '_NULLABLE')
                 ->replaceAndRequest()
                 ->replaceAndRequest('_AND', '_NULLABLE')
@@ -92,6 +93,25 @@ trait DynamicVariables
             $this->str = str_replace(
                 $this->match,
                 $this->getValue('request()->' . $relations, $this->outer),
+                $this->str
+            );
+        }
+        return $this;
+    }
+
+    /**
+     * Replace checking for empty values
+     * @return $this
+     */
+    public function replaceIsNull()
+    {
+        if (Str::contains($this->match, 'IS_NULL')) {
+            $trimedMatch = trim($this->match, '{}');
+            $parts = explode(':', $trimedMatch);
+            $relations = $this->getNesting(explode('.', $parts[1]));
+            $this->str = str_replace(
+                $this->match,
+                $this->getValue('request()->' . $relations . ' IS NULL', $this->outer),
                 $this->str
             );
         }
