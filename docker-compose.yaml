@@ -1,0 +1,40 @@
+version: "3.0"
+services:
+    gtfb_postgres:
+        # ### TODO: make an image
+        # cd ~
+        # apt-get update
+        # apt-get install git make gcc postgresql-server-dev-14 freetds-dev freetds-common
+        # git clone https://github.com/tds-fdw/tds_fdw.git
+        # cd tds_fdw
+        # make USE_PGXS=1 install
+        container_name: gtfb_postgres
+        image: postgres
+        restart: always
+        volumes:
+            - ./data/pgdb:/var/lib/postgresql/data
+        environment:
+            POSTGRES_PASSWORD: zayavka
+            POSTGRES_USER: postgres
+            POSTGRES_DB: zayavka
+        ports:
+            - 5432:5432
+    gtfb_adminer:
+        container_name: gtfb_adminer
+        image: adminer
+        restart: always
+        ports:
+            - 8080:8080
+    gtfb_web:
+        container_name: gtfb_web
+        image: gtfb/host
+        ports:
+            - 8888:80
+            - 443:443
+            - 9110:9110
+        volumes:
+            - './:/var/www/zayavka.geobuilder.ru'
+            - './config/nginx:/usr/local/openresty/nginx/sites'
+            - '.env:/usr/local/env/.env'
+        tty: true
+        restart: always

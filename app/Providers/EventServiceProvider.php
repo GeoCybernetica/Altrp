@@ -21,6 +21,9 @@ class EventServiceProvider extends ServiceProvider
         'Illuminate\Auth\Events\Login' => [
             'App\Listeners\Users\UpdateLastLoggedInAt',
         ],
+        \SocialiteProviders\Manager\SocialiteWasCalled::class => [
+            'App\Providers\SocialiteProviders\Geobuilder\GeobuilderExtendSocialite@handle'
+        ],
     ];
 
     /**

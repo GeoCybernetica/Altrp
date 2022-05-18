@@ -15,9 +15,9 @@ use App\Altrp\Facades\CacheService;
 
 class LoginController extends Controller
 {
-    use DispatchesJobs;
+  use DispatchesJobs;
 
-    /*
+  /*
   |--------------------------------------------------------------------------
   | Login Controller
   |--------------------------------------------------------------------------
@@ -28,22 +28,22 @@ class LoginController extends Controller
   |
   */
 
-    use AuthenticatesUsers;
+  use AuthenticatesUsers;
 
-    /**
+  /**
    * Where to redirect users after login.
    *
    * @var string
    */
   protected $redirectTo = RouteServiceProvider::ADMIN;
 
-    private $robotsService;
+  private $robotsService;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @param RobotsService $robotsService
-     */
+  /**
+   * Create a new controller instance.
+   *
+   * @param RobotsService $robotsService
+   */
   public function __construct(RobotsService $robotsService)
   {
     $this->middleware( 'guest' )->except( 'logout' );
@@ -57,7 +57,7 @@ class LoginController extends Controller
    * @return \Illuminate\Http\JsonResponse
    */
   public function logout( Request $request )
-  { 
+  {
 
     unset($_COOKIE['uid']);
     setcookie('uid', null, -1, '/');
@@ -99,7 +99,7 @@ class LoginController extends Controller
     }
 
     if ($this->attemptLogin($request)) {
-      
+
       CacheService::setUserCookie();
 
       return $this->sendLoginResponse($request);
@@ -110,6 +110,11 @@ class LoginController extends Controller
     // user surpasses their maximum number of attempts they will get locked out.
     $this->incrementLoginAttempts($request);
     return $this->sendFailedLoginResponse($request);
+  }
+
+  public function loginWithPassport($user)
+  {
+    print '<pre>'; print_r($user); die();
   }
 
   /**

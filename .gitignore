@@ -7,7 +7,12 @@ launch.json
 /server-dist
 /storage/*.key
 /storage/document
-storage/tmp/
+/storage/tmp/
+/storage/logs/backups
+/backups
+/dist
+/storage
+/data
 
 /vendor
 .env

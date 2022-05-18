@@ -52,7 +52,10 @@ trait DynamicVariables
             $this->replacePrefix()
                 ->replaceCurrentUser()
                 ->replaceRequest()
+                ->replaceIsNull()
+                ->replaceAndRequest('', '_NULLABLE')
                 ->replaceAndRequest()
+                ->replaceAndRequest('_AND', '_NULLABLE')
                 ->replaceIfAndRequest('_AND')
                 ->replaceCurrentDate()
                 ->replaceCurrentDay()
@@ -97,17 +100,35 @@ trait DynamicVariables
     }
 
     /**
+     * Replace checking for empty values
+     * @return $this
+     */
+    public function replaceIsNull()
+    {
+        if (Str::contains($this->match, 'IS_NULL')) {
+            $trimedMatch = trim($this->match, '{}');
+            $parts = explode(':', $trimedMatch);
+            $this->str = str_replace(
+                $this->match,
+                '" . (request()->' . $parts[1] .' ? (\'\\\'\' . request()->' . $parts[1] . ' . \'\\\'\') : \'NULL\') . " IS NULL',
+                $this->str
+            );
+        }
+        return $this;
+    }
+
+    /**
      * @param string $and
      * @return $this
      */
-    protected function replaceAndRequest($and = '')
+    protected function replaceAndRequest($and = '', $postfix = '')
     {
-        if (Str::contains($this->match, 'IF' . $and . '_REQUEST')) {
+        if (Str::contains($this->match, 'IF' . $and . '_REQUEST' . $postfix)) {
             $trimedMatch = trim($this->match, '{}');
             $parts = explode(':', $trimedMatch);
             $parts[3] = $parts[3] ?? '=';
             list($wrapStart, $value, $wrapEnd) = $this->checkUnixTime($parts[2]);
-            list($startLike, $endLike, $operator) = isset($parts[3]) && \Str::contains($parts[3], 'LIKE')
+            list($startLike, $endLike, $operator) = isset($parts[3]) && Str::contains($parts[3], 'LIKE')
                 ? $this->getSqlLikeExp($parts[3])
                 : ['','',$parts[3]];
             $parts[3] = $operator;
@@ -115,16 +136,24 @@ trait DynamicVariables
             $wrapEnd = $wrapEnd ? $wrapEnd : ". '{$startLike}\''";
             $parts[2] = $value;
             $request = "request()->{$parts[2]}";
+            if ($postfix == '_NULLABLE') {
+              $postfix = ". ' OR {$parts[1]} IS NULL'";
+              $emptyConditionOperator = $and ? trim($and, '_') . ' ' : '';
+              $emptyCondition = "'${emptyConditionOperator}{$parts[1]} IS NULL'";
+            } else {
+              $postfix = '';
+              $emptyCondition = "''";
+            }
             if (Str::contains($parts[3], 'IN')) {
                 $wrapStart = '';
                 $parts[3] .= '(';
                 $wrapEnd = " . ')'";
-                $request = "'\"' . implode('\",\"', explode(',', request()->name )). '\"'";
+                $request = "'\'' . implode('\',\'', explode(',', request()->{$parts[2]} )). '\''";
             }
             $this->str = str_replace($this->match,
                 $this->getValue( '(request()->' . $parts[2]
                 . " ? ' " . ($and ? ' ' . trim($and, '_') : '')
-                . " {$parts[1]} {$parts[3]} ' . {$wrapStart}{$request}{$wrapEnd} : '')", $this->outer),
+                . " ({$parts[1]} {$parts[3]} ' . {$wrapStart}{$request}{$wrapEnd}{$postfix} . ')' : {$emptyCondition})", $this->outer),
                 $this->str
             );
         }
@@ -394,7 +423,7 @@ trait DynamicVariables
     }
 
     /**
-     * Сформировать и получить выражение для SQL оператора LIKE
+     * Сформировать и получить выражение для SQL операторов LIKE и ILIKE
      * @param $operator
      * @return string[]
      */
@@ -402,13 +431,21 @@ trait DynamicVariables
     {
         $startLike = '';
         $endLike = '';
+        $sqlOperator = 'LIKE';
+        if ($operator == 'START_ILIKE' || $operator == 'ILIKE') {
+            $startLike = '%';
+            $sqlOperator = 'ILIKE';
+        }
+        if ($operator == 'END_ILIKE' || $operator == 'ILIKE') {
+            $endLike = '%';
+            $sqlOperator = 'ILIKE';
+        }
         if ($operator == 'START_LIKE' || $operator == 'LIKE') {
             $startLike = '%';
         }
         if ($operator == 'END_LIKE' || $operator == 'LIKE') {
             $endLike = '%';
         }
-        $operator = 'LIKE';
-        return [$startLike, $endLike, $operator];
+        return [$startLike, $endLike, $sqlOperator];
     }
 }

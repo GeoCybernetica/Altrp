@@ -38,6 +38,8 @@ Route::group([
   Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 });
 
+Route::get('login/{provider}', 'Auth\SocialiteController@redirect');
+Route::get('login/callback/{provider}', 'Auth\SocialiteController@callback');
 
 Route::get('/admin/editor', function () {
   return view('editor');

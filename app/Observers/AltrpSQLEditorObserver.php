@@ -21,6 +21,12 @@ use Illuminate\Support\Str;
 class AltrpSQLEditorObserver
 {
     use DynamicVariables;
+
+    private function addSlashes($val) {
+      $val = addslashes($val);
+      return str_replace("\'", "'", $val);
+    }
+
     /**
      * Handle the s q l editor "creating" event.
      *
@@ -42,7 +48,7 @@ class AltrpSQLEditorObserver
         if ($controllerWriter->methodSqlExists($sQLEditor->name)) {
             throw new ControllerFileException('Method already exists', 500);
         }
-        $controllerWriter->writeSqlMethod($sQLEditor->name, $this->replaceDynamicVars(addslashes($sQLEditor->sql), true), $sQLEditor->is_object);
+        $controllerWriter->writeSqlMethod($sQLEditor->name, $this->replaceDynamicVars($this->addSlashes($sQLEditor->sql), true), $sQLEditor->is_object);
     }
 
     /**
@@ -116,7 +122,7 @@ class AltrpSQLEditorObserver
         $controllerWriter->updateSqlMethod(
             $sQLEditor->getOriginal('name'),
             $sQLEditor->name,
-            $this->replaceDynamicVars(addslashes($sQLEditor->sql),true),
+            $this->replaceDynamicVars($this->addSlashes($sQLEditor->sql),true),
             $sQLEditor->is_object
         );
     }

@@ -1,3 +1,4 @@
+import queryString from "query-string";
 import { CHANGE_CURRENT_PAGE, CHANGE_CURRENT_PAGE_PROPERTY } from "./actions";
 import AltrpModel from "../../../../../editor/src/js/classes/AltrpModel";
 import convertQueryParamsToObject from "../../functions/convert-query-params-to-object";
@@ -12,6 +13,13 @@ if( ! params){
 let hashParams = {};
 if(document?.location?.hash && document?.location?.hash.indexOf('=') !== -1){
   hashParams = convertQueryParamsToObject(document?.location?.hash)
+  // Dirty hack for OAuth OpenID redirection
+  if (hashParams.id_token) {
+    const redirectUrl = '/login/callback/geobuilder';
+    const url = `${redirectUrl}?${queryString.stringify(hashParams)}`;
+    console.info('Redirect to OAuth callback', hashParams);
+    window?.location?.replace(url);
+  }
 }
 const defaultPage = {
   url: location?.href || "",

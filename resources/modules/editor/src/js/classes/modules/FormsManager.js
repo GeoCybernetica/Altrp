@@ -25,22 +25,19 @@ class FormsManager {
    * @param {{}} options
    * @return {AltrpForm}
    */
-  registerForm(formId, modelName, method, options = {}){
+  registerForm(formId, modelName, method, options = null){
     let form = this.getForm(formId);
     if(! form){
-      form = new AltrpForm(formId, modelName, method, options);
-      /**
-       * Если в хранилище есть список полей для указанной формы,
-       * то передаем их в форму, а на список ссылку удаляем
-       */
-
-      if(this.fieldsStorage[formId] && this.fieldsStorage[formId].length){
-        form.setFields(this.fieldsStorage[formId]);
-        delete this.fieldsStorage[formId]
-      }
+      form = new AltrpForm(formId, modelName, method, options || {});
       this.forms.push(form);
-    } else if (! _.isEmpty(options)){
-      form.options = options
+    } else if (options && options.dynamicURL && options.customRoute !== form.options.customRoute){
+      // Re-create form in case when URL changes
+      form = new AltrpForm(formId, modelName, method, options);
+      const index = this.forms.findIndex(item => item.formId === formId);
+      this.forms[index] = form;
+    }
+    if(this.fieldsStorage[formId] && this.fieldsStorage[formId].length){
+      form.setFields(this.fieldsStorage[formId]);
     }
     return form;
   }

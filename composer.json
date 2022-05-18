@@ -23,6 +23,7 @@
         "laravel-notification-channels/telegram": "^0.5.1",
         "laravel/framework": "^6.2",
         "laravel/passport": "^8.4",
+        "laravel/socialite": "^5.5",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^1.2",
         "league/color-extractor": "0.3.*",
@@ -33,6 +34,8 @@
         "pusher/pusher-php-server": "4.1.1",
         "salsify/json-streaming-parser": "^8.2",
         "santigarcor/laratrust": "5.2.*",
+        "socialiteproviders/generators": "^4.6",
+        "socialiteproviders/google": "^4.1",
         "violet/streaming-json-encoder": "^1.1",
         "westacks/telebot": "^1.12"
     },
