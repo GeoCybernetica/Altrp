@@ -79,3 +79,4 @@ server.crt
 server.csr
 server.key
 dhparam.pem
+.DS_Store
