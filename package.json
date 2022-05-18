@@ -219,6 +219,7 @@
         "workbox-strategies": "^6.1.5"
     },
     "devDependencies": {
+        "@adonisjs/core": "^5.8.2",
         "@babel/cli": "^7.10.3",
         "@babel/core": "^7.13.16",
         "@babel/node": "^7.13.13",
@@ -265,6 +266,7 @@
         "react-hot-loader": "^4.12.19",
         "react-scripts": "^3.4.3",
         "react-svg-loader": "^3.0.3",
+        "reflect-metadata": "^0.1.13",
         "resolve-url-loader": "^2.3.1",
         "sass": "1.32.12",
         "sass-loader": "^12.1.0",
