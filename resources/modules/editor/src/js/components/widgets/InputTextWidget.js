@@ -370,6 +370,9 @@ const AltrpFieldContainer = styled.div`
       case "right": {
         return "display:flex;flex-direction:row-reverse;justify-content:flex-end;";
       }
+      default: {
+        return "display:block;";
+      }
     }
     return "";
   }}
