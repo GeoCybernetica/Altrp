@@ -123,7 +123,7 @@ class QueriesFile extends ImportExportFile implements IImportExportFile
         $data = DB::table( 'altrp_queries' )
             ->select('altrp_queries.*', 'altrp_models.name as model_name')
             ->leftJoin('altrp_models', 'altrp_queries.model_id', '=', 'altrp_models.id')
-            ->havingRaw('model_name IS NOT NULL')
+            ->whereNotNull('altrp_models.name')
             ->when(!empty($params), function ($query) use ($params) {
               return $query->whereIn('altrp_queries.model_id', $params);
             })

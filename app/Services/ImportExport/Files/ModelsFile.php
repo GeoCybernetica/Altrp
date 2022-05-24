@@ -108,7 +108,7 @@ class ModelsFile extends ImportExportFile implements IImportExportFile
             ->leftJoin('altrp_models as parent_models', 'altrp_models.parent_model_id', '=', 'parent_models.id')
             ->where("altrp_models.preset", "=", 0)
             ->whereNotIn('altrp_models.name', self::EXCEPT_MODELS)
-            ->havingRaw('table_name IS NOT NULL')
+            ->whereNotNull('tables.name')
             ->when(!empty($params), function ($query) use ($params) {
               return $query->whereIn('altrp_models.id', $params);
             })

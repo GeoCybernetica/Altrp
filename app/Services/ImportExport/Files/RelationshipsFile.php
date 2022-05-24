@@ -104,7 +104,8 @@ class RelationshipsFile extends ImportExportFile implements IImportExportFile
             ->select('altrp_relationships.*', 'models.name as model_name', 'target_models.name as target_model_name' )
             ->leftJoin('altrp_models as models', 'altrp_relationships.model_id', '=', 'models.id')
             ->leftJoin('altrp_models as target_models', 'altrp_relationships.target_model_id', '=', 'target_models.id')
-            ->havingRaw('model_name IS NOT NULL AND target_model_name IS NOT NULL')
+            ->whereNotNull('models.name')
+	    ->whereNotNull('target_models.name')
             ->when(!empty($params), function ($query) use ($params) {
               return $query->whereIn('altrp_relationships.model_id', $params);
             })

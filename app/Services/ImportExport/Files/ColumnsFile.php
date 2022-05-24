@@ -120,7 +120,8 @@ class ColumnsFile extends ImportExportFile implements IImportExportFile
             ->select('altrp_columns.*', 'tables.name as table_name', 'altrp_models.name as model_name')
             ->leftJoin('altrp_models', 'altrp_columns.model_id', '=', 'altrp_models.id')
             ->leftJoin('tables', 'altrp_columns.table_id', '=', 'tables.id')
-            ->havingRaw('table_name IS NOT NULL AND model_name IS NOT NULL')
+            ->whereNotNull('tables.name')
+	    ->whereNotNull('altrp_models.name')
             ->when(!empty($params), function ($query) use ($params) {
               return $query->whereIn('altrp_columns.table_id', $params);
             })
