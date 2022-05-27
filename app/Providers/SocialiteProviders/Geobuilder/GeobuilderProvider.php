@@ -132,9 +132,6 @@ class GeobuilderProvider extends AbstractProvider
         $claims = $this->validateIdToken($token);
 
         $user = $this->mapUserToObject($claims);
-        // $roles = $user->getUserRoles();
-        // print '<pre>'; print_r($roles); die;
-        // $claims['permissions'] = $this->loadPermissions($accessToken, $roles);
         $this->token = $accessToken;
         return $user;
     }
@@ -238,30 +235,28 @@ class GeobuilderProvider extends AbstractProvider
       */
      public function loadPermissions($roles)
      {
-         // print '<pre>'; print_r($roles); die;
          $token = $this->request->input('access_token');
-         $url = 'https://egis-app2.mvk.ru/mvk-egis/integration/authz/permissions'; // TODO: to config
+         $url = $this->getConfig('permissions_url');
          try {
-             $response = $this->getHttpClient()->post($url, [  // $this->getConfig('permissions_url')
+             $response = $this->getHttpClient()->post($url, [
                  'headers' => [
                      'Authorization' => 'Bearer '. $token,
                  ],
                  'json' => $roles,
-                 // 'debug' => true,
              ]);
          } catch (Exception $ex) {
              throw new InvalidStateException("Error getting user permissions. {$ex}");
          }
 
-                   $data = json_decode((string) $response->getBody());
-                   $collection = collect($data->value);
-                   $permissions = $collection->filter(function ($item) {
-                       return $item->access === 1;
-                   })->map(function ($item) {
-                       return $item->operation;
-                   })->all();
-                   // print '<pre>'; print_r($permissions); die;
-                   return $permissions;
+         $data = json_decode((string) $response->getBody());
+         $collection = collect($data->value);
+         $permissions = $collection->filter(function ($item) {
+             return $item->access === 1;
+         })->map(function ($item) {
+             return $item->operation;
+         })->all();
+
+         return $permissions;
      }
 
     /**

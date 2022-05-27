@@ -188,7 +188,6 @@ class User extends Authenticatable
     public function getAllUserRoleNames()
     {
         $roles_ = DB::table('roles')->select('name')->get();
-
         $roles = [];
         if ($roles_) {
           foreach ($roles_ as $key => $role) {
@@ -198,26 +197,19 @@ class User extends Authenticatable
         return $roles;
     }
 
-
-
-        public function setUserRolesByNames($role_names)
-        {
-            // print '<pre>'; print_r($role_names); die;
-
-            DB::table('role_user')->where( 'user_id', $this->id )->delete();
-            $role_ids = DB::table('roles')->whereIn( 'name', $role_names )->select('id')->get();
-            // print '<pre>'; print_r($role_ids); die;
-            $insert_data = $role_ids->map(function ($role) {
-                $row = [
-                    'role_id' => $role->id,
-                    'user_id' => $this->id,
-                    'user_type' => 'user'
-                ];
-                return $row;
-            })->all();
-            // print '<pre>'; print_r($insert_data); die;
-            DB::table('role_user')->insert($insert_data);
-        }
-
+    public function setUserRolesByNames($role_names)
+    {
+        DB::table('role_user')->where( 'user_id', $this->id )->delete();
+        $role_ids = DB::table('roles')->whereIn( 'name', $role_names )->select('id')->get();
+        $insert_data = $role_ids->map(function ($role) {
+            $row = [
+                'role_id' => $role->id,
+                'user_id' => $this->id,
+                'user_type' => 'user'
+            ];
+            return $row;
+        })->all();
+        DB::table('role_user')->insert($insert_data);
+    }
 
 }

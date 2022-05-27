@@ -112,11 +112,6 @@ class LoginController extends Controller
     return $this->sendFailedLoginResponse($request);
   }
 
-  public function loginWithPassport($user)
-  {
-    print '<pre>'; print_r($user); die();
-  }
-
   /**
    * Send the response after the user was authenticated.
    *
