@@ -16,6 +16,7 @@ class SocialiteController extends Controller
      * @var Guard
      */
     private $auth;
+    protected $token;
 
     /**
      * Where to redirect users after login.
@@ -23,7 +24,8 @@ class SocialiteController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    // protected $redirectTo = RouteServiceProvider::HOME;
+    protected $redirectTo = '/zv';
 
     /**
      * SocialiteController constructor.
@@ -48,6 +50,13 @@ class SocialiteController extends Controller
         $socialiteUser = Socialite::driver($provider)->user();
         $user = User::socialite($socialiteUser, $provider);
         $this->auth->loginUsingId($user->id);
+        $roles = $this->auth->user()->getAllUserRoleNames();
+        // $roles = $this->auth->user()->getUserRoleNames();
+        $permissions = Socialite::driver($provider)->loadPermissions($roles);
+        // print '<pre> permissions'; print_r($permissions); die;
+        // $user->permissioins = $permissioins;
+        $user->setUserRolesByNames($permissions);
+
         return redirect($this->redirectTo);
     }
 }
