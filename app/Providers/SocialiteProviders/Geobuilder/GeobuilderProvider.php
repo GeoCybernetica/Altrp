@@ -32,6 +32,7 @@ class GeobuilderProvider extends AbstractProvider
      * @var bool
      */
     protected $stateless = true;
+    protected $token;
 
     /**
      * {@inheritdoc}
@@ -129,8 +130,10 @@ class GeobuilderProvider extends AbstractProvider
         $token = $this->request->input('id_token');
         $accessToken = $this->request->input('token');
         $claims = $this->validateIdToken($token);
-        $laims['permissions'] = $this->loadPermissions($accessToken);
-        return $this->mapUserToObject($claims);
+
+        $user = $this->mapUserToObject($claims);
+        $this->token = $accessToken;
+        return $user;
     }
 
     /**
@@ -230,20 +233,30 @@ class GeobuilderProvider extends AbstractProvider
       * @param  string|null  $state
       * @return array
       */
-     protected function loadPermissions($token)
+     public function loadPermissions($roles)
      {
-         $url = 'https://egis-app2.mvk.ru/mvk-egis/integration/authz/permissions'; // TODO: to config
+         $token = $this->request->input('access_token');
+         $url = $this->getConfig('permissions_url');
          try {
-             $response = $this->getHttpClient()->get($url, [  // $this->getConfig('permissions_url')
+             $response = $this->getHttpClient()->post($url, [
                  'headers' => [
                      'Authorization' => 'Bearer '. $token,
                  ],
+                 'json' => $roles,
              ]);
          } catch (Exception $ex) {
              throw new InvalidStateException("Error getting user permissions. {$ex}");
          }
 
-       return json_decode((string) $response->getBody());
+         $data = json_decode((string) $response->getBody());
+         $collection = collect($data->value);
+         $permissions = $collection->filter(function ($item) {
+             return $item->access === 1;
+         })->map(function ($item) {
+             return $item->operation;
+         })->all();
+
+         return $permissions;
      }
 
     /**

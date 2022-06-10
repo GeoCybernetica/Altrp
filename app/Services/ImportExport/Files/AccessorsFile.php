@@ -100,7 +100,7 @@ class AccessorsFile extends ImportExportFile implements IImportExportFile
         $data = DB::table( 'altrp_accessors' )
             ->select('altrp_accessors.*', 'altrp_models.name as model_name')
             ->leftJoin('altrp_models', 'altrp_accessors.model_id', '=', 'altrp_models.id')
-            ->havingRaw('model_name IS NOT NULL')
+            ->whereNotNull('altrp_models.name')
             ->when(!empty($params), function ($query) use ($params) {
               return $query->whereIn('altrp_accessors.model_id', $params);
             })

@@ -100,7 +100,7 @@ class SQLEditorsFile extends ImportExportFile implements IImportExportFile
         $data = DB::table( 's_q_l_editors' )
             ->select('s_q_l_editors.*', 'altrp_models.name as model_name')
             ->leftJoin('altrp_models', 's_q_l_editors.model_id', '=', 'altrp_models.id')
-            ->havingRaw('model_name IS NOT NULL')
+            ->whereNotNull('altrp_models.name')
             ->when(!empty($params), function ($query) use ($params) {
               return $query->whereIn('s_q_l_editors.id', $params);
             })

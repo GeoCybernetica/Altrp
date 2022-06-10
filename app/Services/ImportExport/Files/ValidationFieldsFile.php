@@ -150,7 +150,7 @@ class ValidationFieldsFile extends ImportExportFile implements IImportExportFile
             ->leftJoin('altrp_sources', 'altrp_validation_fields.source_id', '=', 'altrp_sources.id')
             ->leftJoin('altrp_columns', 'altrp_validation_fields.column_id', '=', 'altrp_columns.id')
             ->leftJoin('altrp_models as altrp_columns_models', 'altrp_columns.model_id', '=', 'altrp_columns_models.id')
-            ->havingRaw('model_name IS NOT NULL')
+            ->whereNotNull('altrp_models.name')
             ->get();
 
         $writer->createJsonFile($path, self::FILENAME, $data->toArray());
